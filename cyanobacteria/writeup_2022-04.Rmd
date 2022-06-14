@@ -35,11 +35,8 @@ We used the `GauseR` package to determine the Lotka-Volterra growth parameters o
 Below, we visualise growth of the the strain populations over time. Each point is the average value of three replicates.
 
 ```{r, plotting-raw-data, fig.width=5, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
-# Data location
-path <- 'C:/Users/mholmes/Documents UNamur/Lab work/03_Experiments/12_2022-01-14_DIVERCE/'
-
 # Load data
-in.data <- readRDS(paste0(path, 'mono_data_clean.RData')) %>%
+in.data <- readRDS('mono_data_clean.RData') %>%
   group_by(strain, treat) %>% # group by strain ID and treatment
   arrange(date.time) %>% # order by sampling time
   mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) %>% #in hours
