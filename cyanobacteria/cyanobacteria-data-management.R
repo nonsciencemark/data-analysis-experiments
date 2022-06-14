@@ -109,7 +109,7 @@ mono.data <- list.files(# list all fcs files
   group_by(Date, strain, treat, repl) # re-group data
 
 varsDf <- mono.data %>%
-  dplyr::select(strain, treat, repl, Date, fcs, clusts, cells.col) %>%
+  #dplyr::select(strain, treat, repl, Date, fcs, clusts, cells.col) %>%
   rowwise %>%
   mutate(fcs = list(data.frame(fcs, 'lab' = clusts@label) %>% 
                        dplyr::filter(lab == cells.col) %>%
@@ -117,7 +117,7 @@ varsDf <- mono.data %>%
 
 fcsVars <- varsDf %>% 
   ungroup %>%
-  dplyr::select(-cells.col, -clusts) %>%
+  dplyr::select(strain, treat, repl, Date, fcs) %>%
   unnest(fcs)
   
 PCA <- prcomp(fcsVars %>% dplyr::select(FSC.HLin:RED.R.HLin),
@@ -181,4 +181,17 @@ ggpubr::ggarrange(
   ncol = 2, widths = c(2,1)
 )
 
+# alpha stuff
+
+traitCompare <- function(y1, y2) {
+  exp(-(y1 - y2)^2)
+}
+
+## only relevant traits
+usefulChannels <- c('FSC.HLin', 'SSC.HLin', 'RED.R.HLin', 'RED.B.HLin', 'YEL.B.HLin')
+
+# GET PARAMETERS AND RELEVENAT CHANNELS AND DO THE TRAIT COMPARE FUNCTION AND STUFF
+
+alphaSelf <- mono.data %>% 
+  dplyr::select(strain, treat, repl, Date, usefulChannels)
 
