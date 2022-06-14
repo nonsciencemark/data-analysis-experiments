@@ -43,31 +43,6 @@ name_match <- function(fixed = NULL,
   return(coef_matrix)
 } 
 
-# Demo data
-fixed <- c(
-  'a22' = gause_wrapper(
-    subset(gause_1934_science_f02_03, Treatment == 'Pa')$Day,                     
-    subset(gause_1934_science_f02_03, Treatment == 'Pa')$Volume_Species2, 
-    doplot = FALSE)$parameter_intervals['a11','mu'],
-  'r2' = gause_wrapper(
-    subset(gause_1934_science_f02_03, Treatment == 'Pa')$Day,                     
-    subset(gause_1934_science_f02_03, Treatment == 'Pa')$Volume_Species2, 
-    doplot = FALSE)$parameter_intervals['r1','mu'],
-  'a11' = gause_wrapper(
-    subset(gause_1934_science_f02_03, Treatment == 'Pc')$Day,                     
-    subset(gause_1934_science_f02_03, Treatment == 'Pc')$Volume_Species1, 
-    doplot = FALSE)$parameter_intervals['a11','mu'],
-  'r1' = gause_wrapper(
-    subset(gause_1934_science_f02_03, Treatment == 'Pc')$Day,                     
-    subset(gause_1934_science_f02_03, Treatment == 'Pc')$Volume_Species1, 
-    doplot = FALSE)$parameter_intervals['r1','mu'])
-  
-time <- gause_1934_science_f02_03$Day
-species <- cbind(
-  'caudatum' = subset(gause_1934_science_f02_03, Treatment == 'Mixture')$Volume_Species1,
-  'aurelia' = subset(gause_1934_science_f02_03, Treatment == 'Mixture')$Volume_Species2)
-logfit = FALSE
-
 # function definition
 gause_wrapper_fixed <- function(time, 
                                 species, 
