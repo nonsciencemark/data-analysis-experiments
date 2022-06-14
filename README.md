@@ -3,6 +3,8 @@ Project repository for the functions used to fit DIVERCE experiment data.
 
 # Files
 1. gause_wrapper_fixed.R: modified version of `gauseR::gause_wrapper()` which allows you to keep some parameters fixed/constant (assuming that they have already been determined) using the `offset` argument in `lm()`. Also should allow you to optimise the fit in log-space or regular-space, according to your needs.
+2. demonstration.Rmd: R Markdown file demonstrating the model-fitting procedure
+3. {system}-writeup.Rmd: R Markdown files for the system (i.e. cyanobacteria or ciliates) trait changes writeup
 
 # Workflow
 1. Try stuff
