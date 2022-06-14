@@ -82,4 +82,4 @@ docs/site/
 Manifest.toml
 
 # Projects
-.Rproj
+*.Rproj
