@@ -11,14 +11,66 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-# Packages
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin pulvinar tellus mollis feugiat efficitur. Etiam porttitor risus vel massa porta suscipit. Integer rutrum, nisl sit amet vestibulum laoreet, ipsum odio auctor mauris, vel vestibulum libero elit ut nibh. Curabitur vitae efficitur ex, eu tempus mi. Nunc laoreet maximus ligula, ac tempus dolor porttitor vitae. Proin vel lacus sed eros vestibulum gravida nec sit amet neque. Mauris scelerisque ante in ante faucibus volutpat. Nullam quis velit et arcu sodales cursus. Nullam dolor ligula, blandit eu tincidunt quis, imperdiet a purus. Integer vel risus in eros malesuada pulvinar. Sed bibendum molestie bibendum. Nunc non ex leo. Proin congue erat in justo iaculis, in sodales erat aliquet.
+
+# Setup
+
+## Packages
 
 ```{r packages, message=FALSE, warning=FALSE}
+# tidyverse for ggplot and general data manipulation
 if (!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
+# deSolve for ODE solving and simulations
 if (!require(deSolve)) install.packages('deSolve'); library(deSolve)
+# gauseR for base fitting functions and test data
 if (!require(gauseR)) install.packages('gauseR'); library(gauseR)
 ```
 
-# Source functions
+## Source functions and generate data
+
+```{r sourcing}
+source('gause_wrapper_fixed.R') # these are the functions
+
+# load data
+pairData <- gause_1934_science_f02_03 %>% # shorter name because whhhyyy
+  dplyr::select(-Paper, -Figure) # don't need these
+
+# parameters
+
+## calculate fixed species parameters
+## we assume that a11, a22, r1, and r2 are fixed
+fixed <- c(
+  'a22' = gause_wrapper(
+    subset(pairData, Treatment == 'Pa')$Day,                     
+    subset(pairData, Treatment == 'Pa')$Volume_Species2, 
+    doplot = FALSE)$parameter_intervals['a11','mu'],
+  'r2' = gause_wrapper(
+    subset(pairData, Treatment == 'Pa')$Day,                     
+    subset(pairData, Treatment == 'Pa')$Volume_Species2, 
+    doplot = FALSE)$parameter_intervals['r1','mu'],
+  'a11' = gause_wrapper(
+    subset(pairData, Treatment == 'Pc')$Day,                     
+    subset(pairData, Treatment == 'Pc')$Volume_Species1, 
+    doplot = FALSE)$parameter_intervals['a11','mu'],
+  'r1' = gause_wrapper(
+    subset(pairData, Treatment == 'Pc')$Day,                     
+    subset(pairData, Treatment == 'Pc')$Volume_Species1, 
+    doplot = FALSE)$parameter_intervals['r1','mu'])
+
+time <- pairData$Day # time steps
+
+species <- cbind( # species pairs population data
+  
+  'caudatum' = subset(pairData, Treatment == 'Mixture')$Volume_Species1,
+  'aurelia' = subset(pairData, Treatment == 'Mixture')$Volume_Species2)
+
+logfit = FALSE # do we fit in log-space?
+```
 
 # Demonstration
+
+```{r demonstration-1}
+
+
+
+```
