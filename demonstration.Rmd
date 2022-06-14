@@ -1,0 +1,24 @@
+---
+title: "Data Analysis Demonstration"
+author: "Mark Holmes"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+# Packages
+
+```{r packages, message=FALSE, warning=FALSE}
+if (!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
+if (!require(deSolve)) install.packages('deSolve'); library(deSolve)
+if (!require(gauseR)) install.packages('gauseR'); library(gauseR)
+```
+
+# Source functions
+
+# Demonstration

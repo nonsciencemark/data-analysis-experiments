@@ -83,3 +83,7 @@ Manifest.toml
 
 # Projects
 *.Rproj
+
+# R Markdown outputs
+*.pdf
+*.html
