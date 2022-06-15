@@ -215,5 +215,21 @@ gause_wrapper_fixed <- function(time,
   names(modList) <- spname
 
   # TODO CONTINUE THIS!!!
+  # 
+  # fisher_info <- unname(solve(-optout$hessian))
+  # optout$par_sd <- sqrt(abs(diag(fisher_info)))
+  # parm_signs_sp <- c(rep(1, ncol(opt_data) - 1), parm_signs)
+  # parameter_intervals <- data.frame(lower_sd = numeric(length(parm_signs_sp)), 
+  #                                   mu = numeric(length(parm_signs_sp)), upper_sd = numeric(length(parm_signs_sp)))
+  # parameter_intervals[parm_signs_sp != 0, ] <- data.frame(lower_sd = exp(optout$par - 
+  #                                                                          optout$par_sd) * parm_signs_sp[parm_signs_sp != 0], 
+  #                                                         mu = exp(optout$par) * parm_signs_sp[parm_signs_sp != 
+  #                                                                                                0], upper_sd = exp(optout$par + optout$par_sd) * 
+  #                                                           parm_signs_sp[parm_signs_sp != 0])
+  # tmp1 <- parameter_intervals$lower_sd
+  # tmp2 <- parameter_intervals$upper_sd
+  # ps <- which(parameter_intervals$lower_sd > parameter_intervals$upper_sd)
+  # parameter_intervals$lower_sd[ps] <- tmp2[ps]
+  # parameter_intervals$upper_sd[ps] <- tmp1[ps]
   
 }

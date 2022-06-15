@@ -19,11 +19,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin pulvinar tellus m
 
 ```{r packages, message=FALSE, warning=FALSE}
 # tidyverse for ggplot and general data manipulation
-if (!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
+if (!require('tidyverse')) install.packages('tidyverse'); library('tidyverse')
 # deSolve for ODE solving and simulations
-if (!require(deSolve)) install.packages('deSolve'); library(deSolve)
+if (!require('deSolve')) install.packages('deSolve'); library('deSolve')
 # gauseR for base fitting functions and test data
-if (!require(gauseR)) install.packages('gauseR'); library(gauseR)
+if (!require('gauseR')) install.packages('gauseR'); library('gauseR')
 ```
 
 ## Source functions and generate data
@@ -64,7 +64,7 @@ species <- cbind( # species pairs population data
   'caudatum' = subset(pairData, Treatment == 'Mixture')$Volume_Species1,
   'aurelia' = subset(pairData, Treatment == 'Mixture')$Volume_Species2)
 
-logfit = FALSE # do we fit in log-space?
+logfit = TRUE # do we fit in log-space?
 ```
 
 # Demonstration
