@@ -43,6 +43,48 @@ name_match <- function(fixed = NULL,
   return(coef_matrix)
 } 
 
+# function to optimise in the log-space ripped straight from gauseR and modified a bit
+lv_log_optim <- function (pars, opt_data, parm_signs, odefun = lv_interaction_log) {
+  #' @title lv_log_optim
+  #' 
+  #' @description A slightly modified copy of the lv_optim from gauseR to 
+  #' optimise the data in the log-space rather than normal space
+  #' 
+  #' @param pars A vector of parameter values in log space to be optimized. 
+  #' Must include a logged starting abundance for each species, followed by the
+  #' logged absolute values of the growth rates, followed by the logged 
+  #' absolute value of the elements of the interaction matrix
+  #' @param opt_data Abundance data for optimization. Must include one column 
+  #' labeled 'time' with time steps, and a column for each species abundance.
+  #' @param parm_signs A vector that provides the desired sign of each parameter 
+  #' (i.e. -1 or 1). If value is zero, then the term is held at zero (but 
+  #' should be left out of the pars vector).
+  #' @param odefun The function to use to simulate the ODE - defaults to 
+  #' lv_interaction_log
+  #' 
+  #' @return Squared error between model fits for given parameter values 
+  #' and observations
+  
+  nsp <- ncol(opt_data) - 1
+  logn0 <- pars[1:nsp]
+  logparms <- pars[-c(1:nsp)]
+  n0 <- exp(logn0)
+  times <- opt_data$time
+  par_opt_use <- numeric(length(parm_signs))
+  par_opt_use[parm_signs != 0] <- exp(logparms) * parm_signs[parm_signs != 
+                                                               0]
+  out <- deSolve::ode(y = log(n0), times = times, func = odefun, 
+                      parms = par_opt_use)
+  predictions <- (out[, -1, drop = FALSE])
+  observations <- log(opt_data[, -1, drop = FALSE])
+  for (i in 1:ncol(observations)) {
+    mo <- mean(observations[, i], na.rm = T)
+    predictions[, i] <- predictions[, i]/mo
+    observations[, i] <- observations[, i]/mo
+  }
+  return(sum((predictions - observations)^2, na.rm = T))
+}
+
 # function definition
 gause_wrapper_fixed <- function(time, 
                                 species, 
