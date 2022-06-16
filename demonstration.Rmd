@@ -35,8 +35,6 @@ source('gause_wrapper_fixed.R') # these are the functions
 pairData <- gause_1934_science_f02_03 %>% # shorter name because whhhyyy
   dplyr::select(-Paper, -Figure) # don't need these
 
-# parameters
-
 ## calculate fixed species parameters
 ## we assume that a11, a22, r1, and r2 are fixed
 fixed <- c(
@@ -57,7 +55,7 @@ fixed <- c(
     subset(pairData, Treatment == 'Pc')$Volume_Species1, 
     doplot = FALSE)$parameter_intervals['r1','mu'])
 
-time <- pairData$Day # time steps
+time <- subset(pairData, Treatment == 'Pc')$Day # time steps
 
 species <- cbind( # species pairs population data
   
@@ -65,6 +63,9 @@ species <- cbind( # species pairs population data
   'aurelia' = subset(pairData, Treatment == 'Mixture')$Volume_Species2)
 
 logfit = TRUE # do we fit in log-space?
+
+# parameters
+real_pars <- gause_wrapper(time = time, species = as.data.frame(species), doopt = T)
 ```
 
 # Demonstration

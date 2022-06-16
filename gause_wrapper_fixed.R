@@ -44,7 +44,7 @@ name_match <- function(fixed = NULL,
 } 
 
 # function to optimise in the log-space ripped straight from gauseR and modified a bit
-lv_log_optim <- function (pars, opt_data, parm_signs, odefun = lv_interaction_log) {
+lv_log_optim <- function (pars, opt_data, parm_signs, odefun = lv_interaction_log, fixed) {
   #' @title lv_log_optim
   #' 
   #' @description A slightly modified copy of the lv_optim from gauseR to 
@@ -61,6 +61,9 @@ lv_log_optim <- function (pars, opt_data, parm_signs, odefun = lv_interaction_lo
   #' should be left out of the pars vector).
   #' @param odefun The function to use to simulate the ODE - defaults to 
   #' lv_interaction_log
+  #' @param fixed A named vector with named elements, indicating model
+  #'  parameters to be fixed. Intrinsic growth rates are denoted as r1, r2, etc. 
+  #'  and species interaction coefficients are denoted as a11, a12, a22, etc.
   #' 
   #' @return Squared error between model fits for given parameter values 
   #' and observations
@@ -213,7 +216,9 @@ gause_wrapper_fixed <- function(time,
   
   # now we need to optimise to fit the growth data
   names(modList) <- spname
-
+  
+  
+  
   # TODO CONTINUE THIS!!!
   # 
   # fisher_info <- unname(solve(-optout$hessian))

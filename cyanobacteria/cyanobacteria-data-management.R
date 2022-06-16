@@ -18,11 +18,11 @@ cluster_library(cluster, "gauseR")
 cluster_library(cluster, "PeacoQC")
 
 # source useful R files
-source('C:/Users/mholmes/Documents UNamur/Personnel/flowClust_cluster.R')
-source('C:/Users/mholmes/Documents UNamur/Personnel/flowCore_get_datasets.R')
-source('C:/Users/mholmes/Documents UNamur/Personnel/CytoTree_ExprsMerge.R')
-cluster_send(cluster, source('C:/Users/mholmes/Documents UNamur/Personnel/flowClust_cluster.R'))
-cluster_send(cluster, source('C:/Users/mholmes/Documents UNamur/Personnel/flowCore_get_datasets.R'))
+source('C:/Users/mholmes/Documemts UNamur/Personnel/flowClust_cluster.R')
+source('C:/Users/mholmes/Documemts UNamur/Personnel/flowCore_get_datasets.R')
+source('C:/Users/mholmes/Documemts UNamur/Personnel/CytoTree_ExprsMerge.R')
+cluster_send(cluster, source('C:/Users/mholmes/Documemts UNamur/Personnel/flowClust_cluster.R'))
+cluster_send(cluster, source('C:/Users/mholmes/Documemts UNamur/Personnel/flowCore_get_datasets.R'))
 
 # send cytometer varnames to clusters
 varnames <- c("FSC.HLin","SSC.HLin","GRN.B.HLin","YEL.B.HLin","RED.B.HLin",
