@@ -34,23 +34,29 @@ We used the `GauseR` package to determine the Lotka-Volterra growth parameters o
 ## Species growth
 Below, we visualise growth of the the strain populations over time. Each point is the average value of three replicates.
 
-```{r, plotting-raw-data, fig.width=5, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
+```{r, plotting-raw-data, fig.width=10, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
 # Load data
-in.data <- readRDS('mono_data_clean.RData') %>%
+in.data <- readRDS('C:/Users/mholmes/Documemts UNamur/Lab work/03_Experiments/15_2022-06_DIVERCE/mono_data_clean.RData') %>% #readRDS('mono_data_clean.RData') %>%
   group_by(strain, treat) %>% # group by strain ID and treatment
   arrange(date.time) %>% # order by sampling time
-  mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) %>% #in hours
-  dplyr::filter(treat == 'T' | treat == 'AT') %>% # remove extra treatments
-  mutate(treat = recode(treat, 'T' = 'Control', 'AT' = 'Atrazine'), # Rename treatment levels
-         treat = as.factor(treat),
-         treat = relevel(treat, 'Control', 'Atrazine'))
+  mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) #%>% #in hours
+  #dplyr::filter(treat == 'T' | treat == 'AT') %>% # remove extra treatments
+  #mutate(treat = recode(treat, 'T' = 'Control', 'AT' = 'Atrazine'), # Rename treatment levels
+  #       treat = as.factor(treat),
+  #       treat = relevel(treat, 'Control', 'Atrazine'))
 
 # View raw data
-ggplot(in.data, aes(x = date.time, y = population, col = strain)) + 
-  facet_wrap(strain~treat, scales = 'free_y', nrow = 4, 
+ggplot(in.data %>% dplyr::filter(date > '2022-06-17'), 
+       aes(x = date, y = population, col = strain)) + 
+  facet_wrap(treat~., scales = 'free_y', nrow = 2, 
              labeller = label_wrap_gen(multi_line=FALSE)) +
-  geom_line() + 
-  geom_point(pch = 21, fill = 'white', size = 2) +
+  # geom_line() + 
+  scale_y_log10() +
+  #geom_point(pch = 21, fill = 'white', size = 2) +
+  geom_line(position = position_dodge(.5)) +
+  geom_pointrange(aes(ymin = population - population.se, 
+                      ymax = population + population.se), 
+                  pch = 21, fill = 'white', position = position_dodge(.5)) +
   theme_bw() +
   labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
   theme(legend.position = 'bottom')
@@ -59,7 +65,7 @@ ggplot(in.data, aes(x = date.time, y = population, col = strain)) +
 ## Lotka-Volterra model fitting using GauseR
 We now fit a Lotka-Volterra population model to the data, to determine the intrinsic growth rates and self-interaction parameters ($r$ and $a$, respectively).
 
-```{r, fitting-parameters, fig.width=5, fig.height=8, fig.cap="Prediction of fitted Lotka-Volterra model"}
+```{r, fitting-parameters, fig.width=10, fig.height=8, fig.cap="Prediction of fitted Lotka-Volterra model"}
 # model fitting
 mod <- in.data %>%
   summarise(gause.fit = list(gause_wrapper( # gauseR function
@@ -87,6 +93,7 @@ out.data <- pred.data %>%
 ggplot(out.data, aes(x = date.time, col = strain)) + 
   facet_wrap(strain~treat, scales = 'free_y', nrow = 4, 
              labeller = label_wrap_gen(multi_line=FALSE)) +
+  scale_y_log10() +
   geom_line(aes(y = prediction), lty = 2) +
   geom_point(aes(y = population), pch = 21, fill = 'white', size = 2) +
   theme_bw() +
@@ -117,7 +124,7 @@ ggplot(CoD.data, aes(x = strain, y = R2, pch = treat, col = strain)) +
   labs(x = 'Coefficient of variation (CV) of trait values', 
        y = 'Coefficient of determination\nof model fit',
        pch = 'Treatment', col = 'Strain') +
-  scale_shape_manual(values = c(21, 24)) +
+  scale_shape_manual(values = 21:24) +
   theme(strip.placement = "outside", 
         strip.background = element_rect(fill = "white", linetype = 0), 
         axis.title.x = element_blank(), 
@@ -125,6 +132,22 @@ ggplot(CoD.data, aes(x = strain, y = R2, pch = treat, col = strain)) +
 ```
 
 We can see that the model fit is mostly good except for strain 2383 in atrazine conditions.
+
+```{r}
+in.data %>% dplyr::filter(date > '17-06-2022') %>%
+  mutate(lag.pop = get_lag(population, date.time),
+                   PCGR = percap_growth(lag.pop$x, lag.pop$laggedx, lag.pop$dt)) %>%
+  ggplot(aes(x = lag(population), y = PCGR, col = strain)) + 
+  facet_wrap(strain~treat, scales = 'free', nrow = 4,
+             labeller = label_wrap_gen(multi_line=FALSE)) +
+  scale_x_log10() +
+  geom_point(pch = 21, fill = 'white', size = 2) +
+  theme_bw() +
+  #labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
+  theme(legend.position = 'bottom')
+
+```
+
 
 ### Accuracy and traits
 What if the loss of model accuracy is due to functional trait changes? Let's first view the relevant ones...
@@ -154,7 +177,7 @@ ggplot(trait.time, aes(x = date.time, y = value, col = strain, pch = treat)) +
   geom_line() +
   geom_point(size = 2, fill = 'white') +
   theme_bw() +
-  scale_shape_manual(values = c(21, 24)) +
+  scale_shape_manual(values = c(21, 22, 23, 24)) +
   labs(col = 'Strain', x = 'Time (hours)', y = 'Trait value') +
   theme(legend.position = 'bottom')
 ```
@@ -173,7 +196,7 @@ ggplot(trait.change, aes(x = strain, y = change, col = strain, pch = treat)) +
   geom_hline(lty = 2, yintercept = 0)+
   geom_point(size = 2) +
   theme_bw() +
-  scale_shape_manual(values = c(21, 24)) +
+  scale_shape_manual(values = 21:24) +
   theme(legend.position = 'bottom')
 ```
 
@@ -190,7 +213,7 @@ ggplot(CoD.traits, aes(x = change, y = R2, col = strain, pch = treat)) +
   geom_vline(xintercept = 0, lty = 2) +
   geom_point(size = 2, fill = 'white') +
   theme_bw() +
-  scale_shape_manual(values = c(21, 24)) +
+  scale_shape_manual(values = 21:24) +
   scale_y_continuous(limits = c(.75, 1)) +
   theme(legend.position = 'bottom')
 ```
@@ -209,11 +232,12 @@ mod.df <- mod %>%
   pivot_longer(r:aii, names_to = 'Parameter')
 
 # plot
-ggplot(mod.df, aes(x = strain, y = value, col = strain)) +
+ggplot(mod.df, aes(x = strain, y = value, col = strain, pch = treat)) +
   facet_wrap(Parameter~., scales = 'free_y') +
-  geom_path(lty = 2) +
-  geom_point(aes(pch = treat), size = 2, fill = 'white') +
-  scale_shape_manual(values = c(21, 24)) +
+  geom_path(lty = 2, position = position_dodge(.5)) +
+  geom_point(size = 2, fill = 'white', 
+             position = position_dodge(.5)) +
+  scale_shape_manual(values = 21:24) +
   theme_bw() +
   theme(legend.position = 'bottom')
 ```
@@ -233,7 +257,7 @@ ggplot(mod.traits, aes(x = Channel.value, y = Parameter.value, col = strain)) +
   scale_y_continuous(trans = 'pseudo_log') +
   geom_path(lty = 2) +
   geom_point(aes(pch = treat), size = 2, fill = 'white') +
-  scale_shape_manual(values = c(21, 24)) +
+  scale_shape_manual(values = 21:24) +
   theme_bw() +
   theme(legend.position = 'bottom')
 ```
@@ -243,6 +267,9 @@ ggplot(mod.traits, aes(x = Channel.value, y = Parameter.value, col = strain)) +
 We want the starting trait value on the x vs the change in a, K, r on the y axis
 
 ```{r, diff-traits-growth-par}
+
+# FIXME
+
 # calculate change in parameters
 traits.start <- trait.time %>%
   dplyr::filter(treat == 'Control', date == min(date)) %>%
@@ -251,8 +278,8 @@ traits.start <- trait.time %>%
 
 dpar <- mod.df %>%
   group_by(strain, Parameter) %>%
-  summarise(Parameter.control = value[treat == 'Control'],
-            Parameter.atr  = value[treat == 'Atrazine'],
+  summarise(Parameter.control = value[treat == 'C'],
+            Parameter.atr = value[treat == 'A'],
             Parameter.change = (Parameter.atr)/Parameter.control) %>%
   full_join(traits.start)
 
