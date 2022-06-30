@@ -36,22 +36,24 @@ Below, we visualise growth of the the strain populations over time. Each point i
 
 ```{r, plotting-raw-data, fig.width=10, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
 # Load data
-in.data <- readRDS('C:/Users/mholmes/Documents UNamur/Lab work/03_Experiments/15_2022-06_DIVERCE/mono_data_clean.RData') %>%
+mono.data <- read.csv('cyanobacteria/mono_data.csv') %>%
   group_by(strain, treat) %>% # group by strain ID and treatment
-  arrange(date.time) %>% # order by sampling time
-  mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) #in hours
+  mutate(date.time = date.time %>% as.POSIXct %>% as.numeric, # convert to good format
+         date.time = (date.time - min(date.time)) / 3600, #in hours
+         strain = as.factor(strain)) %>%
+   arrange(date.time) # order by sampling time
 
 # View raw data
-ggplot(in.data, aes(x = date, y = population, col = strain)) + 
+ggplot(mono.data, aes(x = as.POSIXct(date), y = population, col = strain)) + 
   facet_wrap(treat~., scales = 'free_y', nrow = 2, 
-             labeller = label_wrap_gen(multi_line=FALSE)) +
-  # geom_line() + 
-  #geom_point(pch = 21, fill = 'white', size = 2) +
-  scale_y_log10() +
+             labeller = label_wrap_gen(multi_line = FALSE)) +
+    scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
+                labels = trans_format('log10', scales::math_format(10^.x))) +
   geom_line(position = position_dodge(.5)) +
-  geom_pointrange(aes(ymin = population - population.se, 
-                      ymax = population + population.se), 
-                  pch = 21, fill = 'white', position = position_dodge(.5)) +
+  geom_pointrange(aes(
+    ymin = population - population.se, 
+    ymax = population + population.se), 
+    pch = 21, fill = 'white', position = position_dodge(.5)) +
   theme_bw() +
   labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
   theme(legend.position = 'bottom')
@@ -62,7 +64,7 @@ We now fit a Lotka-Volterra population model to the data, to determine the intri
 
 ```{r, fitting-parameters, fig.width=10, fig.height=8, fig.cap="Prediction of fitted Lotka-Volterra model"}
 # model fitting
-mod <- in.data %>%
+mod <- mono.data %>%
   summarise(gause.fit = list(gause_wrapper( # gauseR function
     time = date.time, # sampling intervals
     species = population, # population densities
@@ -81,7 +83,7 @@ pred.data <- mod %>%
   rename(date.time = time, prediction = `1`) # rename columns
 
 out.data <- pred.data %>% 
-  full_join(in.data) %>%
+  full_join(mono.data) %>%
   mutate(d.pred = abs(prediction - population))
 
 # plot
@@ -129,7 +131,7 @@ ggplot(CoD.data, aes(x = strain, y = R2, pch = treat, col = strain)) +
 We can see that the model fit is mostly good except for strain 2383 in atrazine conditions.
 
 ```{r}
-in.data %>% dplyr::filter(date > '17-06-2022') %>%
+mono.data %>% dplyr::filter(date > '17-06-2022') %>%
   mutate(lag.pop = get_lag(population, date.time),
                    PCGR = percap_growth(lag.pop$x, lag.pop$laggedx, lag.pop$dt)) %>%
   ggplot(aes(x = lag(population), y = PCGR, col = strain)) + 
