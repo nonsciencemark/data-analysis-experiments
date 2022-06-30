@@ -36,23 +36,18 @@ Below, we visualise growth of the the strain populations over time. Each point i
 
 ```{r, plotting-raw-data, fig.width=10, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
 # Load data
-in.data <- readRDS('C:/Users/mholmes/Documemts UNamur/Lab work/03_Experiments/15_2022-06_DIVERCE/mono_data_clean.RData') %>% #readRDS('mono_data_clean.RData') %>%
+in.data <- readRDS('C:/Users/mholmes/Documents UNamur/Lab work/03_Experiments/15_2022-06_DIVERCE/mono_data_clean.RData') %>%
   group_by(strain, treat) %>% # group by strain ID and treatment
   arrange(date.time) %>% # order by sampling time
-  mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) #%>% #in hours
-  #dplyr::filter(treat == 'T' | treat == 'AT') %>% # remove extra treatments
-  #mutate(treat = recode(treat, 'T' = 'Control', 'AT' = 'Atrazine'), # Rename treatment levels
-  #       treat = as.factor(treat),
-  #       treat = relevel(treat, 'Control', 'Atrazine'))
+  mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) #in hours
 
 # View raw data
-ggplot(in.data %>% dplyr::filter(date > '2022-06-17'), 
-       aes(x = date, y = population, col = strain)) + 
+ggplot(in.data, aes(x = date, y = population, col = strain)) + 
   facet_wrap(treat~., scales = 'free_y', nrow = 2, 
              labeller = label_wrap_gen(multi_line=FALSE)) +
   # geom_line() + 
-  scale_y_log10() +
   #geom_point(pch = 21, fill = 'white', size = 2) +
+  scale_y_log10() +
   geom_line(position = position_dodge(.5)) +
   geom_pointrange(aes(ymin = population - population.se, 
                       ymax = population + population.se), 
@@ -93,7 +88,7 @@ out.data <- pred.data %>%
 ggplot(out.data, aes(x = date.time, col = strain)) + 
   facet_wrap(strain~treat, scales = 'free_y', nrow = 4, 
              labeller = label_wrap_gen(multi_line=FALSE)) +
-  scale_y_log10() +
+  #scale_y_log10() +
   geom_line(aes(y = prediction), lty = 2) +
   geom_point(aes(y = population), pch = 21, fill = 'white', size = 2) +
   theme_bw() +
@@ -194,7 +189,7 @@ trait.change <- trait.time %>%
 ggplot(trait.change, aes(x = strain, y = change, col = strain, pch = treat)) +
   facet_wrap(.~Channel) +
   geom_hline(lty = 2, yintercept = 0)+
-  geom_point(size = 2) +
+  geom_point(size = 2, position = position_dodge(width = .5)) +
   theme_bw() +
   scale_shape_manual(values = 21:24) +
   theme(legend.position = 'bottom')
@@ -214,7 +209,7 @@ ggplot(CoD.traits, aes(x = change, y = R2, col = strain, pch = treat)) +
   geom_point(size = 2, fill = 'white') +
   theme_bw() +
   scale_shape_manual(values = 21:24) +
-  scale_y_continuous(limits = c(.75, 1)) +
+  #scale_y_continuous(limits = c(.75, 1)) +
   theme(legend.position = 'bottom')
 ```
 
@@ -234,7 +229,6 @@ mod.df <- mod %>%
 # plot
 ggplot(mod.df, aes(x = strain, y = value, col = strain, pch = treat)) +
   facet_wrap(Parameter~., scales = 'free_y') +
-  geom_path(lty = 2, position = position_dodge(.5)) +
   geom_point(size = 2, fill = 'white', 
              position = position_dodge(.5)) +
   scale_shape_manual(values = 21:24) +
@@ -255,7 +249,8 @@ mod.traits <- trait.time %>%
 ggplot(mod.traits, aes(x = Channel.value, y = Parameter.value, col = strain)) +
   facet_grid(Parameter~Channel, scales = 'free') +
   scale_y_continuous(trans = 'pseudo_log') +
-  geom_path(lty = 2) +
+  #geom_path(lty = 2) +
+  geom_smooth(method = 'glm') +
   geom_point(aes(pch = treat), size = 2, fill = 'white') +
   scale_shape_manual(values = 21:24) +
   theme_bw() +
@@ -266,376 +261,363 @@ ggplot(mod.traits, aes(x = Channel.value, y = Parameter.value, col = strain)) +
 
 We want the starting trait value on the x vs the change in a, K, r on the y axis
 
-```{r, diff-traits-growth-par}
+<!-- ```{r, diff-traits-growth-par} -->
 
-# FIXME
+<!-- # FIXME -->
 
-# calculate change in parameters
-traits.start <- trait.time %>%
-  dplyr::filter(treat == 'Control', date == min(date)) %>%
-  rename(Channel.value = value) %>%
-  dplyr::select(-treat, -date.time, -prediction, -date, -population, -pop.vec, -d.pred)
+<!-- # calculate change in parameters -->
+<!-- traits.start <- trait.time %>% -->
+<!--   dplyr::filter(treat == 'Control', date == min(date)) %>% -->
+<!--   rename(Channel.value = value) %>% -->
+<!--   dplyr::select(-treat, -date.time, -prediction, -date, -population, -pop.vec, -d.pred) -->
 
-dpar <- mod.df %>%
-  group_by(strain, Parameter) %>%
-  summarise(Parameter.control = value[treat == 'C'],
-            Parameter.atr = value[treat == 'A'],
-            Parameter.change = (Parameter.atr)/Parameter.control) %>%
-  full_join(traits.start)
+<!-- dpar <- mod.df %>% -->
+<!--   group_by(strain, Parameter) %>% -->
+<!--   summarise(Parameter.control = value[treat == 'C'], -->
+<!--             Parameter.atr = value[treat == 'A'], -->
+<!--             Parameter.change = (Parameter.atr)/Parameter.control) %>% -->
+<!--   full_join(traits.start) -->
 
-# plot 
-ggplot(dpar, aes(x = Channel.value, y = Parameter.change, col = strain)) +
-  facet_grid(Parameter~Channel, scale = 'free') +
-  geom_hline(yintercept = 1, lty = 2) +
-  geom_point(size = 2, fill = 'white', pch = 21) +
-  theme_bw()
-```
-
-Let's try without that outlier
-
-```{r}
-# plot 
-ggplot(dpar %>% dplyr::filter(!(strain == 2383 & Parameter == 'aii')), 
-       aes(x = Channel.value, y = Parameter.change, col = strain)) +
-  facet_grid(Parameter~Channel, scale = 'free') +
-  geom_hline(yintercept = 1, lty = 2) +
-  geom_point(size = 2, fill = 'white', pch = 21) +
-  theme_bw() + 
-  labs()
-```
+<!-- # plot  -->
+<!-- ggplot(dpar, aes(x = Channel.value, y = Parameter.change, col = strain)) + -->
+<!--   facet_grid(Parameter~Channel, scale = 'free') + -->
+<!--   geom_hline(yintercept = 1, lty = 2) + -->
+<!--   geom_point(size = 2, fill = 'white', pch = 21) + -->
+<!--   theme_bw() -->
+<!-- ``` -->
 
 
-# Does the presence of competitors affect trait changes?
-## Strain pairs
-```{r, pairwise-plotting-raw-data, fig.width=5, fig.height=10}
-# import data
-pair.df <- readRDS('C:/Users/mholmes/Documents UNamur/Lab work/03_Experiments/12_2022-01-14_DIVERCE/pair_data_clean.RData') %>%
-  group_by(strains, treat) %>%
-  arrange(date.time) %>%
-  mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) %>% #in hours
-  dplyr::filter(treat == 'T' | treat == 'AT') %>% # remove extra treatments
-  mutate(treat = recode(treat, 'T' = 'Control', 'AT' = 'Atrazine'), # Rename treatment levels
-         treat = as.factor(treat),
-         treat = relevel(treat, 'Control', 'Atrazine'))
+<!-- # Does the presence of competitors affect trait changes? -->
+<!-- ## Strain pairs -->
+<!-- ```{r, pairwise-plotting-raw-data, fig.width=5, fig.height=10} -->
+<!-- # import data -->
+<!-- pair.df <- readRDS('C:/Users/mholmes/Documents UNamur/Lab work/03_Experiments/12_2022-01-14_DIVERCE/pair_data_clean.RData') %>% -->
+<!--   group_by(strains, treat) %>% -->
+<!--   arrange(date.time) %>% -->
+<!--   mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) %>% #in hours -->
+<!--   dplyr::filter(treat == 'T' | treat == 'AT') %>% # remove extra treatments -->
+<!--   mutate(treat = recode(treat, 'T' = 'Control', 'AT' = 'Atrazine'), # Rename treatment levels -->
+<!--          treat = as.factor(treat), -->
+<!--          treat = relevel(treat, 'Control', 'Atrazine')) -->
 
-# plot
-ggplot(pair.df, aes(x = date.time)) + 
-  facet_wrap(strains~treat, scales = 'free', ncol = 2, 
-             labeller = label_wrap_gen(multi_line=FALSE)) +
-  geom_line(aes(y = population.1, col = strain.1)) +
-  geom_line(aes(y = population.2, col = strain.2)) +
-  geom_point(aes(y = population.1, col = strain.1),
-             pch = 21, fill = 'white', size = 2) +
-  geom_point(aes(y = population.2, col = strain.2),
-             pch = 21, fill = 'white', size = 2) +
-  theme_bw() +
-  theme(legend.position = 'bottom')
-```
-
-
-## Lotka-Volterra model fitting using GauseR
-We now fit a Lotka-Volterra population model to the data, to determine the intrinsic growth rates and self/inter-interaction parameters ($r$ and $a$, respectively).
-
-```{r, pair-fitting-parameters, fig.width=5, fig.height=10, fig.cap="Prediction of fitted Lotka-Volterra model"}
-
-## fit
-pair.mod <- pair.df %>%
-  ungroup %>%
-  arrange(strains, treat, date.time) %>%
-  group_by(strains, treat) %>%
-  summarise(gause.fit = tryCatch(list(gause_wrapper(
-        r_starting = rep(5e-2, 2),
-        A_starting = rep(-5e-7, 4),
-        time = date.time,
-        species = data.frame(population.1, population.2),
-        doplot = FALSE,
-        keeptimes = TRUE)),
-      error = function(e) {NULL}),
-    strain.1 = strain.1[1],
-    strain.2 = strain.2[1])
-
-pair.pred <- pair.mod %>% 
-  ungroup %>% 
-  rowwise %>% 
-  dplyr::filter(length(gause.fit) != 1) %>%
-  mutate(pred = list(as.data.frame(gause.fit$out))) %>%
-  dplyr::select(strains, treat, pred) %>% 
-  unnest(pred) %>%
-  rename(date.time = time, prediction.1 = population.1, prediction.2 = population.2)
-
-pair.out <- pair.pred %>% 
-  full_join(pair.df) %>%
-  mutate(d.pred.1 = abs(prediction.1 - population.1),
-         d.pred.2 = abs(prediction.2 - population.2),
-         treat = recode(treat, 'T' = 'Control', 'AT' = 'Atrazine'),
-         treat = as.factor(treat),
-         treat = relevel(treat, 'Control', 'Atrazine'))
-
-# plot
-ggplot(pair.out, aes(x = date.time, pch = treat)) + 
-  facet_wrap(strains~treat, scales = 'free', ncol = 2,
-             labeller = label_wrap_gen(multi_line=FALSE)) +
-  geom_line(aes(y = prediction.1, col = strain.1), lty = 2) +
-  geom_line(aes(y = prediction.2, col = strain.2), lty = 2) +
-  geom_point(aes(y = population.1, col = strain.1),
-             fill = 'white', size = 2) +
-  geom_point(aes(y = population.2, col = strain.2), 
-             fill = 'white', size = 2) +
-  theme_bw() +
-  scale_shape_manual(values = c(21, 24))+
-  labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
-  theme(legend.position = 'bottom')
-
-```
+<!-- # plot -->
+<!-- ggplot(pair.df, aes(x = date.time)) +  -->
+<!--   facet_wrap(strains~treat, scales = 'free', ncol = 2,  -->
+<!--              labeller = label_wrap_gen(multi_line=FALSE)) + -->
+<!--   geom_line(aes(y = population.1, col = strain.1)) + -->
+<!--   geom_line(aes(y = population.2, col = strain.2)) + -->
+<!--   geom_point(aes(y = population.1, col = strain.1), -->
+<!--              pch = 21, fill = 'white', size = 2) + -->
+<!--   geom_point(aes(y = population.2, col = strain.2), -->
+<!--              pch = 21, fill = 'white', size = 2) + -->
+<!--   theme_bw() + -->
+<!--   theme(legend.position = 'bottom') -->
+<!-- ``` -->
 
 
-### Accuracy
-We'd like to see how accurate the model-fitting procedure is using the coefficient of determination... ($R^2$)
+<!-- ## Lotka-Volterra model fitting using GauseR -->
+<!-- We now fit a Lotka-Volterra population model to the data, to determine the intrinsic growth rates and self/inter-interaction parameters ($r$ and $a$, respectively). -->
 
-```{r, pair-coefficient-of-determination, fig.width=5, fig.height=4, fig.cap="Accuracy of model-fitting procedure"}
-# Data frame with CoD
-pair.CoD <- pair.out %>%
-  mutate(difference = (population.1 - prediction.1) + (population.2 - prediction.2),
-         diff.squared = difference^2) %>%
-  group_by(strains, treat) %>%
-  summarise(RSS = sum(diff.squared),
-            TSS = sum((population.1 - mean(population.1))^2, 
-                      (population.2 - mean(population.2))^2),
-            R2 = 1 - (RSS / TSS),
-            pop.1.range = population.1 %>% range %>% diff,
-            pop.2.range = population.2 %>% range %>% diff,
-            population.1 = mean(population.1),
-            population.2 = mean(population.2))
+<!-- ```{r, pair-fitting-parameters, fig.width=5, fig.height=10, fig.cap="Prediction of fitted Lotka-Volterra model"} -->
 
-# plot
-ggplot(pair.CoD, aes(x = strains, y = R2, pch = treat, col = strains)) +
-  facet_grid(.~treat) + 
-  geom_point(size = 2, fill = 'white') +
-  theme_bw() +
-  scale_shape_manual(values = c(21, 24)) +
-  labs(x = 'Coefficient of variation (CV) of trait values', 
-       y = 'Coefficient of determination\nof model fit',
-       pch = 'Treatment', col = 'Strain') +
-  theme(strip.placement = "outside", 
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        strip.background = element_rect(fill = "white", linetype = 0), 
-        axis.title.x = element_blank(), 
-        legend.position = 'bottom', legend.box = 'vertical')
-```
+<!-- ## fit -->
+<!-- pair.mod <- pair.df %>% -->
+<!--   ungroup %>% -->
+<!--   arrange(strains, treat, date.time) %>% -->
+<!--   group_by(strains, treat) %>% -->
+<!--   summarise(gause.fit = tryCatch(list(gause_wrapper( -->
+<!--         r_starting = rep(5e-2, 2), -->
+<!--         A_starting = rep(-5e-7, 4), -->
+<!--         time = date.time, -->
+<!--         species = data.frame(population.1, population.2), -->
+<!--         doplot = FALSE, -->
+<!--         keeptimes = TRUE)), -->
+<!--       error = function(e) {NULL}), -->
+<!--     strain.1 = strain.1[1], -->
+<!--     strain.2 = strain.2[1]) -->
 
+<!-- pair.pred <- pair.mod %>%  -->
+<!--   ungroup %>%  -->
+<!--   rowwise %>%  -->
+<!--   dplyr::filter(length(gause.fit) != 1) %>% -->
+<!--   mutate(pred = list(as.data.frame(gause.fit$out))) %>% -->
+<!--   dplyr::select(strains, treat, pred) %>%  -->
+<!--   unnest(pred) %>% -->
+<!--   rename(date.time = time, prediction.1 = population.1, prediction.2 = population.2) -->
 
-### Accuracy and traits
-What if the loss of model accuracy is due to functional trait changes? Let's first view the relevant ones... How do they change over time?
+<!-- pair.out <- pair.pred %>%  -->
+<!--   full_join(pair.df) %>% -->
+<!--   mutate(d.pred.1 = abs(prediction.1 - population.1), -->
+<!--          d.pred.2 = abs(prediction.2 - population.2), -->
+<!--          treat = recode(treat, 'T' = 'Control', 'AT' = 'Atrazine'), -->
+<!--          treat = as.factor(treat), -->
+<!--          treat = relevel(treat, 'Control', 'Atrazine')) -->
 
-```{r}
-test.pair <- pair.out %>% 
-  dplyr::filter(strain.1 == '2375') %>%
-  mutate(FSC.HLin.1 = FSC.HLin$mean.1,
-         FSC.HLin.2 = FSC.HLin$mean.2) 
-  
-ggplot(test.pair, aes(x = date.time, pch = treat)) +
-  facet_grid(strain.2~treat) +
-  geom_point(aes(y = FSC.HLin.1, col = 'strain_1')) +
-  geom_point(aes(y = FSC.HLin.2, col = 'strain_2')) +
-  theme_bw()
-```
+<!-- # plot -->
+<!-- ggplot(pair.out, aes(x = date.time, pch = treat)) +  -->
+<!--   facet_wrap(strains~treat, scales = 'free', ncol = 2, -->
+<!--              labeller = label_wrap_gen(multi_line=FALSE)) + -->
+<!--   geom_line(aes(y = prediction.1, col = strain.1), lty = 2) + -->
+<!--   geom_line(aes(y = prediction.2, col = strain.2), lty = 2) + -->
+<!--   geom_point(aes(y = population.1, col = strain.1), -->
+<!--              fill = 'white', size = 2) + -->
+<!--   geom_point(aes(y = population.2, col = strain.2),  -->
+<!--              fill = 'white', size = 2) + -->
+<!--   theme_bw() + -->
+<!--   scale_shape_manual(values = c(21, 24))+ -->
+<!--   labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') + -->
+<!--   theme(legend.position = 'bottom') -->
 
-
-```{r, pair-traits-over-time, warning=FALSE, fig.width=8, fig.height=10, fig.cap="Changes in strain traits over time"}
-# trait changes
-pair.trait.time <- pair.out %>%
-  dplyr::select(-GRN.B.HLin, -NIR.B.HLin, -NIR.R.HLin) %>%
-  mutate(trait.1 = across(FSC.HLin:RED.R.HLin, .fns = function(i) {i$mean.1}),
-         trait.2 = across(FSC.HLin:RED.R.HLin, .fns = function(i) {i$mean.2})) %>%
-  dplyr::select(-(FSC.HLin:RED.R.HLin)) %>%
-  unnest_wider(trait.1:trait.2, names_sep = '_')
-
-# strain 2375 vs competitor data frame
-pair.2375 <- pair.trait.time %>%
-  dplyr::filter(strain.1 == '2375' | strain.2 == '2375') %>%
-  mutate(strain = 2375,
-         competitor = ifelse(strain.1 == '2375', strain.2, strain.1),
-         d.pred = ifelse(strain.1 == '2375', d.pred.1, d.pred.2),
-         FSC.HLin = ifelse(strain.1 == '2375', trait.1_FSC.HLin, trait.2_FSC.HLin),
-         SSC.HLin = ifelse(strain.1 == '2375', trait.1_SSC.HLin, trait.2_SSC.HLin),
-         YEL.B.HLin = ifelse(strain.1 == '2375', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin),
-         RED.B.HLin = ifelse(strain.1 == '2375', trait.1_RED.B.HLin, trait.2_RED.B.HLin),
-         RED.R.HLin = ifelse(strain.1 == '2375', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>%
-  dplyr::select(strains, treat, date.time, strain:RED.R.HLin)
-
-# strain 2383 vs competitor data frame
-pair.2383 <- pair.trait.time %>%
-  dplyr::filter(strain.1 == '2383' | strain.2 == '2383') %>%
-  mutate(strain = 2383,
-         competitor = ifelse(strain.1 == '2383', strain.2, strain.1),
-         d.pred = ifelse(strain.1 == '2383', d.pred.1, d.pred.2),
-         FSC.HLin = ifelse(strain.1 == '2383', trait.1_FSC.HLin, trait.2_FSC.HLin),
-         SSC.HLin = ifelse(strain.1 == '2383', trait.1_SSC.HLin, trait.2_SSC.HLin),
-         YEL.B.HLin = ifelse(strain.1 == '2383', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin),
-         RED.B.HLin = ifelse(strain.1 == '2383', trait.1_RED.B.HLin, trait.2_RED.B.HLin),
-         RED.R.HLin = ifelse(strain.1 == '2383', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>%
-  dplyr::select(strains, treat, date.time, strain:RED.R.HLin)
-
-# strain 2434 vs competitor data frame
-pair.2434 <- pair.trait.time %>%
-  dplyr::filter(strain.1 == '2434' | strain.2 == '2434') %>%
-  mutate(strain = 2434,
-         competitor = ifelse(strain.1 == '2434', strain.2, strain.1),
-         d.pred = ifelse(strain.1 == '2434', d.pred.1, d.pred.2),
-         FSC.HLin = ifelse(strain.1 == '2434', trait.1_FSC.HLin, trait.2_FSC.HLin),
-         SSC.HLin = ifelse(strain.1 == '2434', trait.1_SSC.HLin, trait.2_SSC.HLin),
-         YEL.B.HLin = ifelse(strain.1 == '2434', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin),
-         RED.B.HLin = ifelse(strain.1 == '2434', trait.1_RED.B.HLin, trait.2_RED.B.HLin),
-         RED.R.HLin = ifelse(strain.1 == '2434', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>%
-  dplyr::select(strains, treat, date.time, strain:RED.R.HLin)
-
-# strain 2524 vs competitor data frame
-pair.2524 <- pair.trait.time %>%
-  dplyr::filter(strain.1 == '2524' | strain.2 == '2524') %>%
-  mutate(strain = 2524,
-         competitor = ifelse(strain.1 == '2524', strain.2, strain.1),
-         d.pred = ifelse(strain.1 == '2524', d.pred.1, d.pred.2),
-         FSC.HLin = ifelse(strain.1 == '2524', trait.1_FSC.HLin, trait.2_FSC.HLin),
-         SSC.HLin = ifelse(strain.1 == '2524', trait.1_SSC.HLin, trait.2_SSC.HLin),
-         YEL.B.HLin = ifelse(strain.1 == '2524', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin),
-         RED.B.HLin = ifelse(strain.1 == '2524', trait.1_RED.B.HLin, trait.2_RED.B.HLin),
-         RED.R.HLin = ifelse(strain.1 == '2524', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>%
-  dplyr::select(strains, treat, date.time, strain:RED.R.HLin)
-
-# rebind
-pair.trait.time.2 <- rbind(pair.2375, pair.2383, pair.2434, pair.2524) %>%
-  pivot_longer(FSC.HLin:RED.R.HLin, names_to = 'Channel')
-
-# plot
-ggplot(pair.trait.time.2, aes(x = date.time, y = value, col = competitor,
-           pch = treat)) +
-  facet_grid(Channel~strain, scales = 'free_y') +
-  geom_line() +
-  geom_point(size = 2) +
-  theme_bw() +
-  labs(col = 'Competing strain', x = 'Time (hours)', y = 'Trait value', pch = 'Treatment') +
-  theme(legend.position = 'bottom')
-```
-
-How much does each trait change?
-
-```{r, pair-d-traits, fig.width=8, fig.height=6, fig.cap="Amount of trait change between beginning and end of experiment"}
-# trait CV
-pair.trait.change <- pair.trait.time.2 %>%
-  group_by(strain, competitor, treat, Channel) %>%
-  summarise(strains = unique(strains), 
-            change = (first(value) - last(value)) / first(value))#sd(value) / mean(value) * 100)
-
-# plot
-ggplot(pair.trait.change, 
-       aes(x = as.factor(strain), y = change, col = competitor, pch = treat)) +
-  facet_wrap(.~Channel) +
-  geom_hline(lty = 2, yintercept = 0)+
-  geom_point(size = 2, fill = 'white', position = position_dodge(width = 0.25)) +
-  theme_bw() +
-  scale_shape_manual(values = c(21, 24)) +
-  theme(legend.position = 'bottom')
-```
-
-# **COMPLETED UP UNTIL HERE**
-
-How is this trait CV correlated to the coefficient of determination
-
-```{r, pair-d-traits-R2, fig.width=8, fig.height=6, fig.cap="Model fitting accuracy as a function of the amount of trait change"}
-# merge
-pair.CoD.traits <- pair.trait.change %>%
-  left_join(pair.CoD)
-
-# plot
-ggplot(pair.CoD.traits, aes(x = change, y = R2, col = competitor, pch = treat)) +
-  facet_grid(strain~Channel) +
-  geom_vline(xintercept = 0, lty = 2) +
-  geom_point(size = 2, fill = 'white') +
-  theme_bw() +
-  scale_shape_manual(values = c(21, 24)) +
-  scale_y_continuous(limits = c(.75, 1)) +
-  theme(legend.position = 'bottom')
-```
-
-This is pants.
-
-# **COMPLETED UP UNTIL HERE**
-
-# Do effects on traits predict growth
-We have the strain growth parameters.
-
-```{r, pair-growth-par, fig.width=8, fig.height=8, fig.cap="Fitted model parameters"}
-# extract parameters
-pair.mod.df <- pair.mod %>% 
-  rowwise %>%
-  mutate(r1 = gause.fit$parameter_intervals['r1','mu'],
-         r2 = gause.fit$parameter_intervals['r2','mu'],
-         a11 = gause.fit$parameter_intervals['a11','mu'],
-         a12 = gause.fit$parameter_intervals['a12','mu'],
-         a21 = gause.fit$parameter_intervals['a21','mu'],
-         a22 = gause.fit$parameter_intervals['a22','mu'],
-         #K = -r / aii,
-         ) %>%
-  #pivot_longer(r:K, names_to = 'Parameter')
-  pivot_longer(r1:a22, names_to = 'Parameter')
-
-# plot
-ggplot(pair.mod.df, aes(x = strain.1, y = value, col = strain.2)) +
-  facet_grid(Parameter~strain.2, scales = 'free_y') +
-  #scale_y_continuous(trans = 'pseudo_log') +
-  geom_path(lty = 2) +
-  geom_point(aes(pch = treat), size = 2) +
-  theme_bw() +
-  theme(legend.position = 'bottom')
-```
+<!-- ``` -->
 
 
-```{r, pair-traits-growth-par, fig.width=8, fig.height=8, fig.cap="Fitted model parameters as a function of the mean trait value"}
-pair.mod.traits <- pair.trait.time.2 %>% 
-  group_by(strains, treat, Channel) %>%
-  rename(Channel.value = value) %>%
-  summarise(Channel.value = mean(Channel.value)) %>%
-  left_join(pair.mod.df) %>%
-  rename(Parameter.value = value)
+<!-- ### Accuracy -->
+<!-- We'd like to see how accurate the model-fitting procedure is using the coefficient of determination... ($R^2$) -->
 
-# plot
-ggplot(pair.mod.traits, aes(x = Channel.value, y = Parameter.value, col = strains)) +
-  facet_grid(Parameter~Channel, scales = 'free') +
-  scale_y_continuous(trans = 'pseudo_log') +
-  geom_path(lty = 2) +
-  geom_point(aes(pch = treat), size = 2) +
-  theme_bw() +
-  theme(legend.position = 'bottom')
-```
+<!-- ```{r, pair-coefficient-of-determination, fig.width=5, fig.height=4, fig.cap="Accuracy of model-fitting procedure"} -->
+<!-- # Data frame with CoD -->
+<!-- pair.CoD <- pair.out %>% -->
+<!--   mutate(difference = (population.1 - prediction.1) + (population.2 - prediction.2), -->
+<!--          diff.squared = difference^2) %>% -->
+<!--   group_by(strains, treat) %>% -->
+<!--   summarise(RSS = sum(diff.squared), -->
+<!--             TSS = sum((population.1 - mean(population.1))^2,  -->
+<!--                       (population.2 - mean(population.2))^2), -->
+<!--             R2 = 1 - (RSS / TSS), -->
+<!--             pop.1.range = population.1 %>% range %>% diff, -->
+<!--             pop.2.range = population.2 %>% range %>% diff, -->
+<!--             population.1 = mean(population.1), -->
+<!--             population.2 = mean(population.2)) -->
 
-Hey look at 2375, its density dependence never changes due to stress, maybe that's a nice one to keep in mind for later comparison.
+<!-- # plot -->
+<!-- ggplot(pair.CoD, aes(x = strains, y = R2, pch = treat, col = strains)) + -->
+<!--   facet_grid(.~treat) +  -->
+<!--   geom_point(size = 2, fill = 'white') + -->
+<!--   theme_bw() + -->
+<!--   scale_shape_manual(values = c(21, 24)) + -->
+<!--   labs(x = 'Coefficient of variation (CV) of trait values',  -->
+<!--        y = 'Coefficient of determination\nof model fit', -->
+<!--        pch = 'Treatment', col = 'Strain') + -->
+<!--   theme(strip.placement = "outside",  -->
+<!--         axis.text.x = element_text(angle = 90, vjust = 0.5), -->
+<!--         strip.background = element_rect(fill = "white", linetype = 0),  -->
+<!--         axis.title.x = element_blank(),  -->
+<!--         legend.position = 'bottom', legend.box = 'vertical') -->
+<!-- ``` -->
 
-# Do certain traits predict sensitivity to atrazine exposure?
 
-We want the starting trait value on the x vs the change in a, K, r on the y axis
+<!-- ### Accuracy and traits -->
+<!-- What if the loss of model accuracy is due to functional trait changes? Let's first view the relevant ones... How do they change over time? -->
 
-```{r, pair-diff-traits-growth-par}
-# calculate change in parameters
-traits.start <- trait.time %>%
-  dplyr::filter(treat == 'Control', date == min(date)) %>%
-  rename(Channel.value = value) %>%
-  dplyr::select(-treat, -date.time, -prediction, -date, -population, -pop.vec, -d.pred)
+<!-- ```{r} -->
+<!-- test.pair <- pair.out %>%  -->
+<!--   dplyr::filter(strain.1 == '2375') %>% -->
+<!--   mutate(FSC.HLin.1 = FSC.HLin$mean.1, -->
+<!--          FSC.HLin.2 = FSC.HLin$mean.2)  -->
 
-dpar <- mod.df %>%
-  group_by(strain, Parameter) %>%
-  summarise(Parameter.control = value[treat == 'Control'],
-            Parameter.atr  = value[treat == 'Atrazine'],
-            Parameter.change = (Parameter.atr)/Parameter.control) %>%
-  full_join(traits.start)
+<!-- ggplot(test.pair, aes(x = date.time, pch = treat)) + -->
+<!--   facet_grid(strain.2~treat) + -->
+<!--   geom_point(aes(y = FSC.HLin.1, col = 'strain_1')) + -->
+<!--   geom_point(aes(y = FSC.HLin.2, col = 'strain_2')) + -->
+<!--   theme_bw() -->
+<!-- ``` -->
 
-# plot 
-ggplot(dpar, aes(x = Channel.value, y = Parameter.change, col = strain)) +
-  facet_grid(Parameter~Channel, scale = 'free') +
-  #scale_y_continuous(trans = 'pseudo_log') +
-  geom_hline(yintercept = 1, lty = 2) +
-  geom_point() +
-  theme_bw()
-```
+
+<!-- ```{r, pair-traits-over-time, warning=FALSE, fig.width=8, fig.height=10, fig.cap="Changes in strain traits over time"} -->
+<!-- # trait changes -->
+<!-- pair.trait.time <- pair.out %>% -->
+<!--   dplyr::select(-GRN.B.HLin, -NIR.B.HLin, -NIR.R.HLin) %>% -->
+<!--   mutate(trait.1 = across(FSC.HLin:RED.R.HLin, .fns = function(i) {i$mean.1}), -->
+<!--          trait.2 = across(FSC.HLin:RED.R.HLin, .fns = function(i) {i$mean.2})) %>% -->
+<!--   dplyr::select(-(FSC.HLin:RED.R.HLin)) %>% -->
+<!--   unnest_wider(trait.1:trait.2, names_sep = '_') -->
+
+<!-- # strain 2375 vs competitor data frame -->
+<!-- pair.2375 <- pair.trait.time %>% -->
+<!--   dplyr::filter(strain.1 == '2375' | strain.2 == '2375') %>% -->
+<!--   mutate(strain = 2375, -->
+<!--          competitor = ifelse(strain.1 == '2375', strain.2, strain.1), -->
+<!--          d.pred = ifelse(strain.1 == '2375', d.pred.1, d.pred.2), -->
+<!--          FSC.HLin = ifelse(strain.1 == '2375', trait.1_FSC.HLin, trait.2_FSC.HLin), -->
+<!--          SSC.HLin = ifelse(strain.1 == '2375', trait.1_SSC.HLin, trait.2_SSC.HLin), -->
+<!--          YEL.B.HLin = ifelse(strain.1 == '2375', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin), -->
+<!--          RED.B.HLin = ifelse(strain.1 == '2375', trait.1_RED.B.HLin, trait.2_RED.B.HLin), -->
+<!--          RED.R.HLin = ifelse(strain.1 == '2375', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>% -->
+<!--   dplyr::select(strains, treat, date.time, strain:RED.R.HLin) -->
+
+<!-- # strain 2383 vs competitor data frame -->
+<!-- pair.2383 <- pair.trait.time %>% -->
+<!--   dplyr::filter(strain.1 == '2383' | strain.2 == '2383') %>% -->
+<!--   mutate(strain = 2383, -->
+<!--          competitor = ifelse(strain.1 == '2383', strain.2, strain.1), -->
+<!--          d.pred = ifelse(strain.1 == '2383', d.pred.1, d.pred.2), -->
+<!--          FSC.HLin = ifelse(strain.1 == '2383', trait.1_FSC.HLin, trait.2_FSC.HLin), -->
+<!--          SSC.HLin = ifelse(strain.1 == '2383', trait.1_SSC.HLin, trait.2_SSC.HLin), -->
+<!--          YEL.B.HLin = ifelse(strain.1 == '2383', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin), -->
+<!--          RED.B.HLin = ifelse(strain.1 == '2383', trait.1_RED.B.HLin, trait.2_RED.B.HLin), -->
+<!--          RED.R.HLin = ifelse(strain.1 == '2383', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>% -->
+<!--   dplyr::select(strains, treat, date.time, strain:RED.R.HLin) -->
+
+<!-- # strain 2434 vs competitor data frame -->
+<!-- pair.2434 <- pair.trait.time %>% -->
+<!--   dplyr::filter(strain.1 == '2434' | strain.2 == '2434') %>% -->
+<!--   mutate(strain = 2434, -->
+<!--          competitor = ifelse(strain.1 == '2434', strain.2, strain.1), -->
+<!--          d.pred = ifelse(strain.1 == '2434', d.pred.1, d.pred.2), -->
+<!--          FSC.HLin = ifelse(strain.1 == '2434', trait.1_FSC.HLin, trait.2_FSC.HLin), -->
+<!--          SSC.HLin = ifelse(strain.1 == '2434', trait.1_SSC.HLin, trait.2_SSC.HLin), -->
+<!--          YEL.B.HLin = ifelse(strain.1 == '2434', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin), -->
+<!--          RED.B.HLin = ifelse(strain.1 == '2434', trait.1_RED.B.HLin, trait.2_RED.B.HLin), -->
+<!--          RED.R.HLin = ifelse(strain.1 == '2434', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>% -->
+<!--   dplyr::select(strains, treat, date.time, strain:RED.R.HLin) -->
+
+<!-- # strain 2524 vs competitor data frame -->
+<!-- pair.2524 <- pair.trait.time %>% -->
+<!--   dplyr::filter(strain.1 == '2524' | strain.2 == '2524') %>% -->
+<!--   mutate(strain = 2524, -->
+<!--          competitor = ifelse(strain.1 == '2524', strain.2, strain.1), -->
+<!--          d.pred = ifelse(strain.1 == '2524', d.pred.1, d.pred.2), -->
+<!--          FSC.HLin = ifelse(strain.1 == '2524', trait.1_FSC.HLin, trait.2_FSC.HLin), -->
+<!--          SSC.HLin = ifelse(strain.1 == '2524', trait.1_SSC.HLin, trait.2_SSC.HLin), -->
+<!--          YEL.B.HLin = ifelse(strain.1 == '2524', trait.1_YEL.B.HLin, trait.2_YEL.B.HLin), -->
+<!--          RED.B.HLin = ifelse(strain.1 == '2524', trait.1_RED.B.HLin, trait.2_RED.B.HLin), -->
+<!--          RED.R.HLin = ifelse(strain.1 == '2524', trait.1_RED.R.HLin, trait.2_RED.R.HLin)) %>% -->
+<!--   dplyr::select(strains, treat, date.time, strain:RED.R.HLin) -->
+
+<!-- # rebind -->
+<!-- pair.trait.time.2 <- rbind(pair.2375, pair.2383, pair.2434, pair.2524) %>% -->
+<!--   pivot_longer(FSC.HLin:RED.R.HLin, names_to = 'Channel') -->
+
+<!-- # plot -->
+<!-- ggplot(pair.trait.time.2, aes(x = date.time, y = value, col = competitor, -->
+<!--            pch = treat)) + -->
+<!--   facet_grid(Channel~strain, scales = 'free_y') + -->
+<!--   geom_line() + -->
+<!--   geom_point(size = 2) + -->
+<!--   theme_bw() + -->
+<!--   labs(col = 'Competing strain', x = 'Time (hours)', y = 'Trait value', pch = 'Treatment') + -->
+<!--   theme(legend.position = 'bottom') -->
+<!-- ``` -->
+
+<!-- How much does each trait change? -->
+
+<!-- ```{r, pair-d-traits, fig.width=8, fig.height=6, fig.cap="Amount of trait change between beginning and end of experiment"} -->
+<!-- # trait CV -->
+<!-- pair.trait.change <- pair.trait.time.2 %>% -->
+<!--   group_by(strain, competitor, treat, Channel) %>% -->
+<!--   summarise(strains = unique(strains),  -->
+<!--             change = (first(value) - last(value)) / first(value))#sd(value) / mean(value) * 100) -->
+
+<!-- # plot -->
+<!-- ggplot(pair.trait.change,  -->
+<!--        aes(x = as.factor(strain), y = change, col = competitor, pch = treat)) + -->
+<!--   facet_wrap(.~Channel) + -->
+<!--   geom_hline(lty = 2, yintercept = 0)+ -->
+<!--   geom_point(size = 2, fill = 'white', position = position_dodge(width = 0.25)) + -->
+<!--   theme_bw() + -->
+<!--   scale_shape_manual(values = c(21, 24)) + -->
+<!--   theme(legend.position = 'bottom') -->
+<!-- ``` -->
+
+<!-- # **COMPLETED UP UNTIL HERE** -->
+
+<!-- How is this trait CV correlated to the coefficient of determination -->
+
+<!-- ```{r, pair-d-traits-R2, fig.width=8, fig.height=6, fig.cap="Model fitting accuracy as a function of the amount of trait change"} -->
+<!-- # merge -->
+<!-- pair.CoD.traits <- pair.trait.change %>% -->
+<!--   left_join(pair.CoD) -->
+
+<!-- # plot -->
+<!-- ggplot(pair.CoD.traits, aes(x = change, y = R2, col = competitor, pch = treat)) + -->
+<!--   facet_grid(strain~Channel) + -->
+<!--   geom_vline(xintercept = 0, lty = 2) + -->
+<!--   geom_point(size = 2, fill = 'white') + -->
+<!--   theme_bw() + -->
+<!--   scale_shape_manual(values = c(21, 24)) + -->
+<!--   scale_y_continuous(limits = c(.75, 1)) + -->
+<!--   theme(legend.position = 'bottom') -->
+<!-- ``` -->
+
+<!-- This is pants. -->
+
+<!-- # **COMPLETED UP UNTIL HERE** -->
+
+<!-- # Do effects on traits predict growth -->
+<!-- We have the strain growth parameters. -->
+
+<!-- ```{r, pair-growth-par, fig.width=8, fig.height=8, fig.cap="Fitted model parameters"} -->
+<!-- # extract parameters -->
+<!-- pair.mod.df <- pair.mod %>%  -->
+<!--   rowwise %>% -->
+<!--   mutate(r1 = gause.fit$parameter_intervals['r1','mu'], -->
+<!--          r2 = gause.fit$parameter_intervals['r2','mu'], -->
+<!--          a11 = gause.fit$parameter_intervals['a11','mu'], -->
+<!--          a12 = gause.fit$parameter_intervals['a12','mu'], -->
+<!--          a21 = gause.fit$parameter_intervals['a21','mu'], -->
+<!--          a22 = gause.fit$parameter_intervals['a22','mu'], -->
+<!--          #K = -r / aii, -->
+<!--          ) %>% -->
+<!--   #pivot_longer(r:K, names_to = 'Parameter') -->
+<!--   pivot_longer(r1:a22, names_to = 'Parameter') -->
+
+<!-- # plot -->
+<!-- ggplot(pair.mod.df, aes(x = strain.1, y = value, col = strain.2)) + -->
+<!--   facet_grid(Parameter~strain.2, scales = 'free_y') + -->
+<!--   #scale_y_continuous(trans = 'pseudo_log') + -->
+<!--   geom_path(lty = 2) + -->
+<!--   geom_point(aes(pch = treat), size = 2) + -->
+<!--   theme_bw() + -->
+<!--   theme(legend.position = 'bottom') -->
+<!-- ``` -->
+
+
+<!-- ```{r, pair-traits-growth-par, fig.width=8, fig.height=8, fig.cap="Fitted model parameters as a function of the mean trait value"} -->
+<!-- pair.mod.traits <- pair.trait.time.2 %>%  -->
+<!--   group_by(strains, treat, Channel) %>% -->
+<!--   rename(Channel.value = value) %>% -->
+<!--   summarise(Channel.value = mean(Channel.value)) %>% -->
+<!--   left_join(pair.mod.df) %>% -->
+<!--   rename(Parameter.value = value) -->
+
+<!-- # plot -->
+<!-- ggplot(pair.mod.traits, aes(x = Channel.value, y = Parameter.value, col = strains)) + -->
+<!--   facet_grid(Parameter~Channel, scales = 'free') + -->
+<!--   scale_y_continuous(trans = 'pseudo_log') + -->
+<!--   geom_path(lty = 2) + -->
+<!--   geom_point(aes(pch = treat), size = 2) + -->
+<!--   theme_bw() + -->
+<!--   theme(legend.position = 'bottom') -->
+<!-- ``` -->
+
+<!-- Hey look at 2375, its density dependence never changes due to stress, maybe that's a nice one to keep in mind for later comparison. -->
+
+<!-- # Do certain traits predict sensitivity to atrazine exposure? -->
+
+<!-- We want the starting trait value on the x vs the change in a, K, r on the y axis -->
+
+<!-- ```{r, pair-diff-traits-growth-par} -->
+<!-- # calculate change in parameters -->
+<!-- traits.start <- trait.time %>% -->
+<!--   dplyr::filter(treat == 'Control', date == min(date)) %>% -->
+<!--   rename(Channel.value = value) %>% -->
+<!--   dplyr::select(-treat, -date.time, -prediction, -date, -population, -pop.vec, -d.pred) -->
+
+<!-- dpar <- mod.df %>% -->
+<!--   group_by(strain, Parameter) %>% -->
+<!--   summarise(Parameter.control = value[treat == 'Control'], -->
+<!--             Parameter.atr  = value[treat == 'Atrazine'], -->
+<!--             Parameter.change = (Parameter.atr)/Parameter.control) %>% -->
+<!--   full_join(traits.start) -->
+
+<!-- # plot  -->
+<!-- ggplot(dpar, aes(x = Channel.value, y = Parameter.change, col = strain)) + -->
+<!--   facet_grid(Parameter~Channel, scale = 'free') + -->
+<!--   #scale_y_continuous(trans = 'pseudo_log') + -->
+<!--   geom_hline(yintercept = 1, lty = 2) + -->
+<!--   geom_point() + -->
+<!--   theme_bw() -->
+<!-- ``` -->
 
 Let's try without the outlier
 
