@@ -13,15 +13,16 @@ data <- read.csv('ciliates/DIVERCE_TdB_Ciliates_Traits.csv') %>%
          trait = replace(trait, trait == 'sd_speed', 'Speed'),
          trait = replace(trait, trait == 'sd_linearity', 'Linearity'))
 
-# plot with just 
+# plot with just the traits as facets
 ggplot(data %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
-  aes(x = sd, y = -a11, col = Temp, pch = Atrazine) + 
+  aes(x = sd, y = -a11) + 
   scale_x_log10() + 
   scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
                 labels = trans_format('log10', scales::math_format(10^.x))) + 
-  geom_point() + 
+  geom_smooth(method = 'lm') +
+  geom_point(aes(col = Temp, pch = Atrazine)) + 
   labs(x = 'Trait standard deviation (SD)', 
        y = expression(paste('Self-limitation (', alpha['11'], ')'))) +
   facet_wrap(.~trait, scales = 'free')
