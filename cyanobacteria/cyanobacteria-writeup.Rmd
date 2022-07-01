@@ -242,25 +242,30 @@ ggplot(mod.df, aes(x = strain, y = value, col = strain, pch = treat)) +
 
 
 ```{r, traits-growth-par, fig.cap="Fitted model parameters as a function of the mean trait value"}
+# data framing
 mod.traits <- trait.time %>% 
   group_by(strain, treat, channel) %>%
-  rename(channel.value = mean) %>%
-  summarise(channel.value = mean(channel.value)) %>%
+  summarise(channel.value = mean(mean),
+            channel.sd = mean(sd)) %>%
   left_join(mod.df) %>%
-  rename(parameter.value = value)
+  pivot_wider(names_from = parameter, values_from = value)
 
-# plot
-ggplot(mod.traits, aes(x = channel.value, y = parameter.value, col = strain)) +
-  facet_grid(parameter~channel, scales = 'free') +
-  scale_y_continuous(trans = 'pseudo_log') +
-  geom_smooth(method = 'glm') +
-  geom_point(aes(pch = treat), size = 2, fill = 'white') +
+# intrinsic growth rate
+ggplot(mod.traits, aes(x = channel.value, y = r)) +
+  facet_wrap(~channel, scales = 'free') +
+  scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
+                labels = trans_format('log10', scales::math_format(10^.x))) + 
+  geom_smooth(method = 'lm') +
+  geom_point(aes(col = treat, pch = strain),
+             size = 2, fill = 'white') +
   scale_shape_manual(values = 21:24) +
   theme_bw() +
+  labs(x = 'Trait mean value', 
+       y = expression(paste('Intrinsic growth rate (', mu['i'], ')'))) +
   theme(legend.position = 'bottom')
 
-ggplot(mod.traits %>% dplyr::filter(parameter == 'aii'), 
-       aes(x = channel.value, y = -parameter.value)) +
+# density-dependence
+ggplot(mod.traits, aes(x = channel.sd, y = -aii)) +
   facet_wrap(~channel, scales = 'free') +
   scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
                 labels = trans_format('log10', scales::math_format(10^.x))) + 
@@ -269,9 +274,11 @@ ggplot(mod.traits %>% dplyr::filter(parameter == 'aii'),
              size = 2, fill = 'white') +
   scale_shape_manual(values = 21:24) +
   theme_bw() +
-  labs(x = 'Trait mean value', 
+  labs(x = 'Trait standard deviation (SD)', 
        y = expression(paste('Self-limitation (', alpha['11'], ')'))) +
   theme(legend.position = 'bottom')
+
+
 ```
 
 # Do certain traits predict sensitivity to atrazine exposure?
