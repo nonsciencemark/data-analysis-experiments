@@ -1,5 +1,6 @@
 # packages
 library('tidyverse')  
+library('scales')
 
 # load data ====
 # data <- read.csv('ciliates/DIVERCE_TdB_Ciliates_Traits.csv') %>%
