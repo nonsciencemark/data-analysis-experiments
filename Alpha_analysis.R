@@ -1,20 +1,30 @@
 library(tidyverse)
 library(lubridate)
+
 # CILIATES ------
 data_cilia <- read.csv("ciliates/DIVERCE_TdB_Ciliates_Traits.csv") %>%
+  mutate(Days_fromstart.0 = lag(Days_fromstart, 1), .after = Days_fromstart) %>%
+  mutate(Count.0 = lag(Count, 1), 
+         .after = Count) %>%
+  mutate(pcgr = log(Count/Count.0)/(Days_fromstart-Days_fromstart.0),
+         .after = Count.0) %>%
+  mutate(cv_ar = sd_ar/mean_ar) %>%
+  mutate(cv_area = sd_area/mean_area) %>%
+  mutate(cv_speed = sd_speed/mean_speed) %>%
+  mutate(cv_linearity = sd_linearity/mean_linearity) %>%
   group_by(ID_spec, Temp, Atrazine) %>%
   summarise_all(mean, na.rm=T) %>%
-  select(contains(c("mean_", "sd_", "ID", "Temp", "Atrazine", "r1", "a11"))) %>%
-  pivot_longer(contains(c("sd_")), names_to = "trait", values_to= "sd") %>%
+  select(contains(c("cv_", "ID", "Temp", "Atrazine", "r1", "a11"))) %>%
+  pivot_longer(contains(c("cv_")), names_to = "trait", values_to= "cv") %>%
   filter(!grepl('Spiro', ID_spec))
 
 ggplot(data_cilia) + 
   theme_classic() + 
-  aes(x=log10(sd), y=a11, 
+  aes(x=log10(cv), y=a11, 
       col=as_factor(Temp), pch=as_factor(Atrazine)) + 
   geom_point() + 
   facet_grid(cols = vars(trait), scales="free") + #, rows = vars(ID_spec)
-  geom_smooth(method="lm")
+  geom_smooth(method="lm", se=F)
 
 # CYANO ------
 data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
@@ -33,6 +43,10 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
 #all pcgr that are too negative (crashing o/t culture) and 
 #all data points where log10(population.mean) is consistently low (<3.5) because of lags
 data_cyano <- data_cyano %>%
+  mutate(GRN.B.HLin.cv = GRN.B.HLin.sd/GRN.B.HLin.mean) %>%
+  mutate(YEL.B.HLin.cv = YEL.B.HLin.sd/YEL.B.HLin.mean) %>%
+  mutate(RED.B.HLin.cv = RED.B.HLin.sd/RED.B.HLin.mean) %>%
+  mutate(RED.R.HLin.cv = RED.R.HLin.sd/RED.R.HLin.mean) %>%
   filter(pcgr>-0.1) %>%
   mutate(lag.phase = ((log10(population.mean.0)<3.5)&(log10(population.mean)<3.5))) %>%
   filter(lag.phase == FALSE)
@@ -57,17 +71,16 @@ data_cyano <- data_cyano %>%
   mutate(alpha = cov(population.mean.0, pcgr) / var(population.mean.0)) %>% #alphas
   group_by(strain, treat) %>%
   summarise_all(mean, na.rm=T) %>%
-  select(contains(c("strain", "treat", "alpha", ".sd"))) %>%
-  select(-contains("population")) %>%
-  pivot_longer(contains(c(".sd")), names_to = "trait", values_to= "sd")
+  select(contains(c("strain", "treat", "alpha", ".cv"))) %>%
+  pivot_longer(contains(c(".cv")), names_to = "trait", values_to= "cv")
 
 ggplot(data_cyano %>% filter(treat %in% c("C", "T"))) + 
   theme_classic() + 
-  aes(x=log10(sd), y=alpha, 
+  aes(x=log10(cv), y=alpha, 
       col=as_factor(treat)) + 
   geom_point() + 
   facet_grid(cols = vars(trait), scales="free") + 
-  geom_smooth(method="lm") #, rows = vars(ID_spec)
+  geom_smooth(method="lm", se = F) #, rows = vars(ID_spec)
 
 
 
