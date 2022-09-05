@@ -4,7 +4,7 @@ library(lubridate)
 data_cilia <- read.csv("ciliates/DIVERCE_TdB_Ciliates_Traits.csv") %>%
   group_by(ID_spec, Temp, Atrazine) %>%
   summarise_all(mean, na.rm=T) %>%
-  select(contains(c("sd_", "ID", "Temp", "Atrazine", "r1", "a11"))) %>%
+  select(contains(c("mean_", "sd_", "ID", "Temp", "Atrazine", "r1", "a11"))) %>%
   pivot_longer(contains(c("sd_")), names_to = "trait", values_to= "sd") %>%
   filter(!grepl('Spiro', ID_spec))
 
@@ -54,7 +54,7 @@ ggplot(data_cyano) +
 #Now compute the alpha's
 data_cyano <- data_cyano %>%
   group_by(strain, treat) %>%
-  mutate(alpha = -cov(population.mean.0, pcgr) / var(population.mean.0)) %>% #alphas
+  mutate(alpha = cov(population.mean.0, pcgr) / var(population.mean.0)) %>% #alphas
   group_by(strain, treat) %>%
   summarise_all(mean, na.rm=T) %>%
   select(contains(c("strain", "treat", "alpha", ".sd"))) %>%
@@ -63,7 +63,7 @@ data_cyano <- data_cyano %>%
 
 ggplot(data_cyano %>% filter(treat %in% c("C", "T"))) + 
   theme_classic() + 
-  aes(x=log10(sd), y=log10(alpha), 
+  aes(x=log10(sd), y=alpha, 
       col=as_factor(treat)) + 
   geom_point() + 
   facet_grid(cols = vars(trait), scales="free") + 
