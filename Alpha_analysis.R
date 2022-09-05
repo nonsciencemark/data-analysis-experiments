@@ -13,4 +13,8 @@ ggplot(data_cilia) +
   geom_point() + 
   facet_grid(cols = vars(trait), scales="free") #, rows = vars(ID_spec)
 
-data_cyano <- load("cyanobacteria/mono_data_clean.RData")
+data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
+  separate(date.time, sep="-", into = c("year", "month", "day")) %>%
+  separate(day, sep=" ", into =c("day", "h"))
+  
+  
