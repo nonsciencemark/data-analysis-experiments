@@ -1,5 +1,5 @@
 library(tidyverse)
-data <- read.csv("DIVERCE_TdB_Ciliates_Traits.csv") %>%
+data <- read.csv("ciliates/DIVERCE_TdB_Ciliates_Traits.csv") %>%
   group_by(ID_spec, Temp, Atrazine) %>%
   summarise_all(mean, na.rm=T) %>%
   select(contains(c("sd_", "ID", "Temp", "Atrazine", "r1", "a11"))) %>%
