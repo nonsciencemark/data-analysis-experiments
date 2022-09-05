@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lubridate)
 data_cilia <- read.csv("ciliates/DIVERCE_TdB_Ciliates_Traits.csv") %>%
   group_by(ID_spec, Temp, Atrazine) %>%
   summarise_all(mean, na.rm=T) %>%
@@ -14,7 +15,10 @@ ggplot(data_cilia) +
   facet_grid(cols = vars(trait), scales="free") #, rows = vars(ID_spec)
 
 data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
-  separate(date.time, sep="-", into = c("year", "month", "day")) %>%
-  separate(day, sep=" ", into =c("day", "h"))
+  separate(date.time, sep=" ", into = c("date", "time")) %>%
+  mutate(day = yday(date), .after = date) %>%
+  select(-c(date, time)) %>%
+  group_by(strain, treat) %>%
+  mutate(day = day - min(day)) %>%
   
   
