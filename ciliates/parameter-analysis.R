@@ -2,17 +2,6 @@
 library('tidyverse')  
 
 # load data ====
-# data <- read.csv('ciliates/DIVERCE_TdB_Ciliates_Traits.csv') %>%
-#   group_by(ID_spec, Temp, Atrazine) %>%
-#   summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%
-#   select(contains(c('sd_', 'ID', 'Temp', 'Atrazine', 'r1', 'a11'))) %>%
-#   pivot_longer(contains(c('sd_')), names_to = 'trait', values_to = 'sd') %>%
-#   dplyr::filter(!grepl('Spiro', ID_spec)) %>%
-#   mutate(trait = replace(trait, trait == 'sd_ar', 'Aspect ratio'),
-#          trait = replace(trait, trait == 'sd_area', 'Area'),
-#          trait = replace(trait, trait == 'sd_speed', 'Speed'),
-#          trait = replace(trait, trait == 'sd_linearity', 'Linearity'))
-
 data <- read.csv('ciliates/DIVERCE_TdB_Ciliates_Traits.csv') %>%
   group_by(ID_spec, Temp, Atrazine) %>%
   summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%
@@ -29,7 +18,7 @@ data <- read.csv('ciliates/DIVERCE_TdB_Ciliates_Traits.csv') %>%
 
 # alpha analysis ====
 
-# plot aii with just the traits as facets
+## plot aii with just the traits as facets ====
 ggplot(data %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
@@ -43,7 +32,7 @@ ggplot(data %>%
        y = expression(paste('Self-limitation (', alpha['ii'], ')'))) +
   facet_wrap(.~trait, scales = 'free')
 
-# plot aii including species as facet
+## plot aii including species as facet ====
 ggplot(data %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
@@ -58,7 +47,7 @@ ggplot(data %>%
 
 # mu analysis ==== 
 
-# plot ri with just the traits as facets
+## plot ri with just the traits as facets ====
 ggplot(data %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
@@ -72,7 +61,7 @@ ggplot(data %>%
        y = expression(paste('Intrinsic growth rate (', mu['i'], ')'))) +
   facet_wrap(.~trait, scales = 'free')
 
-# plot ri including species as facet
+## plot ri including species as facet ====
 ggplot(data %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 

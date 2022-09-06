@@ -10,6 +10,7 @@ library('tidyverse')
 library('flowClust')
 library('gauseR')
 library('deSolve')
+library('scales')
 ```
 
 # Introduction
@@ -48,7 +49,7 @@ ggplot(mono.data, aes(x = as.POSIXct(date), y = population.mean, col = strain)) 
   facet_wrap(treat~., scales = 'free_y', nrow = 2, 
              labeller = label_wrap_gen(multi_line = FALSE)) +
     scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
-                labels = trans_format('log10', scales::math_format(10^.x))) +
+                labels = trans_format('log10', math_format(10^.x))) +
   geom_line(position = position_dodge(.5)) +
   geom_pointrange(aes(
     ymin = population.mean - population.sd, 
@@ -57,6 +58,26 @@ ggplot(mono.data, aes(x = as.POSIXct(date), y = population.mean, col = strain)) 
   theme_bw() +
   labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
   theme(legend.position = 'bottom')
+```
+
+## Filtering lag phases out using Kremer's [growthTools](https://github.com/ctkremer/growthTools/)
+
+```{r, filter-lag}
+library('growthTools')
+
+lag.sat.pars <- mono.data %>% 
+  group_by(strain, treat) %>%
+  summarise(mods = list(get.growth.rate(
+    date.time, population.mean, id = paste(strain, treat), plot.best.Q = F, 
+    methods = c('linear', 'lag', 'sat', 'lagsat')))) %>%
+  rowwise %>%
+  mutate(best.mod = mods$best.model, 
+         mod.coef = list(coef(mods$best.model.contents[[1]])),
+         B1 = ifelse('B1' %in% names(mod.coef), mod.coef['B1'], NA),
+         B2 = ifelse('B2' %in% names(mod.coef), mod.coef['B2'], NA))
+
+lag.sat.pars
+
 ```
 
 ## Lotka-Volterra model fitting using GauseR
