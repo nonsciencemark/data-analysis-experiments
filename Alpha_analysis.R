@@ -2,25 +2,62 @@ library(tidyverse)
 library(lubridate)
 
 # CILIATES ------
+## Import data and compute pcgr----
 data_cilia <- read.csv("ciliates/DIVERCE_TdB_Ciliates_Traits.csv") %>%
+  group_by(Atrazine, Temp, ID_spec) %>%
   mutate(Days_fromstart.0 = lag(Days_fromstart, 1), .after = Days_fromstart) %>%
   mutate(Count.0 = lag(Count, 1), 
          .after = Count) %>%
   mutate(pcgr = log(Count/Count.0)/(Days_fromstart-Days_fromstart.0),
-         .after = Count.0) %>%
-  mutate(cv_ar = sd_ar/mean_ar) %>%
+         .after = Count.0) 
+
+## Plot growth curves ----
+ggplot(data_cilia) +
+  theme_classic() + 
+  aes(x=Days_fromstart, y=log10(Count), 
+      col=as_factor(Temp), pch=as_factor(Atrazine)) + 
+  geom_point() + 
+  facet_grid(cols = vars(ID_spec), scales="free") #, rows = vars(ID_spec)
+
+## Kick out: ----
+#all pcgr that are too negative (crashing o/t culture)  
+#no apparent lag phase
+data_cilia_clean <- data_cilia %>%
+  filter(pcgr>-1) 
+
+## Re-evaluate growth curves----
+ggplot(data_cilia_clean) +
+  theme_classic() + 
+  aes(x=Days_fromstart, y=log10(Count), 
+      col=as_factor(Temp), pch=as_factor(Atrazine)) + 
+  geom_point() + 
+  facet_grid(cols = vars(ID_spec), scales="free") #, rows = vars(ID_spec)
+
+## Check linear growth----
+ggplot(data_cilia_clean) +
+  theme_classic() + 
+  aes(x=Days_fromstart.0, y=pcgr, 
+      col=as_factor(Temp)) + 
+  geom_point() + 
+  facet_grid(vars(ID_spec), vars(Atrazine), scales="free") + #, rows = vars(ID_spec)
+  geom_smooth(method="lm")
+
+## Continue with the analysis----
+data_cilia_clean_analysis <- data_cilia_clean %>%
+  group_by(Atrazine, Temp, ID_spec) %>%
+  mutate(alpha = cov(Count.0, pcgr) / var(Count.0)) %>% #alphas
+  mutate(cv_ar = sd_ar/mean_ar) %>% #compute cvs
   mutate(cv_area = sd_area/mean_area) %>%
   mutate(cv_speed = sd_speed/mean_speed) %>%
   mutate(cv_linearity = sd_linearity/mean_linearity) %>%
-  group_by(ID_spec, Temp, Atrazine) %>%
   summarise_all(mean, na.rm=T) %>%
-  select(contains(c("cv_", "ID", "Temp", "Atrazine", "r1", "a11"))) %>%
+  select(contains(c("cv_", "ID", "Temp", "Atrazine", "alpha"))) %>%
   pivot_longer(contains(c("cv_")), names_to = "trait", values_to= "cv") %>%
   filter(!grepl('Spiro', ID_spec))
 
-ggplot(data_cilia) + 
+ggplot(data_cilia_clean_analysis) + 
   theme_classic() + 
-  aes(x=log10(cv), y=a11, 
+  aes(x=log10(cv), y=-alpha, 
       col=as_factor(Temp), pch=as_factor(Atrazine)) + 
   geom_point() + 
   facet_grid(cols = vars(trait), scales="free") + #, rows = vars(ID_spec)
