@@ -95,12 +95,15 @@ ggplot(data_cyano) +
   geom_point(aes(x=day, y=log10(population.mean))) + 
   facet_grid(cols = vars(strain), scales="free") #, rows = vars(ID_spec)
 ## Now clean based on GAM predictions:
-# remove all data for timepoints after peak abundance
-# 
+# remove all data for timepoints after peak abundance. 
+# Note that pcgr on last day will remain there.
 data_cyano_clean <- data_cyano %>%
   group_by(strain, treat) %>%
-  filter(day < max(day*(predictions==max(predictions))))
-  mutate(lag.phase = ((log10(population.mean.0)<3.5)&(log10(population.mean)<3.5))) %>%
+  filter(day < max(day*(predictions==max(predictions)))) 
+
+
+
+mutate(lag.phase = ((log10(population.mean.0)<3.5)&(log10(population.mean)<3.5))) %>%
   filter(lag.phase == FALSE)
 
 #all data points where log10(population.mean) is consistently low (<3.5) because of lags
