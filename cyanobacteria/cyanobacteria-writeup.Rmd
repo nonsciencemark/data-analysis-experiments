@@ -219,17 +219,9 @@ ggplot(sd.traits,
        pch = 'Strain',
        title = 'Mean proportional trait change vs model fitting accuracy')
 
+# we have an issue here, since trait values change even while in lag phase...
+
 ```
-
-FSC is...
-
-SSC is...
-
-RED.B is...
-
-RED.R is...
-
-YEL.B is...
 
 How do they change over time?
 
@@ -249,6 +241,35 @@ ggplot(trait.time, aes(x = date.time, y = mean, col = strain, pch = treat)) +
   scale_shape_manual(values = c(21, 22, 23, 24)) +
   labs(col = 'Strain', x = 'Time (hours)', y = 'Trait value') +
   theme(legend.position = 'bottom')
+```
+
+Do the trait values predict per-capita growth?
+
+```{r, traits-percap}
+
+traits.pcgr <- out.data %>%
+  dplyr::select(-contains('.sd')) %>%
+  group_by(strain, treat) %>%
+  mutate(pcgr = percap_growth(population.mean, 
+                              dplyr::lag(population.mean), 
+                              date.time - dplyr::lag(date.time))) %>% 
+  pivot_longer(FSC.HLin.mean:NIR.R.HLin.mean, names_to = 'Channel') %>%
+  rowwise %>%
+  mutate(Channel = strsplit(Channel, '.HLin')[[1]][1]) %>%
+  drop_na(pcgr)
+
+# actually we want to pick channels which are not that different between strains ?
+
+ggplot(traits.pcgr, 
+       aes(x = value, y = pcgr)) +
+  facet_wrap(.~Channel, scales = 'free', labeller = 'label_both') +
+  geom_smooth(method = 'glm', formula = y ~ poly(x, 2), se = T) +
+  geom_hline(yintercept = 0) +
+  geom_point(aes(col = treat, pch = strain)) +
+  theme_bw() +
+  labs(y = 'Per-capita growth rate',
+       x = 'Trait value')
+
 ```
 
 How much does each trait change?
