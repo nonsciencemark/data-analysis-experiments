@@ -35,15 +35,55 @@ We used the `GauseR` package to determine the Lotka-Volterra growth parameters o
 ## Species growth
 Below, we visualise growth of the the strain populations over time. Each point is the average value of three replicates.
 
-```{r, plotting-raw-data, fig.width=10, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
+```{r, import-data, fig.width=10, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
 # Load data
 mono.data <- read.csv('cyanobacteria/mono_data.csv') %>%
   group_by(strain, treat) %>% # group by strain ID and treatment
   mutate(date.time = date.time %>% as.POSIXct %>% as.numeric, # convert to good format
-         date.time = (date.time - min(date.time)) / 3600, #in hours
+         date.time = (date.time - min(date.time)) / 3600,  # in hours 
+         #
+         # ISSUE: THIS ONLY WORKS WHEN NOT IN HOURS??
+         #
          strain = as.factor(strain)) %>%
    arrange(date.time) # order by sampling time
+```
 
+
+## Filtering lag phases out using Kremer's [growthTools](https://github.com/ctkremer/growthTools/)
+
+```{r, filter-lag}
+library('growthTools')
+
+lag.sat.pars <- mono.data %>% 
+  group_by(strain, treat) %>%
+  summarise(mods = list(get.growth.rate(
+    date.time, log(population.mean), id = paste(strain, treat), plot.best.Q = F, 
+    methods = c('linear', 'lag', 'sat', 'lagsat')))) %>%
+  rowwise %>%
+  mutate(best.mod = mods$best.model, 
+         mod.coef = list(coef(mods$best.model.contents[[1]])),
+         B1 = ifelse('B1' %in% names(mod.coef), mod.coef['B1'], NA),
+         B2 = ifelse('B2' %in% names(mod.coef), mod.coef['B2'], NA),
+         a = ifelse(best.mod == 'gr', mod.coef['(Intercept)'], mod.coef['a']),
+         b = ifelse(best.mod == 'gr', mod.coef['x'], mod.coef['b']),
+         r.estim = b / a)
+
+lag.sat.pars
+
+mean.time.diff <- mono.data %>% group_by(strain, treat) %>% summarise(d = mean(diff(date.time))) %>% ungroup %>% summarise(d = mean(d)) %>% unlist %>% c
+
+mono.data <- left_join(mono.data, lag.sat.pars) %>%
+  mutate(cutoff.low =  B1 - 1.5 * mean.time.diff,#mean.time.diff/(5*b),
+         cutoff.high = B2 + 3 * mean.time.diff,#mean.time.diff/(5*b),
+         cutoff.low = ifelse(is.na(B1), 0, cutoff.low),
+         cutoff.high = ifelse(is.na(B2), Inf, cutoff.high)) %>%
+  ungroup %>%
+  dplyr::filter(date.time > cutoff.low,
+                date.time < cutoff.high)
+
+```
+
+```{r,plotting-raw-data}
 # View raw data
 ggplot(mono.data, aes(x = as.POSIXct(date), y = population.mean, col = strain)) + 
   facet_wrap(treat~., scales = 'free_y', nrow = 2, 
@@ -56,43 +96,29 @@ ggplot(mono.data, aes(x = as.POSIXct(date), y = population.mean, col = strain)) 
     ymax = population.mean + population.sd), 
     pch = 21, fill = 'white', position = position_dodge(.5)) +
   theme_bw() +
-  labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
+  labs(col = 'Strain', x = 'Time (Days)', y = 'Population Density') +
   theme(legend.position = 'bottom')
 ```
 
-## Filtering lag phases out using Kremer's [growthTools](https://github.com/ctkremer/growthTools/)
-
-```{r, filter-lag}
-library('growthTools')
-
-lag.sat.pars <- mono.data %>% 
-  group_by(strain, treat) %>%
-  summarise(mods = list(get.growth.rate(
-    date.time, population.mean, id = paste(strain, treat), plot.best.Q = F, 
-    methods = c('linear', 'lag', 'sat', 'lagsat')))) %>%
-  rowwise %>%
-  mutate(best.mod = mods$best.model, 
-         mod.coef = list(coef(mods$best.model.contents[[1]])),
-         B1 = ifelse('B1' %in% names(mod.coef), mod.coef['B1'], NA),
-         B2 = ifelse('B2' %in% names(mod.coef), mod.coef['B2'], NA))
-
-lag.sat.pars
-
-```
 
 ## Lotka-Volterra model fitting using GauseR
 We now fit a Lotka-Volterra population model to the data, to determine the intrinsic growth rates and self-interaction parameters ($r$ and $a$, respectively).
 
 ```{r, fitting-parameters, fig.width=10, fig.height=8, fig.cap="Prediction of fitted Lotka-Volterra model"}
 # model fitting
-mod <- mono.data %>%
-  summarise(gause.fit = list(gause_wrapper( # gauseR function
-    time = date.time, # sampling intervals
-    species = population.mean, # population densities
-    keeptimes = TRUE, # return prediction at the same time-steps
-    r_starting = 5e-2, # initial guess for r
-    A_starting = -5e-7, # initial guess for a 
-    doplot = FALSE))) # don't plot the model fitting process
+mod <- mono.data %>% 
+  group_by(strain, treat) %>%
+  summarise(
+    gause.fit = list(gause_wrapper( # gauseR function
+      time = date.time, # sampling intervals
+      species = population.mean, # population densities
+      keeptimes = TRUE, # return prediction at the same time-steps
+      r_starting = ifelse(first(r.estim) < 0, 8e-6, first(r.estim)), # initial guess for r
+      A_starting = -1e-8, # initial guess for a
+      doplot = FALSE))# don't plot the model fitting process
+    ) #%>%
+  # rowwise %>%
+  # mutate(r = gause.fit$parameter_intervals[2,2])
 
 # extract model prediction
 pred.data <- mod %>%
@@ -154,10 +180,10 @@ ggplot(CoD.data, aes(x = strain, y = R2, pch = treat, col = strain)) +
 We can see that the model fit is mostly good except for strain 2383 in atrazine conditions.
 
 ```{r}
-mono.data %>% dplyr::filter(date > '17-06-2022') %>%
+mono.data %>% #dplyr::filter(date > '17-06-2022') %>%
   mutate(lag.pop = get_lag(population.mean, date.time),
                    PCGR = percap_growth(lag.pop$x, lag.pop$laggedx, lag.pop$dt)) %>%
-  ggplot(aes(x = lag(population.mean), y = PCGR, col = treat)) + 
+  ggplot(aes(x = dplyr::lag(population.mean), y = PCGR, col = treat)) + 
   facet_wrap(strain~., scales = 'free', nrow = 2,
              labeller = label_wrap_gen(multi_line=FALSE)) +
   scale_x_log10() +
