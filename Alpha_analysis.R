@@ -54,6 +54,7 @@ ggplot(data_cilia_clean_analysis) +
   geom_smooth(method="lm", se=F)
 
 # CYANO ------
+## Import data and compute pcgr----
 data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   separate(date.time, sep=" ", into = c("date", "time")) %>%
   mutate(day = yday(date), .after = date) %>%
@@ -64,19 +65,45 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   mutate(population.mean.0 = lag(population.mean, 1), 
          .after = population.mean) %>%
   mutate(pcgr = log(population.mean/population.mean.0)/(day-day.0),
-         .after = population.mean.0)
+         .after = population.mean.0) %>%
+  mutate(strain_treat = paste(strain, treat, sep="_"))
+#we need to make a dummy variable because s() can only take one grouping variable
 
-#kick out: 
-#all pcgr that are too negative (crashing o/t culture) and 
-#all data points where log10(population.mean) is consistently low (<3.5) because of lags
-data_cyano <- data_cyano %>%
-  mutate(GRN.B.HLin.cv = GRN.B.HLin.sd/GRN.B.HLin.mean) %>%
-  mutate(YEL.B.HLin.cv = YEL.B.HLin.sd/YEL.B.HLin.mean) %>%
-  mutate(RED.B.HLin.cv = RED.B.HLin.sd/RED.B.HLin.mean) %>%
-  mutate(RED.R.HLin.cv = RED.R.HLin.sd/RED.R.HLin.mean) %>%
-  filter(pcgr>-0.1) %>%
+## Plot growth curves ----
+ggplot(data_cyano) +
+  theme_classic() + 
+  aes(x=day, y=log10(population.mean), 
+      col=as_factor(treat), pch=as_factor(treat)) + 
+  geom_point() + 
+  facet_grid(cols = vars(strain), scales="free") +
+  geom_smooth(method = "gam")
+#observe lag phaases and population crashes. Solution for crashes:
+#fit a gam, make predictions, compute the pcgr from these predictions 
+#and find the timepoint with max abundance
+
+## Apply GAM fitting ---- 
+model <- gam(log10(population.mean) ~ strain + treat + 
+               s(day, by = as_factor(strain_treat), k=3, bs = "cs"), 
+             data = data_cyano, method = "REML") 
+data_cyano$predictions <- predict.gam(model) 
+## Plot GAM predictions ----
+ggplot(data_cyano) +
+  theme_classic() + 
+  aes(x=day, y=predictions, 
+      col=as_factor(treat), pch=as_factor(treat)) + 
+  geom_line() + 
+  facet_grid(cols = vars(strain), scales="free") #, rows = vars(ID_spec)
+## Now clean based on GAM predictions:
+# remove all data for timepoints after peak abundance
+# 
+data_cyano_clean <- data_cyano %>%
+  group_by(strain, treat) %>%
+  filter(day < max(day*(predictions==max(predictions))))
   mutate(lag.phase = ((log10(population.mean.0)<3.5)&(log10(population.mean)<3.5))) %>%
   filter(lag.phase == FALSE)
+
+#all data points where log10(population.mean) is consistently low (<3.5) because of lags
+
 
 ggplot(data_cyano) +
   theme_classic() + 
@@ -94,6 +121,10 @@ ggplot(data_cyano) +
 
 #Now compute the alpha's
 data_cyano <- data_cyano %>%
+  mutate(GRN.B.HLin.cv = GRN.B.HLin.sd/GRN.B.HLin.mean) %>%
+  mutate(YEL.B.HLin.cv = YEL.B.HLin.sd/YEL.B.HLin.mean) %>%
+  mutate(RED.B.HLin.cv = RED.B.HLin.sd/RED.B.HLin.mean) %>%
+  mutate(RED.R.HLin.cv = RED.R.HLin.sd/RED.R.HLin.mean) %>%
   group_by(strain, treat) %>%
   mutate(alpha = cov(population.mean.0, pcgr) / var(population.mean.0)) %>% #alphas
   group_by(strain, treat) %>%
