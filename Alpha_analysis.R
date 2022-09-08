@@ -15,31 +15,22 @@ data_cilia <- read.csv("ciliates/DIVERCE_TdB_Ciliates_Traits.csv") %>%
 ggplot(data_cilia) +
   theme_classic() + 
   aes(x=Days_fromstart, y=log10(Count), 
-      col=as_factor(Temp), pch=as_factor(Atrazine)) + 
+      col=as_factor(Temp)) + 
   geom_point() + 
-  facet_grid(cols = vars(ID_spec), scales="free") #, rows = vars(ID_spec)
+  facet_grid(cols = vars(Atrazine), rows = vars(ID_spec), scales="free") #, rows = vars(ID_spec)
 
 ## Kick out: ----
-#all pcgr that are too negative (crashing o/t culture)  
-#no apparent lag phase
-data_cilia_clean <- data_cilia %>%
-  filter(pcgr>-1) 
-
-## Re-evaluate growth curves----
-ggplot(data_cilia_clean) +
-  theme_classic() + 
-  aes(x=Days_fromstart, y=log10(Count), 
-      col=as_factor(Temp), pch=as_factor(Atrazine)) + 
-  geom_point() + 
-  facet_grid(cols = vars(ID_spec), scales="free") #, rows = vars(ID_spec)
+#1 extremely negative pcgr: (no apparent lag phase and no real crashes)
+data_cilia_clean <- data_cilia %>% 
+  filter(pcgr > -10)
 
 ## Check linear growth----
 ggplot(data_cilia_clean) +
   theme_classic() + 
-  aes(x=Days_fromstart.0, y=pcgr, 
+  aes(x=Count.0, y=pcgr, 
       col=as_factor(Temp)) + 
   geom_point() + 
-  facet_grid(vars(ID_spec), vars(Atrazine), scales="free") + #, rows = vars(ID_spec)
+  facet_grid(cols = vars(ID_spec), rows = vars(Atrazine), scales="free") +#, rows = vars(ID_spec)
   geom_smooth(method="lm")
 
 ## Continue with the analysis----
@@ -52,12 +43,11 @@ data_cilia_clean_analysis <- data_cilia_clean %>%
   mutate(cv_linearity = sd_linearity/mean_linearity) %>%
   summarise_all(mean, na.rm=T) %>%
   select(contains(c("cv_", "ID", "Temp", "Atrazine", "alpha"))) %>%
-  pivot_longer(contains(c("cv_")), names_to = "trait", values_to= "cv") %>%
-  filter(!grepl('Spiro', ID_spec))
+  pivot_longer(contains(c("cv_")), names_to = "trait", values_to= "cv") 
 
 ggplot(data_cilia_clean_analysis) + 
   theme_classic() + 
-  aes(x=log10(cv), y=-alpha, 
+  aes(x=log10(cv), y=log(-alpha), 
       col=as_factor(Temp), pch=as_factor(Atrazine)) + 
   geom_point() + 
   facet_grid(cols = vars(trait), scales="free") + #, rows = vars(ID_spec)
