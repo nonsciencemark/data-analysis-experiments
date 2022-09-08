@@ -45,7 +45,8 @@ mono.data <- read.csv('cyanobacteria/mono_data.csv') %>%
          # ISSUE: THIS ONLY WORKS WHEN NOT IN HOURS??
          #
          strain = as.factor(strain)) %>%
-   arrange(date.time) # order by sampling time
+   arrange(date.time) %>% # order by sampling time
+  mutate()
 ```
 
 
@@ -113,7 +114,7 @@ mod <- mono.data %>%
       time = date.time, # sampling intervals
       species = population.mean, # population densities
       keeptimes = TRUE, # return prediction at the same time-steps
-      r_starting = ifelse(first(r.estim) < 0, 8e-6, first(r.estim)), # initial guess for r
+      r_starting = ifelse(first(r.estim) < 0, 1e-8, first(r.estim)), # initial guess for r
       A_starting = -1e-8, # initial guess for a
       doplot = FALSE))# don't plot the model fitting process
     ) #%>%
@@ -150,7 +151,7 @@ ggplot(out.data, aes(x = date.time, col = strain)) +
 ### Accuracy
 We'd like to see how accurate the model-fitting procedure is using the coefficient of determination... ($R^2$)
 
-```{r, coefficient-of-determination, fig.width=5, fig.height=3, fig.cap="Accuracy of model-fitting procedure"}
+```{r, coefficient-of-determination, fig.width=7, fig.height=3, fig.cap="Accuracy of model-fitting procedure"}
 # Data frame with CoD
 CoD.data <- out.data %>%
   mutate(difference = population.mean - prediction,
@@ -177,26 +178,48 @@ ggplot(CoD.data, aes(x = strain, y = R2, pch = treat, col = strain)) +
         legend.position = 'bottom')
 ```
 
-We can see that the model fit is mostly good except for strain 2383 in atrazine conditions.
-
-```{r}
-mono.data %>% #dplyr::filter(date > '17-06-2022') %>%
-  mutate(lag.pop = get_lag(population.mean, date.time),
-                   PCGR = percap_growth(lag.pop$x, lag.pop$laggedx, lag.pop$dt)) %>%
-  ggplot(aes(x = dplyr::lag(population.mean), y = PCGR, col = treat)) + 
-  facet_wrap(strain~., scales = 'free', nrow = 2,
-             labeller = label_wrap_gen(multi_line=FALSE)) +
-  scale_x_log10() +
-  geom_smooth(method = 'glm', se = FALSE) +
-  geom_point(pch = 21, fill = 'white', size = 2) +
-  theme_bw() +
-  theme(legend.position = 'bottom')
-
-```
-
+We can see that the model fit is mostly good except for strain 2434 in atrazine and atrazine + temperature conditions.
 
 ### Accuracy and traits
 What if the loss of model accuracy is due to functional trait changes? Let's first view the relevant ones...
+
+```{r, d-traits-vs-acc}
+
+# sd.traits <- out.data %>% 
+#   group_by(strain, treat) %>%
+#   summarise(across(FSC.HLin.mean:NIR.R.HLin.mean, sd)) %>% 
+#   left_join(CoD.data) %>% 
+#   pivot_longer(FSC.HLin.mean:NIR.R.HLin.mean, names_to = 'channel', values_to = 'SD') %>%
+#   rowwise %>%
+#   mutate(channel = strsplit(channel, '.HLin')[[1]][1])
+
+# try with Euclidean distance?
+sd.traits <- out.data %>% 
+  group_by(strain, treat) %>%
+  dplyr::select(date.time, contains('HLin.mean')) %>%
+  dplyr::filter(row_number() %in% c(1, n())) %>% 
+  summarise(across(FSC.HLin.mean:NIR.R.HLin.mean, function(i) {
+    abs(i[2] - i[1]) / sum(i)
+    #dist(i)[1] / sum(i)
+    })) %>%
+  pivot_longer(FSC.HLin.mean:NIR.R.HLin.mean) %>%
+  group_by(strain, treat) %>%
+  summarise(mean.d.trait = mean(value)) %>% 
+  left_join(CoD.data)
+
+ggplot(sd.traits, 
+       aes(x = mean.d.trait, y = R2, col = treat)) +
+  geom_point(aes(pch = strain)) +
+  geom_smooth(method = 'lm', se = FALSE) +
+  coord_cartesian(ylim = c(0, 1)) +
+  theme_bw() + 
+  labs(y = expression('R'^2),
+       x = 'Mean proportional change between initial & final traits',
+       col = 'Treatment',
+       pch = 'Strain',
+       title = 'Mean proportional trait change vs model fitting accuracy')
+
+```
 
 FSC is...
 
