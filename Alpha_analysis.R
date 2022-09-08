@@ -82,9 +82,9 @@ ggplot(data_cyano) +
 #and find the timepoint with max abundance
 
 ## Apply GAM fitting ---- 
-model <- gam(log10(population.mean) ~ strain + treat + 
-               s(day, by = as_factor(strain_treat), k=3, bs = "cs"), 
-             data = data_cyano, method = "REML") 
+model <- gam(log10(population.mean) ~ as_factor(strain_treat) + 
+               s(day, by = as_factor(strain_treat), k=5), 
+             data = data_cyano) 
 data_cyano$predictions <- predict.gam(model) 
 ## Plot GAM predictions ----
 ggplot(data_cyano) +
@@ -92,6 +92,7 @@ ggplot(data_cyano) +
   aes(x=day, y=predictions, 
       col=as_factor(treat), pch=as_factor(treat)) + 
   geom_line() + 
+  geom_point(aes(x=day, y=log10(population.mean))) + 
   facet_grid(cols = vars(strain), scales="free") #, rows = vars(ID_spec)
 ## Now clean based on GAM predictions:
 # remove all data for timepoints after peak abundance
