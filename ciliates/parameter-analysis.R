@@ -1,5 +1,9 @@
 # packages
 library('tidyverse')  
+<<<<<<< Updated upstream
+=======
+library('ggplot2')
+>>>>>>> Stashed changes
 library('scales')
 
 # load data ====
@@ -14,7 +18,7 @@ library('scales')
 #          trait = replace(trait, trait == 'sd_speed', 'Speed'),
 #          trait = replace(trait, trait == 'sd_linearity', 'Linearity'))
 
-data <- read.csv('ciliates/DIVERCE_TdB_Ciliates_Traits.csv') %>%
+data <- read.csv('DIVERCE_TdB_Ciliates_Traits.csv') %>%
   group_by(ID_spec, Temp, Atrazine) %>%
   summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%
   select(contains(c('sd_', 'mean_', 'ID', 'Temp', 'Atrazine', 'r1', 'a11'))) %>%
@@ -22,17 +26,18 @@ data <- read.csv('ciliates/DIVERCE_TdB_Ciliates_Traits.csv') %>%
                names_to = c('metric', 'trait'), 
                names_pattern = '(.*)_(.*)') %>%
   pivot_wider(names_from = metric, values_from = value) %>%
-  dplyr::filter(!grepl('Spiro', ID_spec)) %>%
+  #dplyr::filter(!grepl('Spiro', ID_spec)) %>%
   mutate(trait = replace(trait, trait == 'sd_ar', 'Aspect ratio'),
          trait = replace(trait, trait == 'sd_area', 'Area'),
          trait = replace(trait, trait == 'sd_speed', 'Speed'),
          trait = replace(trait, trait == 'sd_linearity', 'Linearity'))
 
 # alpha analysis ====
-
+dataOUT <- data %>%
+  filter(a11 < -1e-8)
 # plot aii with just the traits as facets
-ggplot(data %>% 
-         mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
+ggplot(dataOUT %>% 
+         mutate(Temp = as.factor(ID_spec), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
   aes(x = sd, y = -a11) + 
   scale_x_log10() + 
@@ -45,7 +50,7 @@ ggplot(data %>%
   facet_wrap(.~trait, scales = 'free')
 
 # plot aii including species as facet
-ggplot(data %>% 
+ggplot(dataOUT %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
   aes(x = sd, y = -a11, col = Temp, pch = Atrazine) + 
@@ -60,7 +65,7 @@ ggplot(data %>%
 # mu analysis ==== 
 
 # plot ri with just the traits as facets
-ggplot(data %>% 
+ggplot(dataOUT %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
   aes(x = mean, y = r1) + 
@@ -74,7 +79,7 @@ ggplot(data %>%
   facet_wrap(.~trait, scales = 'free')
 
 # plot ri including species as facet
-ggplot(data %>% 
+ggplot(dataOUT %>% 
          mutate(Temp = as.factor(Temp), Atrazine = as.factor(Atrazine))) + 
   theme_bw() + 
   aes(x = mean, y = r1, col = Temp, pch = Atrazine) + 
