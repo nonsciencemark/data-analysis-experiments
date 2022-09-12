@@ -22,7 +22,7 @@ ggplot(data_cilia) +
 ## Kick out: ----
 #1 extremely negative pcgr: (no apparent lag phase and no real crashes)
 data_cilia_clean <- data_cilia %>% 
-  filter(pcgr > -10)
+  filter(pcgr > -5)
 
 ## Check linear growth----
 ggplot(data_cilia_clean) +
