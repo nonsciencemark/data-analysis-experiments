@@ -33,25 +33,27 @@ ggplot(data_cilia_clean) +
   facet_grid(cols = vars(ID_spec), rows = vars(Atrazine), scales="free") +#, rows = vars(ID_spec)
   geom_smooth(method="lm")
 
-## Continue with the analysis----
+## Compute the alphas and analyse ----
 data_cilia_clean_analysis <- data_cilia_clean %>%
   group_by(Atrazine, Temp, ID_spec) %>%
   mutate(alpha = cov(Count, pcgr) / var(Count)) %>% #alphas
+  mutate(igr = mean(pcgr) - alpha*mean(Count)) %>% #intrinsic growth rate
   mutate(cv_ar = sd_ar/mean_ar) %>% #compute cvs
   mutate(cv_area = sd_area/mean_area) %>%
   mutate(cv_speed = sd_speed/mean_speed) %>%
   mutate(cv_linearity = sd_linearity/mean_linearity) %>%
-  summarise_all(mean, na.rm=T) %>%
-  select(contains(c("cv_", "ID", "Temp", "Atrazine", "alpha"))) %>%
-  pivot_longer(contains(c("cv_")), names_to = "trait", values_to= "cv") 
+  select(-contains(c("sd_"))) %>%
+  pivot_longer(contains(c("cv_", "mean_")), names_to = "trait", values_to = "value") %>%
+  group_by(Atrazine, Temp, ID_spec, trait) %>%
+  mutate(value_delta = max(value) - min(value)) %>% # change of mean and sd of traits
+  summarise_all(mean, na.rm=T) 
 
 ggplot(data_cilia_clean_analysis) + 
   theme_classic() + 
-  aes(x=log10(cv), y=log(-alpha), 
-      col=as_factor(Temp), pch=as_factor(Atrazine)) + 
+  aes(x=log10(value_delta), y=log10(-alpha)) + #col=as_factor(treat)
   geom_point() + 
-  facet_grid(cols = vars(trait), scales="free") + #, rows = vars(ID_spec)
-  geom_smooth(method="lm", se=F)
+  facet_grid(cols = vars(trait), scales="free") + 
+  geom_smooth(method="lm", se=F) #, rows = vars(ID_spec)
 
 # CYANO ------
 ## Import data and compute pcgr----
@@ -109,25 +111,30 @@ ggplot(data_cyano_clean) +
   geom_point() + 
   facet_grid(cols = vars(strain), scales="free") #, rows = vars(ID_spec)
 
-## Now compute the alpha's ----
+## Now compute the alpha's and analyse----
 data_cyano_analysed <- data_cyano_clean %>%
+  mutate(FSC.HLin.cv = FSC.HLin.sd/FSC.HLin.mean) %>%
+  mutate(SSC.HLin.cv = SSC.HLin.sd/FSC.HLin.mean) %>%
   mutate(GRN.B.HLin.cv = GRN.B.HLin.sd/GRN.B.HLin.mean) %>%
   mutate(YEL.B.HLin.cv = YEL.B.HLin.sd/YEL.B.HLin.mean) %>%
   mutate(RED.B.HLin.cv = RED.B.HLin.sd/RED.B.HLin.mean) %>%
   mutate(RED.R.HLin.cv = RED.R.HLin.sd/RED.R.HLin.mean) %>%
+  select(-contains(c("NIR."))) %>% #kick out NIR data
   group_by(strain, treat) %>%
   mutate(alpha = cov(population.mean, pcgr) / var(population.mean)) %>% #alphas
-  summarise_all(mean, na.rm=T) %>%
-  select(contains(c("strain", "treat", "alpha", ".cv"))) %>%
-  pivot_longer(contains(c(".cv")), names_to = "trait", values_to= "cv")
+  mutate(igr = mean(pcgr) - alpha*mean(population.mean)) %>% #intrinsic growth rate
+  select(-contains(c(".sd", "population"))) %>%
+  pivot_longer(contains(c(".cv", ".mean")), names_to = "trait", values_to = "value") %>%
+  group_by(strain, treat, trait) %>%
+  mutate(value_delta = max(value) - min(value)) %>% # change of mean and sd of traits
+  summarise_all(mean, na.rm=T) 
 
-ggplot(data_cyano_analysed %>% filter(treat %in% c("C", "T"))) + 
+ggplot(data_cyano_analysed) + 
   theme_classic() + 
-  aes(x=log10(cv), y=alpha, 
-      col=as_factor(treat)) + 
+  aes(x=log10(value_delta), y=log10(-alpha)) + #col=as_factor(treat)
   geom_point() + 
   facet_grid(cols = vars(trait), scales="free") + 
-  geom_smooth(method="lm", se = F) #, rows = vars(ID_spec)
+  geom_smooth(method="lm", se=F) #, rows = vars(ID_spec)
 
 
 
