@@ -52,8 +52,8 @@ ggplot(data_cilia_clean_analysis) +
   theme_classic() + 
   aes(x=log10(value_delta), y=log10(-alpha)) + #col=as_factor(treat)
   geom_point() + 
-  facet_grid(cols = vars(trait), scales="free") + 
-  geom_smooth(method="lm", se=F) #, rows = vars(ID_spec)
+  facet_wrap(.~trait, scales="free") + 
+  geom_smooth(method="lm", se=T) #, rows = vars(ID_spec)
 
 # CYANO ------
 ## Import data and compute pcgr----
@@ -133,8 +133,8 @@ ggplot(data_cyano_analysed) +
   theme_classic() + 
   aes(x=log10(value_delta), y=log10(-alpha)) + #col=as_factor(treat)
   geom_point() + 
-  facet_grid(cols = vars(trait), scales="free") + 
-  geom_smooth(method="lm", se=F) #, rows = vars(ID_spec)
+  facet_wrap(.~trait, scales="free") + 
+  geom_smooth(method="lm", se=T) #, rows = vars(ID_spec)
 
 
 
