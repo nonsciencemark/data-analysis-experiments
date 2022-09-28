@@ -42,8 +42,11 @@ ggplot(data_cyano) +
   theme_bw() + 
   geom_point(aes(x=log10(population.mean), y=pcgr, pch=as_factor(strain),
                  col=as_factor(treat))) + 
-  geom_smooth(method=lm, aes(x=log10(population.mean), y=pcgr, colour=as_factor(treat)), 
+  geom_smooth(method=lm, aes(x=log10(population.mean), y=pcgr, 
+                             colour=as_factor(treat)), 
               formula=y ~ poly(x,1), se=F) +
   facet_wrap(vars(trait), scales="free") #, rows = vars(ID_spec)strain ~ 
 
-
+test <- lm(data_cyano, 
+           formula = pcgr ~ log10(population.mean)*as_factor(treat) + as_factor(treat))#test linear model
+plot(predict(test), data_cyano$pcgr)
