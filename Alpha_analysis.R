@@ -5,41 +5,52 @@ library(mgcv)
 #library(growthTools)
 
 # CILIATES ------
-## Import data and compute pcgr----
+## Import data and compute pcgr, and only keep specific species-trait combinations----
 data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
-  group_by(Atrazine, Temp, ID_spec) %>%
+  rename(strain = ID_spec) %>%
+  group_by(Atrazine, Temp, strain) %>%
   mutate(pcgr = log(lead(Count, 1)/Count)/(lead(Days_fromstart, 1)-Days_fromstart),
          .after = Count) %>% 
-  ungroup() %>%
-  group_by(ID_spec) %>%
-  mutate(phase = cut_interval(log10(Count), n=5, labels = FALSE)) %>%
   filter(pcgr > -5) %>% #Kick out extremely negative pcgr
+  ungroup() %>%
+  separate(strain, into = c("species", "sp.strain"), remove=F) %>%#link to species
+  group_by(strain) %>%
+  mutate(phase = cut_interval(log10(Count), n=5, labels = FALSE)) %>%
   pivot_longer(mean_ar:sd_linearity, names_to="trait") %>%
   separate(trait, into=c("stat", "trait"), sep="_") %>%
   pivot_wider(names_from=stat, values_from=value) %>%
-  mutate(cv=sd/mean)
+  mutate(cv=sd/mean)%>%
+  filter(((species=="Spiro")&(trait=="linearity"))|((species=="Tetra")&(trait=="area"))
+         |((species=="Para")&(trait=="speed"))|((species=="Loxo")&(trait=="linearity")))
 
+## fit a reference model: of dd for C data only, and add to the original data frame:------
+ref_model <- lm(data_cilia %>% filter(Treatment==1), 
+                formula = pcgr ~ poly(Count,1)*strain + strain)
+data_cilia$pcgr_ref <- predict.lm(ref_model, newdata = data_cilia)
+data_cilia <- data_cilia %>%
+  mutate(delta = pcgr - pcgr_ref)
+#plot the data and overlay the reference model of dd
 ggplot(data_cilia) +
-  scale_shape_manual(values = 0:8) +
   theme_bw() + 
-  geom_point(aes(x=mean, y=pcgr, pch=as_factor(Treatment),
-                 col=as_factor(phase)), alpha=0.5) + 
-  geom_smooth(method=lm, aes(x=mean, y=pcgr, 
-                             colour=as_factor(phase)), 
-              formula=y ~ poly(x,1)) + #, se=F
-  facet_wrap(vars(trait), scales="free") #, rows = vars(ID_spec)strain ~ 
+  geom_point(aes(x=Count, y=pcgr)) + 
+  #geom_smooth(method=lm, aes(x=Count, y=pcgr), 
+  #            formula=y ~ poly(x,1), se=F) + #
+  geom_line(aes(x=Count, y=pcgr_ref)) +
+  facet_wrap(vars(Treatment, strain), scales="free")
 
+#now check if the deviation from the ref model (delta) 
+#depends on the trait value
 ggplot(data_cilia) +
-  scale_shape_manual(values = 0:8) +
   theme_bw() + 
-  geom_point(aes(x=cv, y=pcgr, pch=as_factor(Treatment),
-                 col=as_factor(phase)), alpha=0.5) + 
-  geom_smooth(method=lm, aes(x=cv, y=pcgr, colour=as_factor(phase)), 
-              formula=y ~ poly(x,1), se=F) +
-  facet_wrap(vars(trait), scales="free")
+  geom_point(aes(x=mean, y=delta, col=as_factor(Treatment), 
+                 pch=as_factor(sp.strain))) + 
+  #geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(treat)),
+  #            formula=y ~ poly(x,1), se=F) + #
+  facet_wrap(vars(species), scales="free") #, rows = vars(ID_spec)strain ~ 
+#It doesn't 
 
 # CYANO ------
-## Import data and compute pcgr----
+## Import data and compute pcgr, and only keep specific species-trait combinations----
 data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   separate(date.time, sep=" ", into = c("date", "time")) %>%
   mutate(day = yday(date), .after = date) %>%
@@ -48,29 +59,41 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   mutate(day = day - min(day)) %>%
   mutate(pcgr = log(lead(population.mean,1)/population.mean)/(lead(day,1)-day),
          .after = population.mean) %>%
+  filter(!is.na(pcgr)) %>%
   ungroup() %>%
+  mutate(species = case_when(strain%in%c(2375,2524)~"one",
+                             TRUE ~ "two")) %>%#link to species
+  mutate(strain = as_factor(strain)) %>%
   group_by(strain) %>%
   mutate(phase = cut_interval(log10(population.mean), n=5, labels = FALSE)) %>%
   select(-population.sd) %>%
   pivot_longer(FSC.HLin.mean:NIR.R.HLin.sd, names_to="trait") %>%
   separate(trait, into=c("trait", "stat"), sep="in.") %>%
   pivot_wider(names_from=stat, values_from=value) %>%
-  mutate(cv=sd/mean)
+  mutate(cv=sd/mean) %>%
+  filter(((species=="one")&(trait=="RED.R.HL"))|((species=="two")&(trait=="YEL.B.HL")))
 
+## fit a reference model: of dd for C data only, and add to the data:--------
+ref_model <- lm(data_cyano %>% filter(treat=="C"), 
+                formula = pcgr ~ poly(population.mean,1)*strain + strain)
+data_cyano$pcgr_ref <- predict.lm(ref_model, newdata = data_cyano)
+data_cyano <- data_cyano %>%
+  mutate(delta = pcgr - pcgr_ref)
+#plot the data and overlay the reference model of dd
 ggplot(data_cyano) +
   theme_bw() + 
-  geom_point(aes(x=mean, y=pcgr, pch=as_factor(treat),
-                 col=as_factor(phase)), alpha=0.5) + 
-  geom_smooth(method=lm, aes(x=mean, y=pcgr, 
-                             colour=as_factor(phase)), 
-              formula=y ~ poly(x,1)) + #, se=F
-  facet_wrap(vars(trait), scales="free") #, rows = vars(ID_spec)strain ~ 
+  geom_point(aes(x=population.mean, y=pcgr)) + 
+  #geom_smooth(method=lm, aes(x=population.mean, y=pcgr), 
+  #            formula=y ~ poly(x,2), se=F) + #
+  geom_line(aes(x=population.mean, y=pcgr_ref)) +
+  facet_wrap(vars(treat, strain), scales="free") #, rows = vars(ID_spec)strain ~ 
 
+#now check if delta with ref model depends on the trait
 ggplot(data_cyano) +
   theme_bw() + 
-  geom_point(aes(x=cv, y=pcgr, pch=as_factor(treat),
-                 col=as_factor(phase)), alpha=0.5) + 
-  geom_smooth(method=lm, aes(x=cv, y=pcgr, 
-                             colour=as_factor(phase)), 
-              formula=y ~ poly(x,1), se=F) +
-  facet_wrap(vars(trait), scales="free") 
+  geom_point(aes(x=mean, y=delta, col=as_factor(treat), 
+                 pch=as_factor(strain))) + 
+  #geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(treat)),
+  #            formula=y ~ poly(x,1), se=F) + #
+  facet_wrap(vars(species), scales="free") #, rows = vars(ID_spec)strain ~ 
+#It does seem to be the case. 
