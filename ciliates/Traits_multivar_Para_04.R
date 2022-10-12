@@ -274,12 +274,12 @@ Obsnorm$Temp <- Total$Temp
 Obsnorm$Atrazine <- Total$Atrazine
 Obsnorm$Days_fromstart <- Total$Days_fromstart
 
-m<-apply(Totalsd[-c(8)],2,mean) #Calc mean for all columns
+m<-apply(Totalsd[-c(13)],2,mean) #Calc mean for all columns
 m
-s<-apply(Totalsd[-c(8)],2,sd) # idem for sd
+s<-apply(Totalsd[-c(13)],2,sd) # idem for sd
 s
 
-Obsnormsd<-as.data.frame(scale(Totalsd[-c(8)],m,s)) #normalized data
+Obsnormsd<-as.data.frame(scale(Totalsd[-c(13)],m,s)) #normalized data
 Obsnormsd$ID_spec <- Totalsd$ID_spec
 Obsnormsd$Temp <- Totalsd$Temp
 Obsnormsd$Atrazine <- Totalsd$Atrazine
@@ -288,44 +288,83 @@ Obsnormsd$Days_fromstart <- Totalsd$Days_fromstart
 
 # put together:
 
-TotalNorm <- cbind(Obsnorm, Obsnormsd)
+TotalNorm <- full_join(Obsnorm, Obsnormsd)
 
 
 # plot avg of traits with upper and lower sd values:
 ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_linearity, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_linearity - sd_linearity, ymax = mean_linearity + sd_linearity,
-                                            fill = as_factor(Temp)), alpha = 1/10) +
+  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_linearity - sd_linearity, ymax = mean_linearity + sd_linearity,
+   #                                         fill = as_factor(Temp)), alpha = 1/10) +
   geom_smooth(se=F) +
   labs(title = "Mean Movement linearity over time") +
-  theme_classic() 
+  theme_classic(base_size = 24) 
 
 ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_area, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_area - sd_area, ymax = mean_area + sd_area,
-                                            fill = as_factor(Temp)), alpha = 1/10) +
+  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_area - sd_area, ymax = mean_area + sd_area,
+   #                                         fill = as_factor(Temp)), alpha = 1/10) +
   geom_smooth(se=F) +
   labs(title = "Cell size over time") +
-  theme_classic() 
+  theme_classic(base_size = 24) 
 
 ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_ar, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_ar - sd_ar, ymax = mean_ar + sd_ar,
-                                            fill = as_factor(Temp)), alpha = 1/10) +
+ # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_ar - sd_ar, ymax = mean_ar + sd_ar,
+  #                                          fill = as_factor(Temp)), alpha = 1/10) +
   geom_smooth(se=F) +
   labs(title = "Cell shape over time") +
-  theme_classic() 
+  theme_classic(base_size = 24) 
 
 ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_speed, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_speed - sd_speed, 
-                                            ymax = mean_speed + sd_speed,
-                                            fill = as_factor(Temp)), alpha = 1/10) +
+ # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_speed - sd_speed, 
+  #                                          ymax = mean_speed + sd_speed,
+   #                                         fill = as_factor(Temp)), alpha = 1/10) +
   geom_smooth(se=F) +
   labs(title = "Movement speed over time") +
-  theme_classic() 
+  theme_classic(base_size = 24) 
+
+
+# plot avg of traits with upper and lower sd values:
+ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_linearity, color = as_factor(Temp))) +
+  facet_wrap(facets = ~Totalsd$Atrazine) +
+  geom_point() +
+  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_linearity - sd_linearity, ymax = mean_linearity + sd_linearity,
+  #                                         fill = as_factor(Temp)), alpha = 1/10) +
+  geom_smooth(se=F) +
+  labs(title = "sd Movement linearity over time") +
+  theme_classic(base_size = 24) 
+
+ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_area, color = as_factor(Temp))) +
+  facet_wrap(facets = ~Totalsd$Atrazine) +
+  geom_point() +
+  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_area - sd_area, ymax = mean_area + sd_area,
+  #                                         fill = as_factor(Temp)), alpha = 1/10) +
+  geom_smooth(se=F) +
+  labs(title = "sd Cell size over time") +
+  theme_classic(base_size = 24) 
+
+ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_ar, color = as_factor(Temp))) +
+  facet_wrap(facets = ~Totalsd$Atrazine) +
+  geom_point() +
+  # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_ar - sd_ar, ymax = mean_ar + sd_ar,
+  #                                          fill = as_factor(Temp)), alpha = 1/10) +
+  geom_smooth(se=F) +
+  labs(title = "sd Cell shape over time") +
+  theme_classic(base_size = 24) 
+
+ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_speed, color = as_factor(Temp))) +
+  facet_wrap(facets = ~Totalsd$Atrazine) +
+  geom_point() +
+  # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_speed - sd_speed, 
+  #                                          ymax = mean_speed + sd_speed,
+  #                                         fill = as_factor(Temp)), alpha = 1/10) +
+  geom_smooth(se=F) +
+  labs(title = "sd Movement speed over time") +
+  theme_classic(base_size = 24) 
 
