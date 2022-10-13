@@ -100,3 +100,8 @@ ggplot(data_cyano) +
   #            formula=y ~ poly(x,1), se=F) + #
   facet_wrap(vars(strain), scales="free") #, rows = vars(ID_spec)strain ~ 
 #It does seem to be the case. 
+
+# To do:
+# Standardize traits
+# Do clustering algorithm cf. Lisa's paper? 
+
