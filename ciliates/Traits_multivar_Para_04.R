@@ -1,6 +1,7 @@
 
 library(tidyverse)
-library(ggplot2)
+library(lubridate)
+library(mgcv)
 '''
 Traj.avg <- read.csv("U:/DIVERCE_experiments/DIVERCE_WP01_exp01/Analysis/Overview_dataframe/OverviewTraitsFull.csv", header = T) %>%
   mutate(Parts_permL = Count/830*1000)
@@ -22,14 +23,29 @@ write.csv(Traj.avg, file = 'U:/DIVERCE_experiments/DIVERCE_WP01_exp01/Analysis/O
           row.names = F)
 '''
 
-Traj.avg <- read.csv("OverviewTraitsFull.csv", header = T) %>%
-  filter(ID_spec == "Para_4")
+# CILIATES ------
+## Import data and compute pcgr, and only keep specific species-trait combinations----
+data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
+  #filter(ID_spec == "Para_4") %>%
+  #rename(strain = ID_spec) %>%
+  group_by(Atrazine, Temp, ID_spec) %>%
+  mutate(pcgr = log(lead(Parts_permL, 1)/Parts_permL)/(lead(Days_fromstart, 1)-Days_fromstart),
+         .after = Parts_permL) %>% 
+  filter(pcgr > -5) %>% #Kick out extremely negative pcgr
+  ungroup() %>%
+  mutate(phase = cut_interval(log10(Parts_permL), n=5, labels = FALSE)) %>%
+  select(ID_spec, Sample,  Days_fromstart, Treatment, Temp, Atrazine, contains(c("mean_", "sd")), pcgr, Parts_permL)
+  #pivot_longer(mean_ar:sd_linearity, names_to="trait") %>%
+  #separate(trait, into=c("stat", "trait"), sep="_") %>%
+  #pivot_wider(names_from=stat, values_from=value) %>%
+  #mutate(cv=sd/mean) %>%
+  
+  #filter(((species=="Spiro")&(trait=="linearity"))|((species=="Tetra")&(trait=="area"))
+   #      |((species=="Para")&(trait=="speed"))|((species=="Loxo")&(trait=="linearity")))
 
 
-Expl_vars <- Traj.avg[c("Temp", "Atrazine", "Days_fromstart", "ID_spec")]
-Obs_vars <- Traj.avg[c(8:16)]
-
-Traj.avg
+Expl_vars <- data_cilia[c("Temp", "Atrazine", "Days_fromstart", "ID_spec")]
+Obs_vars <- data_cilia[c(7:16)]
 
 ### FROM KRISTINA MOJICA:
 #Function for multi-panel Cleveland dotplot.
@@ -63,11 +79,9 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 }
 
 #pairs correlation plot
-pairs(Obs_vars[c(1:9)], lower.panel = panel.cor) # Keep all for now
+pairs(Obs_vars[c(1:10)], lower.panel = panel.cor) # Keep all for now
 
 Obs_vars.select <- Obs_vars
-
-pairs(Obs_vars.select, lower.panel = panel.cor)
 
 library(Hmisc)
 hist.data.frame(Obs_vars.select) # not much use actually as data hasnt been standardized yet..
@@ -87,14 +101,14 @@ Obs <- Obs_vars.select[c("mean_ar",
                          "mean_area", 
                          #"mean_ar",
                          "mean_speed",
-                         #"duration",
+                         "pcgr",
                          "mean_linearity",
                          "Parts_permL"
                          )]
 
 Obs_sd <- Obs_vars.select[c("sd_ar", 
                             "sd_area", 
-                            #"mean_ar",
+                            "pcgr",
                             "sd_speed",
                             #"duration",
                             "sd_linearity"
@@ -104,16 +118,7 @@ Expl <- Expl_vars
 #First column of the dataset as row labels: NOT USEFULL HERE AS STATION DONT RESULT IN UNIQUE ROWNAMES
 
 Total <- cbind(Obs, Expl)
-Totalsd <- cbind(Obs_sd, Total) %>%
-  mutate(linearity_uppersd = mean_linearity + sd_linearity,
-         linearity_lowersd = mean_linearity - sd_linearity,
-         area_uppersd = mean_area + sd_area,
-         area_lowersd = mean_area - sd_area,
-         ar_uppersd = mean_ar + sd_ar,
-         ar_lowersd = mean_ar - sd_ar,
-         speed_uppersd = mean_speed + sd_speed,
-         speed_lowersd = mean_speed - sd_speed) #%>%
-  #select(-c(sd_linearity, sd_area, sd_ar, sd_speed))
+Totalsd <- full_join(Obs_sd, Total)
 
 
 
@@ -122,20 +127,16 @@ res.pca <- PCA(Total[c("mean_ar",
                        "mean_area", 
                        #"mean_ar",
                        "mean_speed",
-                       #"duration",
-                       "mean_linearity",
-                       "Parts_permL"
+                       "mean_linearity"
                        )])
 
 summary(res.pca)
 
 #Do a PCA on trait variance
 res.pca2 <- PCA(Totalsd[c("sd_ar", 
-                        "sd_area", 
-                        #"mean_ar",
-                        "sd_speed",
-                        #"duration",
-                        "sd_linearity"
+                          "sd_area", 
+                          "sd_speed",
+                          "sd_linearity"
 )])
 
 summary(res.pca2)
@@ -159,39 +160,48 @@ fviz_eig(res.pca2, addlabels = TRUE, ylim = c(0, 70))+
 #The weight of the different variables on the different dimensions
 library("corrplot")
 corrplot(var$cos2,method = "number",cl.lim = c(0,1),tl.col = "black",col=colorRampPalette(c("white","snow3","black"))(200))
-
+# pcgr is represented in dim 1 and 3
 
 corrplot(varsd$cos2,method = "number",cl.lim = c(0,1),tl.col = "black",col=colorRampPalette(c("white","snow3","black"))(200))
 
 
 #The sum of the representation of our variables on the different dimensions (here 2)
-fviz_cos2(res.pca, choice = "var", axes = 1:2,ylim=c(0,1),fill = "lightgray", color = "black")+
+fviz_cos2(res.pca, choice = "var", axes = 1:3,ylim=c(0,1),fill = "lightgray", color = "black")+
   geom_text(aes(label=round(cos2, digits = 2)),fontface=2, vjust=1.6, color="black", size=3.5)+
-  ggtitle(label = "Representation of our variables on the PCA dimensions 1 to 2")+
+  ggtitle(label = "Representation of our variables on the PCA dimensions 1 to 3")+
   theme(plot.title = element_text(hjust = 0.5))        ## 
 
-fviz_cos2(res.pca2, choice = "var", axes = 1:2,ylim=c(0,1),fill = "lightgray", color = "black")+
+fviz_cos2(res.pca2, choice = "var", axes = 1:3,ylim=c(0,1),fill = "lightgray", color = "black")+
   geom_text(aes(label=round(cos2, digits = 2)),fontface=2, vjust=1.6, color="black", size=3.5)+
-  ggtitle(label = "Representation of our variables on the PCA dimensions 1 to 2")+
+  ggtitle(label = "Representation of our variables on the PCA dimensions 1 to 3")+
   theme(plot.title = element_text(hjust = 0.5)) 
 
 #COrrelation circles: speed is the most important, parts per mL and aspect ratio contribute the least
 fviz_pca_var(res.pca,axes = 1:2, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
 )+theme(plot.title = element_blank() ) # logPO4, Chla, MLD/DCM are representing reality well, logNP and logNH4 badly
 
-#fviz_pca_var(res.pca,axes = 2:3, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
-#)+theme(plot.title = element_blank() ) # logNP, logN2_zavgsqrtPar and MLD/DCM represent reality well, rest badly
-
+fviz_pca_var(res.pca,axes = c(1,3), col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
+)+theme(plot.title = element_text()) + # logNP, logN2_zavgsqrtPar and MLD/DCM represent reality well, rest badly
+labs(title = "Axes 1 vs 3")
 
 # variance in linearity is most important, variance in aspect ratio contributes the least
 fviz_pca_var(res.pca2,axes = 1:2, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
 )+theme(plot.title = element_blank() ) # logPO4, Chla, MLD/DCM are representing reality well, logNP and logNH4 badly
 
-#fviz_pca_var(res.pca2,axes = 2:3, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
-#)+theme(plot.title = element_blank() ) # logNP, logN2_zavgsqrtPar and MLD/DCM represent reality well, rest badly
+fviz_pca_var(res.pca2,axes = 2:3, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
+)+theme(plot.title = element_blank() ) # logNP, logN2_zavgsqrtPar and MLD/DCM represent reality well, rest badly
 
 # axes 1 + 2 Temp: slight shift towards slower, smaller and non-linear moving cells
 fviz_pca_biplot(res.pca, pointsize = 5, 
+                label="var",
+                col.var = "black",
+                pointshape = 21, fill.ind = as.factor(Total$ID_spec),
+                legend.title = "Temperature",
+                addEllipses = TRUE,
+                repel = TRUE)
+
+fviz_pca_biplot(res.pca, pointsize = 5, 
+                axes = c(1,3),
                 label="var",
                 col.var = "black",
                 pointshape = 21, fill.ind = as.factor(Total$Temp),
@@ -203,6 +213,15 @@ fviz_pca_biplot(res.pca, pointsize = 5,
 fviz_pca_biplot(res.pca2, pointsize = 5, 
                 label="var",
                 col.var = "black",
+                pointshape = 21, fill.ind = as.factor(Totalsd$ID_spec),
+                legend.title = "Temperature",
+                addEllipses = TRUE,
+                repel = TRUE)
+
+fviz_pca_biplot(res.pca2, pointsize = 5,
+                axes = c(1,3),
+                label="var",
+                col.var = "black",
                 pointshape = 21, fill.ind = as.factor(Totalsd$Temp),
                 legend.title = "Temperature",
                 addEllipses = TRUE,
@@ -211,6 +230,15 @@ fviz_pca_biplot(res.pca2, pointsize = 5,
 
 # axes 1 + 2 Atra: No effect that I see
 fviz_pca_biplot(res.pca, pointsize = 5, 
+                label="var",
+                col.var = "black",
+                pointshape = 21, fill.ind = as.factor(Total$Atrazine),
+                legend.title = "Atrazine",
+                addEllipses = TRUE,
+                repel = TRUE)
+
+fviz_pca_biplot(res.pca, pointsize = 5, 
+                axes = c(1,3),
                 label="var",
                 col.var = "black",
                 pointshape = 21, fill.ind = as.factor(Total$Atrazine),
@@ -237,6 +265,15 @@ fviz_pca_biplot(res.pca,
                 gradient.cols = c("yellow", "purple")
 )+theme(plot.title = element_text(hjust = 0.5))
 
+fviz_pca_biplot(res.pca,
+                axes = c(1,3),
+                pointsize = 5,# Variables color
+                label="var",
+                col.var = "black",
+                pointshape = 21, fill.ind = Total$Days_fromstart,
+                legend.title = "Days from start",
+                gradient.cols = c("yellow", "purple")
+)+theme(plot.title = element_text(hjust = 0.5))
 
 ## axes 1,2, Culture age: more variation in speed over time
 fviz_pca_biplot(res.pca2,
@@ -249,122 +286,181 @@ fviz_pca_biplot(res.pca2,
 )+theme(plot.title = element_text(hjust = 0.5))
 
 
-# Intermediate concludion: Culture age has a stronger effect than temp or atra
+# pcgr as color gradient:
 
-# Try an RDA with Temp, Atrazine and Days_fromstart:
-library(vegan)
+## axes 1,2, 
+fviz_pca_biplot(res.pca,
+                pointsize = 5,# Variables color
+                label="var",
+                col.var = "black",
+                pointshape = 21, fill.ind = Total$pcgr,
+                legend.title = "Per Capita Growth rate",
+                gradient.cols = c("yellow", "purple")
+)+theme(plot.title = element_text(hjust = 0.5))
 
-# normalize data:
-Total <- Total %>%
-  mutate(Atrazine = as.numeric(as.character(Atrazine)),
-         Temp = as.numeric(as.character(Temp)))
+fviz_pca_biplot(res.pca,
+                axes = c(1,3),
+                pointsize = 5,# Variables color
+                label="var",
+                col.var = "black",
+                pointshape = 21, fill.ind = Total$pcgr,
+                legend.title = "Per Capita Growth rate",
+                gradient.cols = c("yellow", "purple")
+)+theme(plot.title = element_text(hjust = 0.5))
 
-Totalsd <- Totalsd %>%
-  mutate(Atrazine = as.numeric(as.character(Atrazine)),
-         Temp = as.numeric(as.character(Temp)))
-
-m<-apply(Total[-c(9)],2,mean) #Calc mean for all columns
-m
-s<-apply(Total[-c(9)],2,sd) # idem for sd
-s
-
-Obsnorm<-as.data.frame(scale(Total[-c(9)],m,s)) #normalized data
-Obsnorm$ID_spec <- Total$ID_spec
-Obsnorm$Temp <- Total$Temp
-Obsnorm$Atrazine <- Total$Atrazine
-Obsnorm$Days_fromstart <- Total$Days_fromstart
-
-m<-apply(Totalsd[-c(13)],2,mean) #Calc mean for all columns
-m
-s<-apply(Totalsd[-c(13)],2,sd) # idem for sd
-s
-
-Obsnormsd<-as.data.frame(scale(Totalsd[-c(13)],m,s)) #normalized data
-Obsnormsd$ID_spec <- Totalsd$ID_spec
-Obsnormsd$Temp <- Totalsd$Temp
-Obsnormsd$Atrazine <- Totalsd$Atrazine
-Obsnormsd$Days_fromstart <- Totalsd$Days_fromstart
-#normalize expl data 
-
-# put together:
-
-TotalNorm <- full_join(Obsnorm, Obsnormsd)
+## axes 1,2, 
+fviz_pca_biplot(res.pca2,
+                pointsize = 5,# Variables color
+                label="var",
+                col.var = "black",
+                pointshape = 21, fill.ind = Totalsd$pcgr,
+                legend.title = "Per Capita Growth rate",
+                gradient.cols = c("yellow", "purple")
+)+theme(plot.title = element_text(hjust = 0.5))
 
 
-# plot avg of traits with upper and lower sd values:
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_linearity, color = as_factor(Temp))) +
-  facet_wrap(facets = ~Totalsd$Atrazine) +
+
+# plot pcgr vs traits to see for correlations:
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = mean_linearity, color = as_factor(Temp))) +
+  facet_wrap(facets = ~Totalsd$Atrazine + ID_spec) +
   geom_point() +
-  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_linearity - sd_linearity, ymax = mean_linearity + sd_linearity,
-   #                                         fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "Mean Movement linearity over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "Mean Movement linearity versus growth") +
   theme_classic(base_size = 24) 
 
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_area, color = as_factor(Temp))) +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = mean_area, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_area - sd_area, ymax = mean_area + sd_area,
-   #                                         fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "Cell size over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "Cell size versus growth") +
   theme_classic(base_size = 24) 
 
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_ar, color = as_factor(Temp))) +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = mean_ar, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
- # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_ar - sd_ar, ymax = mean_ar + sd_ar,
-  #                                          fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "Cell shape over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "Cell shape versus growth") +
   theme_classic(base_size = 24) 
 
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = mean_speed, color = as_factor(Temp))) +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = mean_speed, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
- # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_speed - sd_speed, 
-  #                                          ymax = mean_speed + sd_speed,
-   #                                         fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "Movement speed over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "Movement speed versus growth") +
   theme_classic(base_size = 24) 
 
 
 # plot avg of traits with upper and lower sd values:
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_linearity, color = as_factor(Temp))) +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = sd_linearity, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_linearity - sd_linearity, ymax = mean_linearity + sd_linearity,
-  #                                         fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "sd Movement linearity over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "sd Movement linearity versus growth") +
   theme_classic(base_size = 24) 
 
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_area, color = as_factor(Temp))) +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = sd_area, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  #geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_area - sd_area, ymax = mean_area + sd_area,
-  #                                         fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "sd Cell size over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "sd Cell size versus growth") +
   theme_classic(base_size = 24) 
 
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_ar, color = as_factor(Temp))) +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = sd_ar, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_ar - sd_ar, ymax = mean_ar + sd_ar,
-  #                                          fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "sd Cell shape over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "sd Cell shape versus growth") +
   theme_classic(base_size = 24) 
 
-ggplot(data = Totalsd, mapping = aes(x = Days_fromstart, y = sd_speed, color = as_factor(Temp))) +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = sd_speed, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
   geom_point() +
-  # geom_ribbon(data = Totalsd, mapping = aes(x = Days_fromstart, ymin = mean_speed - sd_speed, 
-  #                                          ymax = mean_speed + sd_speed,
-  #                                         fill = as_factor(Temp)), alpha = 1/10) +
-  geom_smooth(se=F) +
-  labs(title = "sd Movement speed over time") +
+  geom_smooth(se=T, method = "lm") +
+  labs(title = "sd Movement speed versus growth") +
   theme_classic(base_size = 24) 
 
+
+# part 1.5 # CODE FROM QZ
+# mean trait correlation,Para_4
+unique(Totalsd$ID_spec)
+data2 <-Totalsd
+
+cor(data2$mean_ar, data2$mean_area, method = c("pearson"))  #
+cor(data2$mean_ar, data2$mean_speed, method = c("pearson")) #
+cor(data2$mean_ar, data2$mean_linearity, method = c("pearson")) #
+
+cor(data2$mean_area, data2$mean_speed, method = c("pearson")) #
+cor(data2$mean_area, data2$mean_linearity, method = c("pearson")) #
+
+cor(data2$mean_speed, data2$mean_linearity, method = c("pearson")) #0.5464877
+a2<-summary(lm(data2$mean_linearity~data2$mean_speed))
+a2
+
+data2$Atrazine <- as.factor(data2$Atrazine)
+
+
+library("ggpubr")
+library("ggplot2")
+a<-ggscatter(data2, x = "pcgr", y = "mean_speed",
+             shape = "ID_spec",
+             color = "ID_spec", 
+             size=3,
+             add = "reg.line", conf.int = FALSE,
+             cor.coef = TRUE, cor.method = "pearson",
+             title= "",  
+             xlab = "pcgr", ylab = "mean_speed"
+)
+
+a+theme_bw()+
+  facet_wrap(~Atrazine + Temp) +
+  #geom_abline(intercept =a2$coefficients[1,1], slope = a2$coefficients[2,1], color="black", linetype="solid", size=1)+
+  theme(plot.title = element_text(hjust = 0.5,size=15), legend.position='right')
+#geom_ab
+
+a<-ggscatter(data2, x = "pcgr", y = "mean_linearity",
+             shape = "ID_spec",
+             color = "ID_spec", 
+             size=3,
+             add = "reg.line", conf.int = FALSE,
+             cor.coef = TRUE, cor.method = "pearson",
+             title= "",  
+             xlab = "pcgr", ylab = "mean_linearity"
+)
+
+a+theme_bw()+
+  facet_wrap(~Atrazine + Temp) +
+  #geom_abline(intercept =a2$coefficients[1,1], slope = a2$coefficients[2,1], color="black", linetype="solid", size=1)+
+  theme(plot.title = element_text(hjust = 0.5,size=15), legend.position='right')
+#geom_ab
+
+a<-ggscatter(data2, x = "pcgr", y = "mean_area",
+             shape = "ID_spec",
+             color = "ID_spec", 
+             size=3,
+             add = "reg.line", conf.int = FALSE,
+             cor.coef = TRUE, cor.method = "pearson",
+             title= "",  
+             xlab = "pcgr", ylab = "mean_area"
+)
+
+a+theme_bw()+
+  facet_wrap(~Atrazine + Temp) +
+  #geom_abline(intercept =a2$coefficients[1,1], slope = a2$coefficients[2,1], color="black", linetype="solid", size=1)+
+  theme(plot.title = element_text(hjust = 0.5,size=15), legend.position='right')
+#geom_ab
+
+a<-ggscatter(data2, x = "pcgr", y = "mean_ar",
+             shape = "ID_spec",
+             color = "ID_spec", 
+             size=3,
+             add = "reg.line", conf.int = FALSE,
+             cor.coef = TRUE, cor.method = "pearson",
+             title= "",  
+             xlab = "pcgr", ylab = "mean_aspect_ratio"
+)
+
+a+theme_bw()+
+  facet_wrap(~Atrazine + Temp) +
+  #geom_abline(intercept =a2$coefficients[1,1], slope = a2$coefficients[2,1], color="black", linetype="solid", size=1)+
+  theme(plot.title = element_text(hjust = 0.5,size=15), legend.position='right')
+#geom_ab
