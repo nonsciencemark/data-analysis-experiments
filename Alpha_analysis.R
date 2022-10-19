@@ -13,7 +13,7 @@ data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
   group_by(Atrazine, Temp, strain) %>%
   mutate(pcgr = log(lead(Parts_permL, 1)/Parts_permL)/(lead(Days_fromstart, 1)-Days_fromstart),
          .after = Parts_permL) %>% 
-  filter(pcgr > -5) %>% #Kick out extremely negative pcgr
+  filter(pcgr > -5, strain!="Spiro_5") %>% #Kick out extremely negative pcgr, as well as Spiro_5 (not enough data to make a ref model)
   ungroup() %>%
   separate(strain, into = c("species", "sp.strain"), remove=F) %>%#link to species
   group_by(strain) %>%
@@ -25,9 +25,24 @@ data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
   filter(((species=="Spiro")&(trait=="linearity"))|((species=="Tetra")&(trait=="area"))
          |((species=="Para")&(trait=="speed"))|((species=="Loxo")&(trait=="linearity")))
 
-## fit a reference model: of dd for C data only, and add to the original data frame:------
-ref_model <- lm(data_cilia %>% filter(Treatment==1), 
+## fit a reference model for density dependence ------
+# This model only uses the control data, cleaned up, i.e. 
+# w/o crashes and lag phases if any. Crash detection happens with a GAM
+# No apparent lag phases here.
+data_cilia_ref <- data_cilia %>% 
+  filter(Treatment==1) 
+
+gam_model <- gam(log10(Parts_permL) ~ as_factor(strain) + 
+             s(Days_fromstart, by = as_factor(strain), k=5),
+             data = data_cilia_ref)
+data_cilia_ref$predictions <- predict.gam(gam_model) 
+data_cilia_ref <- data_cilia_ref %>%
+  group_by(strain) %>%
+  filter(Days_fromstart < max(Days_fromstart*(predictions==max(predictions))))
+
+ref_model <- lm(data_cilia_ref, 
                 formula = pcgr ~ poly(Parts_permL,1)*strain + strain)
+#add to the original data frame
 data_cilia$pcgr_ref <- predict.lm(ref_model, newdata = data_cilia)
 data_cilia <- data_cilia %>%
   mutate(delta = pcgr - pcgr_ref)
@@ -44,11 +59,13 @@ ggplot(data_cilia) +
 #depends on the trait value
 ggplot(data_cilia) +
   theme_bw() + 
-  scale_colour_manual(values=cbPalette) + 
-  geom_point(aes(x=mean, y=delta, col=as_factor(Atrazine), 
-                 pch=as_factor(Temp))) + 
-  #geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(treat)),
-  #            formula=y ~ poly(x,1), se=F) + #
+  scale_size_manual(values=c(3, rep(1,10))) +
+  scale_colour_manual(values=c(cbPalette, "black")) + 
+  geom_point(aes(x=mean, y=delta, col=as_factor(Treatment),
+                 size=as_factor(Treatment)),
+             alpha=0.5) + 
+  #geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(Treatment)),
+  #            formula=y ~ poly(x,2), se=F) + #
   facet_wrap(vars(strain), scales="free") #, rows = vars(ID_spec)strain ~ 
 #It doesn't 
 
@@ -76,9 +93,22 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   mutate(cv=sd/mean) %>%
   filter(((species=="one")&(trait=="RED.R.HL"))|((species=="two")&(trait=="YEL.B.HL")))
 
-## fit a reference model: of dd for C data only, and add to the data:--------
-ref_model <- lm(data_cyano %>% filter(treat=="C"), 
-                formula = pcgr ~ poly(population.mean,1)*strain + strain)
+## fit a reference model of dd--------
+# This model only uses the control data, cleaned up, i.e. 
+# w/o crashes and lag phases if any. Crash detection happens with a GAM
+# no apparent lags
+data_cyano_ref <- data_cyano %>% 
+  filter(treat=="C") 
+
+gam_model <- gam(log10(population.mean) ~ as_factor(strain) + 
+                   s(day, by = as_factor(strain), k=5),
+                 data = data_cyano_ref)
+data_cyano_ref$predictions <- predict.gam(gam_model) 
+data_cyano_ref <- data_cyano_ref %>%
+  group_by(strain) %>%
+  filter(day < max(day*(predictions==max(predictions))))
+
+ref_model <- lm(data_cyano_ref, formula = pcgr ~ poly(population.mean,1)*strain + strain)
 data_cyano$pcgr_ref <- predict.lm(ref_model, newdata = data_cyano)
 data_cyano <- data_cyano %>%
   mutate(delta = pcgr - pcgr_ref)
@@ -94,8 +124,11 @@ ggplot(data_cyano) +
 #now check if delta with ref model depends on the trait
 ggplot(data_cyano) +
   theme_bw() + 
+  scale_size_manual(values=c(rep(1,2), 3, rep(1,10))) +
   scale_colour_manual(values=cbPalette[c(2,3,1,4)]) + 
-  geom_point(aes(x=mean, y=delta, col=as_factor(treat))) + 
+  geom_point(aes(x=mean, y=delta, col=as_factor(treat), 
+                 size=as_factor(treat)), 
+             alpha=0.8) + 
   #geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(treat)),
   #            formula=y ~ poly(x,1), se=F) + #
   facet_wrap(vars(strain), scales="free") #, rows = vars(ID_spec)strain ~ 
