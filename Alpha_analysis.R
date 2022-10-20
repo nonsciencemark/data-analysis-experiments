@@ -60,14 +60,16 @@ ggplot(data_cilia) +
 ggplot(data_cilia) +
   theme_bw() + 
   scale_size_manual(values=c(3, rep(1,10))) +
-  scale_colour_manual(values=c(cbPalette, "black")) + 
+  scale_colour_manual(values=c(cbPalette, "purple")) + 
   geom_point(aes(x=mean, y=delta, col=as_factor(Treatment),
                  size=as_factor(Treatment)),
              alpha=0.5) + 
-  #geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(Treatment)),
-  #            formula=y ~ poly(x,2), se=F) + #
+  geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(Treatment)),
+              formula=y ~ poly(x,1), se=F) + 
+  geom_smooth(method=lm, aes(x=mean, y=delta),
+              formula=y ~ poly(x,1), colour="black") +
   facet_wrap(vars(strain), scales="free") #, rows = vars(ID_spec)strain ~ 
-#It doesn't 
+ 
 
 # CYANO ------
 ## Import data and compute pcgr, and only keep specific species-trait combinations----
@@ -129,8 +131,10 @@ ggplot(data_cyano) +
   geom_point(aes(x=mean, y=delta, col=as_factor(treat), 
                  size=as_factor(treat)), 
              alpha=0.8) + 
-  #geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(treat)),
-  #            formula=y ~ poly(x,1), se=F) + #
+  geom_smooth(method=lm, aes(x=mean, y=delta, col=as_factor(treat)),
+              formula=y ~ poly(x,1), se=F) + 
+  geom_smooth(method=lm, aes(x=mean, y=delta),
+              formula=y ~ poly(x,1), colour="black") +
   facet_wrap(vars(strain), scales="free") #, rows = vars(ID_spec)strain ~ 
 #It does seem to be the case. 
 
