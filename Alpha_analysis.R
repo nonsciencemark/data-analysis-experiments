@@ -101,62 +101,43 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   separate(trait, into=c("trait", "stat"), sep="in.") %>%
   pivot_wider(names_from=stat, values_from=value) %>%
   mutate(cv=sd/mean) %>%
-  filter(((species=="one")&(trait=="FSC.HL"))|((species=="two")&(trait=="FSC.HL")))
+  filter(((species=="one")&(trait=="RED.B.HL"))|((species=="two")&(trait=="YEL.B.HL")))
 
-## fit a reference model of dd--------
-# This model only uses the control data, cleaned up, i.e. 
-# w/o crashes and lag phases if any. Crash detection happens with a GAM
-# no apparent lags
+## fit a reference model of dd and trait dependence on density--------
+# This model only uses the control data
+# no apparent lags; no apparent crashes
+###first dd----------------
 data_cyano_ref <- data_cyano %>% 
-  filter(treat=="C") 
+  filter(treat=="C")
+ref_model_dd <- lm(data_cyano_ref, formula = pcgr ~ poly(population.mean,1)*strain + strain)
 
-gam_model <- gam(log10(population.mean) ~ as_factor(strain) + 
-                   s(day, by = as_factor(strain), k=5),
-                 data = data_cyano_ref)
-data_cyano_ref$predictions <- predict.gam(gam_model) 
-data_cyano_ref <- data_cyano_ref %>%
-  group_by(strain) %>%
-  filter(day < max(day*(predictions==max(predictions))))
+###then traits----------------
+ref_model_trait <- lm(data_cyano_ref, formula = mean ~ poly(population.mean,1)*species + species)
 
-ref_model <- lm(data_cyano_ref, formula = pcgr ~ poly(population.mean,1)*strain + strain)
-
-## fit a reference model for the trait dynamics ------
-ref_model_trait <- gam(log10(mean) ~ strain + 
-                         s(log10(population.mean), by = strain, k=5),
-                       data = data_cyano_ref)
-#add predictions to the original data frame
-data_cyano$pcgr_ref <- predict.lm(ref_model, newdata = data_cyano)
-data_cyano$mean_ref <- 10^predict.gam(ref_model_trait, newdata = data_cyano)
+###add predictions to the original data frame -------------
+data_cyano$pcgr_ref <- predict.lm(ref_model_dd, newdata = data_cyano)
+data_cyano$mean_ref <- predict.lm(ref_model_trait, newdata = data_cyano)
 
 data_cyano <- data_cyano %>%
   mutate(delta_pcgr = pcgr-pcgr_ref) %>%
   mutate(delta_trait = mean-mean_ref)
-
-#plot the data and overlay the reference model of dd
-ggplot(data_cyano) +
-  theme_bw() + 
-  geom_point(aes(x=day, y=mean)) + 
-  geom_smooth(method=lm, aes(x=day, y=mean), 
-              formula=y ~ poly(x,1), se=F) + #
-  geom_line(aes(x=day, y=mean_ref)) +
-  facet_wrap(vars(treat, strain), scales="free") #, rows = vars(ID_spec)strain ~ 
 
 #now check if delta with ref model depends on the trait
 ggplot(data_cyano) +
   theme_bw() + 
   scale_size_manual(values=c(rep(1,2), 3, rep(1,10))) +
   scale_colour_manual(values=cbPalette[c(2,3,1,4)]) + 
-  geom_point(aes(x=mean, y=delta_pcgr, col=as_factor(treat), 
+  geom_point(aes(x=delta_trait, y=delta_pcgr, col=as_factor(treat), 
                  size=as_factor(treat)), 
              alpha=0.8) + 
-  geom_smooth(method=lm, aes(x=mean, y=delta_pcgr, col=as_factor(treat)),
+  geom_smooth(method=lm, aes(x=delta_trait, y=delta_pcgr, col=as_factor(treat)),
               formula=y ~ poly(x,1), se=F) + 
-  geom_smooth(method=lm, aes(x=mean, y=delta_pcgr),
+  geom_smooth(method=lm, aes(x=delta_trait, y=delta_pcgr),
               formula=y ~ poly(x,1), colour="black") +
-  facet_wrap(vars(strain), scales="free") #, rows = vars(ID_spec)strain ~ 
-#It does seem to be the case. 
+  facet_wrap(vars(species), scales="free") #, rows = vars(ID_spec)strain ~ 
+
 
 # To do:
-# Standardize traits
-# Do clustering algorithm cf. Lisa's paper? 
+# Check behaviour of all traits with time (just raw data)
+# Effect of treatments on dd; effects of density on traits and if altered by treatments.
 
