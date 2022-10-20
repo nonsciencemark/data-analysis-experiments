@@ -80,7 +80,7 @@ ggplot(data_cilia) +
  
 
 # CYANO ------
-## Import data and compute pcgr, and only keep specific species-trait combinations----
+## Import data and compute pcgr----
 data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   separate(date.time, sep=" ", into = c("date", "time")) %>%
   mutate(day = yday(date), .after = date) %>%
@@ -100,44 +100,54 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   pivot_longer(FSC.HLin.mean:NIR.R.HLin.sd, names_to="trait") %>%
   separate(trait, into=c("trait", "stat"), sep="in.") %>%
   pivot_wider(names_from=stat, values_from=value) %>%
-  mutate(cv=sd/mean) %>%
-  filter(((species=="one")&(trait=="RED.B.HL"))|((species=="two")&(trait=="YEL.B.HL")))
+  mutate(cv=sd/mean) 
+#%>%
+  #filter(((species=="one")&(trait=="RED.B.HL"))|((species=="two")&(trait=="YEL.B.HL")))
+
+##check if dd changes with treatment -------
+ggplot(data_cyano) +
+  aes(x=population.mean,y=pcgr, col=treat) +
+  geom_point() +
+  facet_grid(cols=vars(strain), rows=vars(trait), scales="free") +
+  geom_smooth(method=lm, aes(x=population.mean, y=pcgr, col=treat),
+              formula=y ~ poly(x,1), se=F) 
+
+##check if dependence of trait on density changes with treatment -------
+ggplot(data_cyano) +
+  aes(x=log10(population.mean),y=mean, col=treat) +
+  geom_point() +
+  facet_grid(cols=vars(strain), rows=vars(trait), scales="free") +
+  geom_smooth(method=lm, aes(x=log10(population.mean), y=mean, col=treat),
+              formula=y ~ poly(x,2), se=F)
+
+#yes, 2nd order
 
 ## fit a reference model of dd and trait dependence on density--------
 # This model only uses the control data
 # no apparent lags; no apparent crashes
 ###first dd----------------
-data_cyano_ref <- data_cyano %>% 
-  filter(treat=="C")
-ref_model_dd <- lm(data_cyano_ref, formula = pcgr ~ poly(population.mean,1)*strain + strain)
+ref_model_dd <- lm(data_cyano%>%filter(treat=="C"), formula = pcgr ~ poly(population.mean,1)*strain + strain)
 
 ###then traits----------------
-ref_model_trait <- lm(data_cyano_ref, formula = mean ~ poly(population.mean,1)*species + species)
+ref_model_trait <- lm(data_cyano%>%filter(treat=="C"),  
+                      formula = mean ~ poly(log10(population.mean),2)*strain*trait + strain*trait + strain + trait)
 
 ###add predictions to the original data frame -------------
 data_cyano$pcgr_ref <- predict.lm(ref_model_dd, newdata = data_cyano)
 data_cyano$mean_ref <- predict.lm(ref_model_trait, newdata = data_cyano)
-
 data_cyano <- data_cyano %>%
   mutate(delta_pcgr = pcgr-pcgr_ref) %>%
-  mutate(delta_trait = mean-mean_ref)
+  mutate(delta_trait = log10(mean/mean_ref))
 
 #now check if delta with ref model depends on the trait
 ggplot(data_cyano) +
   theme_bw() + 
   scale_size_manual(values=c(rep(1,2), 3, rep(1,10))) +
-  scale_colour_manual(values=cbPalette[c(2,3,1,4)]) + 
-  geom_point(aes(x=delta_trait, y=delta_pcgr, col=as_factor(treat), 
-                 size=as_factor(treat)), 
+  scale_colour_manual(values=cbPalette[c(2,3,1,4:8)]) + 
+  geom_point(aes(x=delta_trait, y=delta_pcgr, col=treat, pch=strain), 
              alpha=0.8) + 
-  geom_smooth(method=lm, aes(x=delta_trait, y=delta_pcgr, col=as_factor(treat)),
-              formula=y ~ poly(x,1), se=F) + 
-  geom_smooth(method=lm, aes(x=delta_trait, y=delta_pcgr),
-              formula=y ~ poly(x,1), colour="black") +
-  facet_wrap(vars(species), scales="free") #, rows = vars(ID_spec)strain ~ 
-
-
-# To do:
-# Check behaviour of all traits with time (just raw data)
-# Effect of treatments on dd; effects of density on traits and if altered by treatments.
+  geom_smooth(method=lm, aes(x=delta_trait, y=delta_pcgr, col=treat),#
+              formula=y ~ poly(x,1)) + #,  col="black"
+  facet_grid(cols=vars(species), rows=vars(trait), scales="free")
+  
 
