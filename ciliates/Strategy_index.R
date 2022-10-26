@@ -1,6 +1,6 @@
 
 # Script to standardize ciliate data by species and make a Strategy index per treatment 
-# (strategy index = sum of means of linearity, speed, area and aspact ratio)
+# (strategy index = sum per row of -linearity, -speed, area and aspact ratio)
 
 library(tidyverse)
 library(lubridate)
@@ -10,7 +10,6 @@ library(vegan)
 # THE QUESTION IS: CAN PER CAPITA GROWTH RATE BE EXPLAINED BY TRAIT MEANS AND/OR VARIANCES??
 # H0: IT CANNOT
 
-# to answer this I need to take away the treatments so I should use only control curves:
 
 # Data entry:
 data_cilia <-  read.csv("C:/Users/debruin/OneDrive - UCL/Bio/UCL/GitHub/TeamWork/data-analysis-experiments/ciliates/OverviewTraitsFull.csv") %>%
@@ -27,16 +26,18 @@ data_cilia <-  read.csv("C:/Users/debruin/OneDrive - UCL/Bio/UCL/GitHub/TeamWork
   ungroup() %>%
   mutate(Strategy_Go = (mean_speed + mean_linearity), 
          Strategy_Stay = (mean_area + mean_ar),
-         Strategy_index = (-mean_speed + -mean_linearity + mean_area + mean_ar)) %>% # index 
+         Strategy_index = (-mean_speed + -mean_linearity + mean_area + mean_ar)) %>% # index by summing speed, linearity, size and shape
   mutate(phase = cut_interval(log10(Parts_permL), n=5, labels = FALSE)) %>%
   select(Species, Atrazine, Temp, Treatment, ID_spec,  Days_fromstart, contains(c("mean_", "sd_")), Strategy_Stay, Strategy_Go, Strategy_index, pcgr, Parts_permL) # without sd for now! All standardized per Species
 
-# make an index by summing speed, linearity, size and shape
+# convert to factors:
 data_cilia$Temp <- as.factor(data_cilia$Temp)
 data_cilia$Atrazine <- as.factor(data_cilia$Atrazine)
 data_cilia$Treatment <- as.factor(data_cilia$Treatment)
 data_cilia$Species <- as.factor(data_cilia$Species)
 
+
+# Plots:
 ggplot(data = data_cilia, mapping = aes(x = Atrazine, y = Strategy_Go, color = ID_spec)) +
   geom_point(aes(shape = Temp), stat = "summary", size = 3, show.legend = TRUE) +
   facet_wrap(facets = .~ Species) +
