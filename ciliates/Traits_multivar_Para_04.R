@@ -25,7 +25,7 @@ write.csv(Traj.avg, file = 'U:/DIVERCE_experiments/DIVERCE_WP01_exp01/Analysis/O
 
 # CILIATES ------
 ## Import data and compute pcgr, and only keep specific species-trait combinations----
-data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
+data_cilia <- read.csv("C:/Users/debruin/OneDrive - UCL/Bio/UCL/GitHub/TeamWork/data-analysis-experiments/ciliates/OverviewTraitsFull.csv") %>%
   #filter(ID_spec == "Para_4") %>%
   #rename(strain = ID_spec) %>%
   group_by(Atrazine, Temp, ID_spec) %>%
@@ -98,8 +98,7 @@ library(factoextra)
 
 #Make same selection as in normalized2 but denormalized cause pca in facominer already does that:
 Obs <- Obs_vars.select[c("mean_ar", 
-                         "mean_area", 
-                         #"mean_ar",
+                         "mean_area",
                          "mean_speed",
                          "pcgr",
                          "mean_linearity",
@@ -110,7 +109,6 @@ Obs_sd <- Obs_vars.select[c("sd_ar",
                             "sd_area", 
                             "pcgr",
                             "sd_speed",
-                            #"duration",
                             "sd_linearity"
 )]
 Expl <- Expl_vars
@@ -124,10 +122,11 @@ Totalsd <- full_join(Obs_sd, Total)
 
 #Do a PCA on mean traits and abundance
 res.pca <- PCA(Total[c("mean_ar", 
-                       "mean_area", 
-                       #"mean_ar",
+                       "mean_area",
                        "mean_speed",
-                       "mean_linearity"
+                       "pcgr",
+                       "mean_linearity",
+                       "Parts_permL"
                        )])
 
 summary(res.pca)
@@ -135,6 +134,7 @@ summary(res.pca)
 #Do a PCA on trait variance
 res.pca2 <- PCA(Totalsd[c("sd_ar", 
                           "sd_area", 
+                          "pcgr",
                           "sd_speed",
                           "sd_linearity"
 )])
@@ -180,9 +180,9 @@ fviz_cos2(res.pca2, choice = "var", axes = 1:3,ylim=c(0,1),fill = "lightgray", c
 fviz_pca_var(res.pca,axes = 1:2, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
 )+theme(plot.title = element_blank() ) # logPO4, Chla, MLD/DCM are representing reality well, logNP and logNH4 badly
 
-fviz_pca_var(res.pca,axes = c(1,3), col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
+fviz_pca_var(res.pca,axes = c(2,3), col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
 )+theme(plot.title = element_text()) + # logNP, logN2_zavgsqrtPar and MLD/DCM represent reality well, rest badly
-labs(title = "Axes 1 vs 3")
+labs(title = "Axes 2 vs 3")
 
 # variance in linearity is most important, variance in aspect ratio contributes the least
 fviz_pca_var(res.pca2,axes = 1:2, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
@@ -321,12 +321,14 @@ fviz_pca_biplot(res.pca2,
 
 
 # plot pcgr vs traits to see for correlations:
-ggplot(data = Totalsd, mapping = aes(x = pcgr, y = mean_linearity, color = as_factor(Temp))) +
-  facet_wrap(facets = ~Totalsd$Atrazine + ID_spec) +
-  geom_point() +
+ggplot(data = Totalsd, mapping = aes(x = pcgr, y = mean_linearity, color = as_factor(ID_spec))) +
+  facet_wrap(facets = ~Totalsd$Atrazine + Temp) +
+  geom_point(pch = as.factor(Totalsd$ID_spec)) +
   geom_smooth(se=T, method = "lm") +
   labs(title = "Mean Movement linearity versus growth") +
   theme_classic(base_size = 24) 
+
+# Extract the regression coefficient and rsquared? and thn plot those?
 
 ggplot(data = Totalsd, mapping = aes(x = pcgr, y = mean_area, color = as_factor(Temp))) +
   facet_wrap(facets = ~Totalsd$Atrazine) +
@@ -401,7 +403,27 @@ data2$Atrazine <- as.factor(data2$Atrazine)
 
 library("ggpubr")
 library("ggplot2")
-a<-ggscatter(data2, x = "pcgr", y = "mean_speed",
+
+for (i in 1:8) {
+  ggscatter(subset(data2, ID_spec == unique(Totalsd$ID_spec[i])), x = "pcgr", y = "mean_speed",
+               shape = "ID_spec",
+               color = "ID_spec", 
+               size=3,
+               add = "reg.line", conf.int = FALSE,
+               cor.coef = TRUE, cor.method = "pearson",
+               title= "",  
+               xlab = "pcgr", ylab = "mean_speed"
+  ) +theme_bw()+
+    facet_wrap(~Atrazine + Temp) +
+    #geom_abline(intercept =a2$coefficients[1,1], slope = a2$coefficients[2,1], color="black", linetype="solid", size=1)+
+    theme(plot.title = element_text(hjust = 0.5,size=15), legend.position='right')
+  #geom_ab
+  
+  
+} # Not working so far..
+
+
+a<-ggscatter(subset(data2, ID_spec == "Loxo_1"), x = "pcgr", y = "mean_speed",
              shape = "ID_spec",
              color = "ID_spec", 
              size=3,
