@@ -1,0 +1,209 @@
+---
+title: "Cilia_traits_Multivar"
+author: "Tessa"
+date: "2022-10-28"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I made a trait index with NS as follows: sum(-linearity, -speed, area, aspect ratio) the sum is of the means, we didnt use sd for now
+
+I also split the index into: sum(linearity, speed) and sum(area, aspect ratio) and plotted them against each other. I thus expected a negative
+correlation. However, I observed a positive correlation. Thet is why I conduct a pcs below with all traits so see how they relate to each other. Initially I included all means and sd of speed, linearity, area and aspect ratio (ar) as well as density (Parts_permL), culture are (Days_fromstart) and per capita growth rate (pcgr).
+
+Goal: To make a meaningfull trait index
+Question: how are the traits associated to each other?
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(car)
+
+Traj.avg <- read.csv("U:/DIVERCE_experiments/DIVERCE_WP01_exp01/Analysis/Overview_dataframe/OverviewTraitsFull.csv") %>%
+  filter(ID_spec != "Spiro_5") %>%  
+  group_by(Atrazine, Temp, ID_spec) %>%
+  mutate(pcgr = log(lead(Parts_permL, 1)/Parts_permL)/(lead(Days_fromstart, 1)-Days_fromstart),
+         .after = Parts_permL) %>% 
+  filter(pcgr > -5) %>% #Kick out extremely negative pcgr
+  ungroup() %>%
+  mutate(Species = as.factor(str_replace_all(str_sub(ID_spec, start = 1, end = 5), "[[:punct:]]", ""))) %>%
+  group_by(ID_spec) %>%
+  mutate_at(c("mean_speed", "mean_area", "mean_ar", "mean_linearity", "sd_speed", "sd_area", "sd_ar", "sd_linearity", "pcgr", "Parts_permL", "Days_fromstart"), ~ (scale(.) %>% as.vector)) %>%
+  ungroup() %>%
+  mutate(Strategy_Go = (mean_speed + mean_linearity), 
+         Strategy_Stay = (mean_area + mean_ar),
+         Strategy_index = (-mean_speed + -mean_linearity + mean_area + mean_ar)) %>% # index by summing speed, linearity, size and shape
+  mutate(phase = cut_interval(log10(Parts_permL), n=5, labels = FALSE)) %>%
+  select(Species, Atrazine, Temp, Treatment, ID_spec,  Days_fromstart, contains(c("mean_", "sd_")), Strategy_Stay, Strategy_Go, Strategy_index, pcgr, Parts_permL) # without sd for now! All standardized per Species
+
+Expl_vars <- Traj.avg[c("Temp", "Atrazine", "Days_fromstart", "ID_spec")]
+Obs_vars <- Traj.avg[c(7:14, 18, 19)]
+
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+#pairs 
+pairs(Obs_vars, lower.panel = panel.cor) # Keep all for now, strongest covariation is mean vs sd speed (0.66)
+
+Obs_vars.select <- Obs_vars
+```
+
+As visual in the cleveland dot plot, there is 0.66 covariation between mean and sd speed. I kept everything.
+Plot histogram and boxplot to show data has been properly standardized and look more or less normal (some are a little skewed but I think it's alright):
+
+```{r, echo=FALSE}
+library(Hmisc)
+hist.data.frame(Obs_vars.select)
+boxplot(Obs_vars.select)
+```
+
+Now create a PCR with all variables included:
+
+```{r, echo=FALSE}
+library(FactoMineR)
+library(factoextra)
+# which are vars to be put in pca?
+pca.dat <- Obs_vars.select[c("mean_ar", 
+                         "mean_area", 
+                         "sd_ar",
+                         "sd_area",
+                         "mean_speed",
+                         "sd_speed",
+                         "mean_linearity",
+                         "sd_linearity",
+                         "Parts_permL",
+                         "pcgr"
+                         )]
+Expl <- Expl_vars
+
+Total <- cbind(pca.dat, Expl)
+
+res.pca <- PCA(Total[c("mean_ar", 
+                         "mean_area", 
+                         "sd_ar",
+                         "sd_area",
+                         "mean_speed",
+                         "sd_speed",
+                         "mean_linearity",
+                         "sd_linearity",
+                         "Parts_permL",
+                         "pcgr"
+                       )])
+
+#Store some PCA vars using factoextra, use for cos2 calculation for example
+var <- get_pca_var(res.pca)
+
+#The weight of the different dimensions of the PCA
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 70))+
+  ggtitle(label = "Representation of our dataset on the PCA dimensions")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+When plotting the variation explained by the different pcs dimensions, the first three seem relevant (i.e. > 10%)
+Now plot how well the variables are represented by the first three dimensions:
+
+```{r, echo=FALSE}
+#The sum of the representation of our variables on the different dimensions (here 3)
+fviz_cos2(res.pca, choice = "var", axes = 1:3,ylim=c(0,1),fill = "lightgray", color = "black")+
+  geom_text(aes(label=round(cos2, digits = 2)),fontface=2, vjust=1.6, color="black", size=3.5)+
+  ggtitle(label = "Representation of our variables on the PCA dimensions 1 to 3")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+sd_linearity and pcgr are < 50% represented so I decided to kick them out:
+
+```{r, echo=FALSE}
+res.pca <- PCA(Total[c("mean_ar", 
+                         "mean_area", 
+                         "sd_ar",
+                         "sd_area",
+                         "mean_speed",
+                         "sd_speed",
+                         "mean_linearity",
+                         "Parts_permL"
+                       )])
+
+#Store some PCA vars using factoextra, use for cos2 calculation for example
+var <- get_pca_var(res.pca)
+
+#The weight of the different dimensions of the PCA
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 70))+
+  ggtitle(label = "Representation of our dataset on the PCA dimensions")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+#The sum of the representation of our variables on the different dimensions (here 3)
+fviz_cos2(res.pca, choice = "var", axes = 1:3,ylim=c(0,1),fill = "lightgray", color = "black")+
+  geom_text(aes(label=round(cos2, digits = 2)),fontface=2, vjust=1.6, color="black", size=3.5)+
+  ggtitle(label = "Representation of our variables on the PCA dimensions 1 to 3")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Now Parts_permL is below 50% so same treatment:
+
+```{r, echo=FALSE}
+res.pca <- PCA(Total[c("mean_ar", 
+                         "mean_area", 
+                         "sd_ar",
+                         "sd_area",
+                         "mean_speed",
+                         "sd_speed",
+                         "mean_linearity"
+                       )])
+
+#Store some PCA vars using factoextra, use for cos2 calculation for example
+var <- get_pca_var(res.pca)
+
+#The weight of the different dimensions of the PCA
+fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 70))+
+  ggtitle(label = "Representation of our dataset on the PCA dimensions")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+#The sum of the representation of our variables on the different dimensions (here 3)
+fviz_cos2(res.pca, choice = "var", axes = 1:3,ylim=c(0,1),fill = "lightgray", color = "black")+
+  geom_text(aes(label=round(cos2, digits = 2)),fontface=2, vjust=1.6, color="black", size=3.5)+
+  ggtitle(label = "Representation of our variables on the PCA dimensions 1 to 3")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+This looks better. Now plot the contributions of each variable to the first three dimensions per dimension:
+
+```{r, echo=FALSE}
+library("corrplot")
+corrplot(var$cos2,method = "number",cl.lim = c(0,1),tl.col = "black",col=colorRampPalette(c("white","snow3","black"))(200))
+
+```
+1) dim1 mean_speed, mean_linearity, sd_speed
+2) dim2 sd_ar and sd_area
+3) dim3 mean_ar, mean_area
+
+When plotted, this looks as follows:
+NB: the first plot is dim1 vs dim 2, the second dim 2 vs dim 3 and the third dim 1 vs 3
+```{r, echo=FALSE}
+#COrrelation circle
+fviz_pca_var(res.pca,axes = 1:2, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
+)+theme(plot.title = element_blank() ) 
+
+fviz_pca_var(res.pca,axes = 2:3, col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
+)+theme(plot.title = element_blank() ) 
+
+fviz_pca_var(res.pca,axes = c(1,3), col.var = "cos2", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), repel = TRUE # Avoid text overlapping
+)+theme(plot.title = element_blank() ) 
+
+```
+
+From the first plot, it is clear that:
+1) speed (mean and sd) and linearity are + associated with each other
+2) sd ar and sd area are + associated with each other (though weakly bcs the corr plot of before showed 55 and 0.51% representation, respectively)
+
+From the second plot, it is clear that:
+1) mean area and mean ar are NOT + associated as was expected, but slightly - associated by contrast
+
+2) Moreover, from the third plot it is clear that there is no negative correlation between shape and size (ar and area) on the one vs movement (speed and linearity) on the other hand (this was what Nico and me based the trait index on). aspect ratio and area seem even more negatively correlated in this third plot. Maybe when dying cells become more round (we know this from Tetrahymena thermophila), therefore having a low (close to 1:1) mean_ar, they also bcome bigger (bloated) until they lyse. healthy cells have more shape (mean_ar > 1) and might be smaller. This would explain a negative relation between aspect ratio and area 
