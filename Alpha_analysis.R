@@ -29,11 +29,13 @@ data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
 ##check if dd changes with treatment -------
 ggplot(data_cilia) +
   scale_colour_manual(values=c("black", cbPalette)) + 
-  aes(x=Parts_permL,y=pcgr, col=as.factor(Treatment)) +
+  aes(x=Parts_permL,y=pcgr, col=as.factor(Temp)) +
   geom_point() +
-  facet_grid(cols=vars(strain), scales="free") +
-  geom_smooth(method=lm, aes(x=Parts_permL, y=pcgr, col=as.factor(Treatment)),
-              formula=y ~ poly(x,1), se=F) 
+  facet_grid(cols=vars(strain), rows=vars(Atrazine), scales="free") +
+  geom_smooth(method=lm, aes(x=Parts_permL, y=pcgr, col=as.factor(Temp)),
+              formula=y ~ poly(x,1), se=F)
+ggsave("dd_cilia.pdf", width=12, height = 4, 
+       device = "pdf")
 
 ##check if dependence of trait on density changes with treatment -------
 ggplot(data_cilia) +
@@ -79,7 +81,7 @@ ggplot(data_cilia) +
              alpha=0.8) + 
   geom_smooth(method=lm, aes(x=delta_trait, y=delta_pcgr, col=as.factor(Treatment)),#
               formula=y ~ poly(x,1)) + #,  col="black"
-  facet_grid(rows=vars(species), cols=vars(trait), scales="free")
+  facet_wrap(vars(species, trait), scales="free")
 
 # CYANO ------
 ## Import data and compute pcgr----
