@@ -25,8 +25,8 @@ data_cilia <-  read.csv("C:/Users/debruin/OneDrive - UCL/Bio/UCL/GitHub/TeamWork
   mutate_at(c("mean_speed", "mean_area", "mean_ar", "mean_linearity", "sd_speed", "sd_area", "sd_ar", "sd_linearity", "pcgr", "Parts_permL", "Days_fromstart"), ~ (scale(.) %>% as.vector)) %>%
   ungroup() %>%
   mutate(Strategy_Go = (mean_speed + mean_linearity), 
-         Strategy_Stay = (mean_area + mean_ar),
-         Strategy_index = (-mean_speed + -mean_linearity + mean_area + mean_ar)) %>% # index by summing speed, linearity, size and shape
+         Strategy_Stay = (mean_area - mean_ar),
+         Strategy_index = (mean_speed + mean_linearity + mean_area)) %>% # index by summing speed, linearity and size: more positive = go, more negative = stay
   mutate(phase = cut_interval(log10(Parts_permL), n=5, labels = FALSE)) %>%
   select(Species, Atrazine, Temp, Treatment, ID_spec,  Days_fromstart, contains(c("mean_", "sd_")), Strategy_Stay, Strategy_Go, Strategy_index, pcgr, Parts_permL) # without sd for now! All standardized per Species
 
@@ -57,6 +57,15 @@ ggplot(data = data_cilia, mapping = aes(x = Atrazine, y = Strategy_Stay, color =
 
 ggplot(data = data_cilia, mapping = aes(x = Strategy_Stay, y = Strategy_Go), color = as.factor(Temp)) +
   geom_point(aes(color = Temp) )+  
+  facet_wrap(facets = .~ ID_spec) +
+  geom_smooth(aes(group = Temp, color = Temp), method = "lm") +
+  geom_hline(yintercept = 0, lty = 2, color = "grey") +
+  labs() +
+  theme_classic(base_size = 24)
+
+ggplot(data = data_cilia, mapping = aes(x = Atrazine, y = Strategy_index), color = as.factor(Temp)) +
+  stat_summary(aes( color = Temp), fun.data = "mean_cl_normal",
+               geom = "pointrange") + 
   facet_wrap(facets = .~ ID_spec) +
   geom_smooth(aes(group = Temp, color = Temp), method = "lm") +
   geom_hline(yintercept = 0, lty = 2, color = "grey") +
@@ -106,7 +115,7 @@ ggplot(data = subset(data_cilia, Species == "Spiro" | Species == "Tetra"), mappi
                fun.data = "mean_se",
                geom = "point", 
                show.legend = TRUE) +
-  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "loess", se = F) +
+  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "lm", se = T) +
   facet_wrap(facets = .~ ID_spec + Temp) +
   geom_hline(yintercept = 0, lty = 2, color = "grey") +
   labs() +
@@ -117,7 +126,7 @@ ggplot(data = subset(data_cilia, Species == "Loxo" | Species == "Para"), mapping
                fun.data = "mean_se",
                geom = "point", 
                show.legend = TRUE) +
-  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "loess", se = F) +
+  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "lm", se = F) +
   facet_wrap(facets = .~ ID_spec + Temp) +
   geom_hline(yintercept = 0, lty = 2, color = "grey") +
   labs() +
