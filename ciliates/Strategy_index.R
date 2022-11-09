@@ -22,10 +22,10 @@ data_cilia <-  read.csv("C:/Users/debruin/OneDrive - UCL/Bio/UCL/GitHub/TeamWork
   ungroup() %>%
   mutate(Species = as.factor(str_replace_all(str_sub(ID_spec, start = 1, end = 5), "[[:punct:]]", ""))) %>%
   group_by(ID_spec) %>%
-  mutate_at(c("mean_speed", "mean_area", "mean_ar", "mean_linearity", "sd_speed", "sd_area", "sd_ar", "sd_linearity", "pcgr", "Parts_permL", "Days_fromstart"), ~ (scale(.) %>% as.vector)) %>%
+  mutate_at(c("mean_speed", "mean_area", "mean_ar", "mean_linearity", "sd_speed", "sd_area", "sd_ar", "sd_linearity", "pcgr", "Parts_permL"), ~ (scale(.) %>% as.vector)) %>%
   ungroup() %>%
   mutate(Strategy_Go = (mean_speed + mean_linearity), 
-         Strategy_Stay = (mean_area - mean_ar),
+         Strategy_Stay = (-mean_area - mean_ar), # aspect ratio is hard to interpret and therefore not included in the strategy index formula
          Strategy_index = (mean_speed + mean_linearity + mean_area)) %>% # index by summing speed, linearity and size: more positive = go, more negative = stay
   mutate(phase = cut_interval(log10(Parts_permL), n=5, labels = FALSE)) %>%
   select(Species, Atrazine, Temp, Treatment, ID_spec,  Days_fromstart, contains(c("mean_", "sd_")), Strategy_Stay, Strategy_Go, Strategy_index, pcgr, Parts_permL) # without sd for now! All standardized per Species
@@ -37,7 +37,7 @@ data_cilia$Treatment <- as.factor(data_cilia$Treatment)
 data_cilia$Species <- as.factor(data_cilia$Species)
 
 
-# Plots:
+# Plots: Go and Stay strategies separately and Strategy index, against treatments and per capita growth rate
 ggplot(data = data_cilia, mapping = aes(x = Atrazine, y = Strategy_Go, color = ID_spec)) +
   stat_summary(fun.data = "mean_cl_normal",
                geom = "pointrange") +
@@ -61,7 +61,7 @@ ggplot(data = data_cilia, mapping = aes(x = Strategy_Stay, y = Strategy_Go), col
   geom_smooth(aes(group = Temp, color = Temp), method = "lm") +
   geom_hline(yintercept = 0, lty = 2, color = "grey") +
   labs() +
-  theme_classic(base_size = 24)
+  theme_classic(base_size = 24) # negative correlation as expected :D
 
 ggplot(data = data_cilia, mapping = aes(x = Atrazine, y = Strategy_index), color = as.factor(Temp)) +
   stat_summary(aes( color = Temp), fun.data = "mean_cl_normal",
@@ -72,20 +72,13 @@ ggplot(data = data_cilia, mapping = aes(x = Atrazine, y = Strategy_index), color
   labs() +
   theme_classic(base_size = 24)
 
-ggplot(data = data_cilia, mapping = aes(x = Atrazine, y = Strategy_index, color = ID_spec)) +
-  stat_summary(fun.data = "mean_cl_normal",
-               geom = "pointrange") +
-  facet_wrap(facets = .~ Species + Temp) +
-  geom_hline(yintercept = 0, lty = 2, color = "grey") +
-  labs() +
-  theme_classic(base_size = 24)
 
 ggplot(data = subset(data_cilia, Species == "Loxo" | Species == "Para"), mapping = aes(x = pcgr, y = Strategy_Go)) +
   stat_summary(aes(x = pcgr, y = Strategy_Go, shape = Temp, color = Atrazine), 
                fun.data = "mean_se",
                geom = "point", 
                show.legend = TRUE) +
-  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "loess", se = F) +
+  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "lm", se = ) +
   facet_wrap(facets = .~ ID_spec + Temp) +
   geom_hline(yintercept = 0, lty = 2, color = "grey") +
   labs() +
@@ -104,7 +97,7 @@ ggplot(data = subset(data_cilia, Species == "Spiro" | Species == "Tetra"), mappi
 
 ggplot(data = data_cilia, mapping = aes(x = pcgr, y = Strategy_Stay)) +
   geom_point(aes(shape = Temp, color = ID_spec), stat = "summary", size = 1, show.legend = TRUE) +
-  geom_smooth(aes(group = ID_spec, color = ID_spec), se = F) +
+  geom_smooth(aes(group = ID_spec, color = ID_spec), method = "lm", se = T) +
   facet_wrap(facets = .~ Species + Temp) +
   geom_hline(yintercept = 0, lty = 2, color = "grey") +
   labs() +
@@ -126,8 +119,29 @@ ggplot(data = subset(data_cilia, Species == "Loxo" | Species == "Para"), mapping
                fun.data = "mean_se",
                geom = "point", 
                show.legend = TRUE) +
-  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "lm", se = F) +
+  geom_smooth(aes(group = Atrazine, color = Atrazine), method = "lm", se = T) +
   facet_wrap(facets = .~ ID_spec + Temp) +
   geom_hline(yintercept = 0, lty = 2, color = "grey") +
   labs() +
   theme_classic(base_size = 24)
+
+##############################################################################################################
+##############################################################################################################
+
+# Plot strategy index over time, same way as we do with growth curves:
+
+library("viridis")
+
+barplot(1:10, col = inferno(10))
+plasma(6, begin = 1, end = 0)
+
+
+ggplot(data = data_cilia, mapping = aes(x = Days_fromstart, y = Strategy_index, color = Temp)) +
+         scale_color_manual(values = c("20" = viridis(10, begin = 0, end = 1)[10],
+                                       "22" =  inferno(10, begin = 0, end = 1)[7],
+                                       "24" =  inferno(10, begin = 0, end = 1)[5])) + 
+  stat_summary(aes(shape = Atrazine), fun.data = "mean_cl_normal",
+               geom = "point", size = 1.5) +
+  geom_smooth() +
+  facet_wrap(facets = .~ ID_spec) +
+  theme_bw(base_size = 20)
