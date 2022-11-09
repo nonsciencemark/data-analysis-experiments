@@ -29,22 +29,33 @@ data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
 ##check if dd changes with treatment -------
 ggplot(data_cilia) +
   scale_colour_manual(values=c("black", cbPalette)) + 
-  aes(x=Parts_permL,y=pcgr, col=as.factor(Temp)) +
+  aes(x=Parts_permL,y=pcgr, col=as.factor(Atrazine)) +
   geom_point() +
-  facet_grid(cols=vars(strain), rows=vars(Atrazine), scales="free") +
-  geom_smooth(method=lm, aes(x=Parts_permL, y=pcgr, col=as.factor(Temp)),
-              formula=y ~ poly(x,1), se=F)
-ggsave("dd_cilia.pdf", width=12, height = 4, 
+  facet_wrap(vars(ID_spec, Temp), scales="free", ncol=3,#,
+             labeller = label_bquote(paste("T=", .(Temp),
+                                           ", strain=", .(ID_spec)))) +
+  geom_smooth(method=lm, aes(x=Parts_permL, y=pcgr, col=as.factor(Atrazine)),
+              formula=y ~ poly(x,1), se=F) + 
+  labs(x="Inds per mL", y="pcgr", col="Atrazine")
+ggsave("dd_cilia.pdf", width=6, height = 12, 
        device = "pdf")
-
+model <- lm(pcgr~(Parts_permL+as.factor(Atrazine)+as.factor(Temp)+strain)^2, 
+            data=data_cilia)
 ##check if dependence of trait on density changes with treatment -------
-ggplot(data_cilia) +
+ggplot(subset(data_cilia, trait=="linearity")) +
   scale_colour_manual(values=c("black", cbPalette)) + 
-  aes(x=log10(Parts_permL),y=log10(mean), col=as.factor(Treatment)) +
+  aes(x=log10(Parts_permL),y=log10(mean), col=as.factor(Atrazine)) +
   geom_point() +
-  facet_grid(cols=vars(strain), rows=vars(trait), scales="free") +
-  geom_smooth(method=lm, aes(x=log10(Parts_permL), y=log10(mean), col=as.factor(Treatment)),
-              formula=y ~ poly(x,1), se=F)
+  facet_wrap(vars(ID_spec, Temp), scales="free", ncol=3,#,
+             labeller = label_bquote(paste("T=", .(Temp),
+                                           ", strain=", .(ID_spec)))) +
+  geom_smooth(method=lm, aes(x=log10(Parts_permL), y=log10(mean), col=as.factor(Atrazine)),
+              formula=y ~ poly(x,1), se=F)+
+  labs(x="log10(Inds per mL)", y="log10(mean)", col="Atrazine")
+ggsave("dd_cilia_linearity.pdf", width=6, height = 12, 
+       device = "pdf")
+model <- lm(log10(mean)~(log10(Parts_permL)+as.factor(Atrazine)+as.factor(Temp)+strain)^2, 
+            data=subset(data_cilia, trait=="area"))
 
 ## fit a reference model of dd and trait dependence on density--------
 # This model only uses the control data
