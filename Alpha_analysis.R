@@ -42,7 +42,7 @@ ggsave("dd_cilia.pdf", width=6, height = 12,
 model <- lm(pcgr~(Parts_permL+as.factor(Atrazine)+as.factor(Temp)+strain)^2, 
             data=data_cilia)
 ##check if dependence of trait on density changes with treatment -------
-ggplot(subset(data_cilia, trait=="linearity")) +
+ggplot(subset(data_cilia, trait=="speed")) +
   scale_colour_manual(values=c("black", cbPalette)) + 
   aes(x=log10(Parts_permL),y=log10(mean), col=as.factor(Atrazine)) +
   geom_point() +
@@ -55,7 +55,7 @@ ggplot(subset(data_cilia, trait=="linearity")) +
 ggsave("dd_cilia_linearity.pdf", width=6, height = 12, 
        device = "pdf")
 model <- lm(log10(mean)~(log10(Parts_permL)+as.factor(Atrazine)+as.factor(Temp)+strain)^2, 
-            data=subset(data_cilia, trait=="area"))
+            data=subset(data_cilia, trait=="speed"))
 
 ## fit a reference model of dd and trait dependence on density--------
 # This model only uses the control data
