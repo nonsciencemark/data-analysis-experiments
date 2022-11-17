@@ -15,19 +15,25 @@ data         <- get(paste("data_",model_system, sep=""))
 ##check if dd changes with treatment -------
 ggplot(data) +
   scale_colour_manual(values=c("black", cbPalette)) + 
-  aes(x=density,y=pcgr, col=as.factor(atrazine)) +
+  aes(x=density,y=pcgr, col=atrazine) +
   geom_point() +
   facet_wrap(vars(strain, temperature), scales="free", 
              ncol=length(unique(data$temperature)),#,
-             labeller = label_bquote(paste("T=", .(temperature),
-                                           ", strain=", .(strain)))) +
+             labeller = label_bquote(paste("T=", .(as.character(temperature)),
+                                           ", strain=", .(as.character(strain))))) +
   geom_smooth(method=lm, aes(x=density, y=pcgr, col=as.factor(atrazine)),
               formula=y ~ poly(x,1), se=F) + 
   labs(x="Inds per mL", y="pcgr", col="atrazine")
 ggsave(paste("dd_",model_system,".pdf", sep=""), width=1+2*length(unique(data$temperature)), 
        height = 4*length(unique(data$temperature)), device = "pdf")
-model <- lm(pcgr~(Parts_permL+as.factor(Atrazine)+as.factor(Temp)+strain)^2, 
-            data=data_cilia)
+
+n <- length(unique(data$strain))
+modelling <- data %>%
+  ungroup()%>%
+  nest_by(strain) %>%
+  mutate(model = list(summary(lm(pcgr~ atrazine + temperature + density*atrazine + density*temperature, 
+                                 data = data))$coefficients)) %>%
+  mutate(test = list((model[which(model[,"Pr(>|t|)"]<0.05/n),])))
 
 ##check if dependence of trait on density changes with treatment -------
 for (trait_i in unique(data$trait)){
@@ -46,10 +52,14 @@ for (trait_i in unique(data$trait)){
   ggsave(paste("dd_", model_system, "_",trait_i,".pdf", sep=""), plot=plot_i, 
          width = 1+2*length(unique(data$temperature)), 
          height = 4*length(unique(data$temperature)))
-  model_i <- lm(log10(mean)~(log10(density)+as.factor(atrazine)+as.factor(temperature)+strain)^2, 
-              data=subset(data, trait==trait_i))
-  print(trait_i)
-  print(summary(model_i))
+  for (strain_i in unique(data$strain))
+  {
+    model_i <- lm(log10(mean)~log10(density)+atrazine+temperature+strain, 
+                  data=subset(data, trait==trait_i, strain==strain_i))
+    print(trait_i)
+    print(summary(model_i))
+  }
+  
   }
 
 ## fit a reference model of dd and trait dependence on density--------
@@ -63,8 +73,8 @@ ref_model_dd <- lm(data_ref, formula = pcgr ~ poly(density,1)*strain + strain)
 ref_model_trait <- lm(data_ref,  formula = mean ~ poly(log10(density),1)*strain*trait + 
                         strain*trait + strain + trait)
 ###add predictions to the original data frame------------
-data$pcgr_ref <- predict.lm(ref_model_dd, newdata = data)
-data$mean_ref <- predict.lm(ref_model_trait, newdata = data)
+data$pcgr_ref <- predict.lm(ref_model_dd, newdata = data)#predictions of pcgr
+data$mean_ref <- predict.lm(ref_model_trait, newdata = data)#predictions of mean trait
 data <- data %>%
   mutate(delta_pcgr = pcgr-pcgr_ref) %>%
   mutate(delta_trait = mean-mean_ref)

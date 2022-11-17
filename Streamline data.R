@@ -2,9 +2,9 @@
 #Import and make uniform the ciliate data
 data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
   rename(density = Parts_permL) %>%
-  rename(strain = ID_spec) %>%
-  rename(temperature = Temp) %>%
-  rename(atrazine = Atrazine) %>%
+  mutate(strain = as.factor(ID_spec)) %>%
+  mutate(temperature = as.factor(Temp)) %>%
+  mutate(atrazine = as.factor(Atrazine)) %>%
   group_by(atrazine, temperature, strain) %>%
   mutate(pcgr = log(lead(density, 1)/density)/(lead(Days_fromstart, 1)-Days_fromstart),
          .after = density) %>% 
@@ -26,10 +26,11 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   select(-c(date, time)) %>%
   mutate(species = case_when(strain%in%c(2375,2524)~"one",
                              TRUE ~ "two")) %>%#link to species
-  mutate(atrazine = case_when(treat%in%c("A", "AT")~"yes",
-                              TRUE ~ "no")) %>%
-  mutate(temperature = case_when(treat%in%c("A", "C")~"normal",
-                          TRUE ~ "hot")) %>%
+  mutate(strain = as_factor(strain)) %>%
+  mutate(atrazine = as_factor(case_when(treat%in%c("C", "T")~"no",
+                              TRUE ~ "yes"))) %>%
+  mutate(temperature = as_factor(case_when(treat%in%c("A", "C")~"normal",
+                          TRUE ~ "hot"))) %>%
   group_by(atrazine, temperature, strain) %>%
   mutate(day = day - min(day)) %>%
   mutate(pcgr = log(lead(density,1)/density)/(lead(day,1)-day),
@@ -44,3 +45,4 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   pivot_wider(names_from=stat, values_from=value) %>%
   mutate(cv=sd/mean) 
 
+data_cyano$atrazine <- relevel(data_cyano$atrazine, ref="no")
