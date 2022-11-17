@@ -26,7 +26,7 @@ ggplot(data) +
   labs(x="Inds per mL", y="pcgr", col="atrazine")
 ggsave(paste("dd_",model_system,".pdf", sep=""), width=1+2*length(unique(data$temperature)), 
        height = 4*length(unique(data$temperature)), device = "pdf")
-
+### do the stats --------
 n <- length(unique(data$strain))
 modelling <- data %>%
   ungroup()%>%
@@ -52,15 +52,16 @@ for (trait_i in unique(data$trait)){
   ggsave(paste("dd_", model_system, "_",trait_i,".pdf", sep=""), plot=plot_i, 
          width = 1+2*length(unique(data$temperature)), 
          height = 4*length(unique(data$temperature)))
-  for (strain_i in unique(data$strain))
-  {
-    model_i <- lm(log10(mean)~log10(density)+atrazine+temperature+strain, 
-                  data=subset(data, trait==trait_i, strain==strain_i))
-    print(trait_i)
-    print(summary(model_i))
-  }
-  
-  }
+}
+
+### do the stats --------
+n <- length(unique(data$strain)) * length(unique(data$trait))
+modelling <- data %>%
+  ungroup()%>%
+  nest_by(strain, trait) %>% 
+  mutate(model = list(summary(lm(log10(mean)~ atrazine + temperature + log10(density)*atrazine + log10(density)*temperature, 
+                                 data = data))$coefficients)) %>%
+  mutate(test = list((as.data.frame(model)[which(model[,"Pr(>|t|)"]<0.05/n),])))
 
 ## fit a reference model of dd and trait dependence on density--------
 # This model only uses the control data
@@ -97,10 +98,18 @@ for (trait_i in unique(data$trait)){
   ggsave(paste("delta_",model_system,"_",trait_i,".pdf", sep=""), plot=plot_i, 
          width = 1+2*length(unique(data$temperature)), 
          height = 4*length(unique(data$temperature)))
-  model_i <- lm(delta_trait~(delta_pcgr+as.factor(atrazine)+as.factor(temperature)+strain)^2, 
-                data=subset(data, trait==trait_i))
-  print(trait_i)
-  print(summary(model_i))
 }
+
+### do the stats --------
+n <- length(unique(data$strain)) * length(unique(data$trait))
+modelling <- data %>%
+  ungroup()%>%
+  nest_by(strain, trait) %>%
+  mutate(model = list(summary(lm(delta_pcgr ~ atrazine + temperature + 
+                                   delta_trait*atrazine + delta_trait*temperature, 
+                                 data = data))$coefficients)) %>%
+  mutate(test = list((as.data.frame(model)[which(model[,"Pr(>|t|)"]<0.05/n),])))
+
+
 
 
