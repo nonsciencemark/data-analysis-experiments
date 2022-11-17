@@ -6,10 +6,10 @@ cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442",
 #devtools::install_github("ctkremer/growthTools")
 #library(growthTools)
 
-# IMPORT AND MAKE UNIFORM THE DATA -----------------------
-source("Streamline data.R")
+# IMPORT TOOLS AND DATA -----------------------
+source("Tools and data.R")
 # PICK DATA SOURCE ---------------
-model_system <- "cyano" #cilia or cyano
+model_system <- "cilia" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
 ##check if dd changes with treatment -------
@@ -27,13 +27,26 @@ ggplot(data) +
 ggsave(paste("dd_",model_system,".pdf", sep=""), width=1+2*length(unique(data$temperature)), 
        height = 4*length(unique(data$temperature)), device = "pdf")
 ### do the stats --------
+stats_result <- modelling(data=data, 
+                          var_to_nest_by = "strain",
+                          formula="pcgr~ atrazine + temperature + density*atrazine + density*temperature") %>%
+  rowwise() %>%
+  mutate(type_of_pred = ifelse(length(grep("density", predictor)>0), "slope", "intercept")) %>%
+  ungroup()
 n <- length(unique(data$strain))
-modelling <- data %>%
-  ungroup()%>%
-  nest_by(strain) %>%
-  mutate(model = list(summary(lm(pcgr~ atrazine + temperature + density*atrazine + density*temperature, 
-                                 data = data))$coefficients)) %>%
-  mutate(test = list((model[which(model[,"Pr(>|t|)"]<0.05/n),])))
+plot_dd <- ggplot(stats_result %>% filter(`Pr(>|t|)`<0.05/n)) +
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  aes(x=predictor, y=Estimate, col=strain) +
+  geom_point(shape=1, size=3, position=position_dodge(width=0.5)) +
+  geom_errorbar(aes(ymin=Estimate-`Std. Error`, ymax=Estimate+`Std. Error`), 
+                position=position_dodge(width=0.5), width=.2) +
+  geom_hline(yintercept=0, linetype="dashed") +
+  coord_flip() + 
+  facet_wrap(vars(type_of_pred), scales="free", ncol=1)
+
+ggsave(paste("dd_general_",model_system,".pdf", sep=""), plot=plot_dd, 
+       width = 5, height = 3)
 
 ##check if dependence of trait on density changes with treatment -------
 for (trait_i in unique(data$trait)){
@@ -55,13 +68,28 @@ for (trait_i in unique(data$trait)){
 }
 
 ### do the stats --------
+stats_result <- modelling(data=data, 
+                          var_to_nest_by = c("strain", "trait"),
+                          formula="log10(mean)~ atrazine + temperature + log10(density)*atrazine + log10(density)*temperature")%>%
+  rowwise() %>%
+  mutate(type_of_pred = ifelse(length(grep("density", predictor)>0), "slope", "intercept")) %>%
+  ungroup()
 n <- length(unique(data$strain)) * length(unique(data$trait))
-modelling <- data %>%
-  ungroup()%>%
-  nest_by(strain, trait) %>% 
-  mutate(model = list(summary(lm(log10(mean)~ atrazine + temperature + log10(density)*atrazine + log10(density)*temperature, 
-                                 data = data))$coefficients)) %>%
-  mutate(test = list((as.data.frame(model)[which(model[,"Pr(>|t|)"]<0.05/n),])))
+
+plot_dd <- ggplot(stats_result %>% filter(`Pr(>|t|)`<0.05/n)) +
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  scale_shape_manual(values=c(0:10)) +
+  aes(x=predictor, y=Estimate, col=strain, shape=trait) +
+  geom_point(size=3, position=position_dodge(width=0.5)) +
+  geom_errorbar(aes(ymin=Estimate-`Std. Error`, ymax=Estimate+`Std. Error`), 
+                width=.2, position=position_dodge(width=0.5)) +
+  geom_hline(yintercept=0, linetype="dashed") +
+  coord_flip() + 
+  facet_wrap(vars(type_of_pred), scales="free", ncol=1)
+
+ggsave(paste("dd_general_trait_",model_system,".pdf", sep=""), plot=plot_dd, 
+       width = 6, height = 4)
 
 ## fit a reference model of dd and trait dependence on density--------
 # This model only uses the control data
@@ -101,15 +129,27 @@ for (trait_i in unique(data$trait)){
 }
 
 ### do the stats --------
+stats_result <- modelling(data=data, 
+                          var_to_nest_by = c("strain", "trait"),
+                          formula="delta_pcgr~ atrazine + temperature + delta_trait*atrazine + delta_trait*temperature")%>%
+  rowwise() %>%
+  mutate(type_of_pred = ifelse(length(grep("delta", predictor)>0), "slope", "intercept")) %>%
+  ungroup()
 n <- length(unique(data$strain)) * length(unique(data$trait))
-modelling <- data %>%
-  ungroup()%>%
-  nest_by(strain, trait) %>%
-  mutate(model = list(summary(lm(delta_pcgr ~ atrazine + temperature + 
-                                   delta_trait*atrazine + delta_trait*temperature, 
-                                 data = data))$coefficients)) %>%
-  mutate(test = list((as.data.frame(model)[which(model[,"Pr(>|t|)"]<0.05/n),])))
 
+plot_vs <- ggplot(stats_result %>% filter(`Pr(>|t|)`<0.05/n)) +
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  scale_shape_manual(values=c(0:10)) +
+  aes(x=predictor, y=Estimate, col=strain, shape=trait) +
+  geom_point(size=3, position=position_dodge(width=0.5)) +
+  geom_errorbar(aes(ymin=Estimate-`Std. Error`, ymax=Estimate+`Std. Error`), 
+                width=.2, position=position_dodge(width=0.5)) +
+  geom_hline(yintercept=0, linetype="dashed") +
+  coord_flip() + 
+  facet_wrap(vars(type_of_pred), scales="free", ncol=1)
 
+ggsave(paste("delta_vs_delta_",model_system,".pdf", sep=""), plot=plot_vs, 
+       width = 5, height = 4)
 
 

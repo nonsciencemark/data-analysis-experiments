@@ -1,5 +1,20 @@
 
-#Import and make uniform the ciliate data
+#Functions -----------------
+modelling <- function(data=data, var_to_nest_by="strain", formula) {
+  test <- data %>%
+    ungroup()%>%
+    nest_by(across({{var_to_nest_by}})) %>%
+    mutate(model = list(lm(as.formula(formula), 
+                                   data = data))) %>%
+    mutate(model_summary = 
+             list(as_tibble(rownames_to_column(as.data.frame(summary(model)$coefficients),
+                                               var = "predictor")))) %>%
+    unnest(model_summary) %>%
+    select(-c("data")) 
+  return(test)
+}
+
+#Import and make uniform the ciliate data ----------
 data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
   rename(density = Parts_permL) %>%
   mutate(strain = as.factor(ID_spec)) %>%
@@ -46,3 +61,4 @@ data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
   mutate(cv=sd/mean) 
 
 data_cyano$atrazine <- relevel(data_cyano$atrazine, ref="no")
+
