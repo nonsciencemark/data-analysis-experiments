@@ -15,7 +15,7 @@ modelling <- function(data=data, var_to_nest_by="strain", formula) {
 }
 
 #Import and make uniform the ciliate data ----------
-data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
+data_cilia <- read.csv("data/ciliates/OverviewTraitsFull.csv") %>%
   rename(density = Parts_permL) %>%
   mutate(strain = as.factor(ID_spec)) %>%
   mutate(temperature = as.factor(Temp)) %>%
@@ -34,7 +34,7 @@ data_cilia <- read.csv("ciliates/OverviewTraitsFull.csv") %>%
   mutate(cv=sd/mean)
 
 #Import and make uniform the cyano data
-data_cyano <- read.csv("cyanobacteria/mono_data.csv") %>%
+data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
   rename(density = population.mean) %>%
   separate(date.time, sep=" ", into = c("date", "time")) %>%
   mutate(day = yday(date), .after = date) %>%

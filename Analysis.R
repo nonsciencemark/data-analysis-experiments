@@ -24,7 +24,7 @@ ggplot(data) +
   geom_smooth(method=lm, aes(x=density, y=pcgr, col=as.factor(atrazine)),
               formula=y ~ poly(x,1), se=F) + 
   labs(x="Inds per mL", y="pcgr", col="atrazine")
-ggsave(paste("dd_",model_system,".pdf", sep=""), width=1+2*length(unique(data$temperature)), 
+ggsave(paste("plots/dd_",model_system,".pdf", sep=""), width=1+2*length(unique(data$temperature)), 
        height = 4*length(unique(data$temperature)), device = "pdf")
 ### do the stats --------
 stats_result <- modelling(data=data, 
@@ -45,7 +45,7 @@ plot_dd <- ggplot(stats_result %>% filter(`Pr(>|t|)`<0.05/n)) +
   coord_flip() + 
   facet_wrap(vars(type_of_pred), scales="free", ncol=1)
 
-ggsave(paste("dd_general_",model_system,".pdf", sep=""), plot=plot_dd, 
+ggsave(paste("plots/dd_general_",model_system,".pdf", sep=""), plot=plot_dd, 
        width = 5, height = 3)
 
 ##check if dependence of trait on density changes with treatment -------
@@ -62,7 +62,7 @@ for (trait_i in unique(data$trait)){
                              col=as.factor(atrazine)),
               formula=y ~ poly(x,1), se=F)+
   labs(x="log10(density)", y="log10(trait)", col="atrazine")
-  ggsave(paste("dd_", model_system, "_",trait_i,".pdf", sep=""), plot=plot_i, 
+  ggsave(paste("plots/dd_", model_system, "_",trait_i,".pdf", sep=""), plot=plot_i, 
          width = 1+2*length(unique(data$temperature)), 
          height = 4*length(unique(data$temperature)))
 }
@@ -88,7 +88,7 @@ plot_dd <- ggplot(stats_result %>% filter(`Pr(>|t|)`<0.05/n)) +
   coord_flip() + 
   facet_wrap(vars(type_of_pred), scales="free", ncol=1)
 
-ggsave(paste("dd_general_trait_",model_system,".pdf", sep=""), plot=plot_dd, 
+ggsave(paste("plots/dd_general_trait_",model_system,".pdf", sep=""), plot=plot_dd, 
        width = 6, height = 4)
 
 ## fit a reference model of dd and trait dependence on density--------
@@ -123,7 +123,7 @@ for (trait_i in unique(data$trait)){
                labeller = label_bquote(paste("T=", .(temperature),
                                              ", strain=", .(strain)))) +
     labs(x=expression(paste(delta[trait])), y=expression(paste(delta[pcgr])), col="atrazine")
-  ggsave(paste("delta_",model_system,"_",trait_i,".pdf", sep=""), plot=plot_i, 
+  ggsave(paste("plots/delta_",model_system,"_",trait_i,".pdf", sep=""), plot=plot_i, 
          width = 1+2*length(unique(data$temperature)), 
          height = 4*length(unique(data$temperature)))
 }
@@ -149,7 +149,7 @@ plot_vs <- ggplot(stats_result %>% filter(`Pr(>|t|)`<0.05/n)) +
   coord_flip() + 
   facet_wrap(vars(type_of_pred), scales="free", ncol=1)
 
-ggsave(paste("delta_vs_delta_",model_system,".pdf", sep=""), plot=plot_vs, 
+ggsave(paste("plots/delta_vs_delta_",model_system,".pdf", sep=""), plot=plot_vs, 
        width = 5, height = 4)
 
 
