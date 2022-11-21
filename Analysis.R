@@ -9,7 +9,7 @@ cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442",
 # IMPORT TOOLS AND DATA -----------------------
 source("Tools and data.R")
 # PICK DATA SOURCE ---------------
-model_system <- "cilia" #cilia or cyano
+model_system <- "cyano" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
 ##check if dd changes with treatment -------
@@ -23,7 +23,7 @@ ggplot(data) +
                                            ", strain=", .(as.character(strain))))) +
   geom_smooth(method=lm, aes(x=density, y=pcgr, col=as.factor(atrazine)),
               formula=y ~ poly(x,1), se=F) + 
-  labs(x="Inds per mL", y="pcgr", col="atrazine")
+  labs(x="density", y="pcgr", col="atrazine")
 ggsave(paste("plots/dd_",model_system,".pdf", sep=""), width=1+2*length(unique(data$temperature)), 
        height = 4*length(unique(data$temperature)), device = "pdf")
 ### do the stats --------
