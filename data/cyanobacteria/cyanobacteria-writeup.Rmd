@@ -10,7 +10,6 @@ library('tidyverse')
 library('flowClust')
 library('gauseR')
 library('deSolve')
-library('scales')
 ```
 
 # Introduction
@@ -35,91 +34,42 @@ We used the `GauseR` package to determine the Lotka-Volterra growth parameters o
 ## Species growth
 Below, we visualise growth of the the strain populations over time. Each point is the average value of three replicates.
 
-```{r, import-data, fig.width=10, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
+```{r, plotting-raw-data, fig.width=10, fig.height=8, fig.cap="Strain population change over time during 7 days of growth"}
 # Load data
-mono.data <- read.csv('cyanobacteria/mono_data.csv') %>%
+in.data <- readRDS('C:/Users/mholmes/Documents UNamur/Lab work/03_Experiments/15_2022-06_DIVERCE/mono_data_clean.RData') %>%
   group_by(strain, treat) %>% # group by strain ID and treatment
-  mutate(date.time = date.time %>% as.POSIXct %>% as.numeric, # convert to good format
-         date.time = (date.time - min(date.time)) / 3600,  # in hours 
-         #
-         # ISSUE: THIS ONLY WORKS WHEN NOT IN HOURS??
-         #
-         strain = as.factor(strain)) %>%
-   arrange(date.time) %>% # order by sampling time
-  mutate()
-```
+  arrange(date.time) %>% # order by sampling time
+  mutate(date.time = as.numeric(date.time - min(date.time)) / 3600) #in hours
 
-
-## Filtering lag phases out using Kremer's [growthTools](https://github.com/ctkremer/growthTools/)
-
-```{r, filter-lag}
-library('growthTools')
-
-lag.sat.pars <- mono.data %>% 
-  group_by(strain, treat) %>%
-  summarise(mods = list(get.growth.rate(
-    date.time, log(population.mean), id = paste(strain, treat), plot.best.Q = F, 
-    methods = c('linear', 'lag', 'sat', 'lagsat')))) %>%
-  rowwise %>%
-  mutate(best.mod = mods$best.model, 
-         mod.coef = list(coef(mods$best.model.contents[[1]])),
-         B1 = ifelse('B1' %in% names(mod.coef), mod.coef['B1'], NA),
-         B2 = ifelse('B2' %in% names(mod.coef), mod.coef['B2'], NA),
-         a = ifelse(best.mod == 'gr', mod.coef['(Intercept)'], mod.coef['a']),
-         b = ifelse(best.mod == 'gr', mod.coef['x'], mod.coef['b']),
-         r.estim = b / a)
-
-lag.sat.pars
-
-mean.time.diff <- mono.data %>% group_by(strain, treat) %>% summarise(d = mean(diff(date.time))) %>% ungroup %>% summarise(d = mean(d)) %>% unlist %>% c
-
-mono.data <- left_join(mono.data, lag.sat.pars) %>%
-  mutate(cutoff.low =  B1 - 1.5 * mean.time.diff,#mean.time.diff/(5*b),
-         cutoff.high = B2 + 3 * mean.time.diff,#mean.time.diff/(5*b),
-         cutoff.low = ifelse(is.na(B1), 0, cutoff.low),
-         cutoff.high = ifelse(is.na(B2), Inf, cutoff.high)) %>%
-  ungroup %>%
-  dplyr::filter(date.time > cutoff.low,
-                date.time < cutoff.high)
-
-```
-
-```{r,plotting-raw-data}
 # View raw data
-ggplot(mono.data, aes(x = as.POSIXct(date), y = population.mean, col = strain)) + 
+ggplot(in.data, aes(x = date, y = population, col = strain)) + 
   facet_wrap(treat~., scales = 'free_y', nrow = 2, 
-             labeller = label_wrap_gen(multi_line = FALSE)) +
-    scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
-                labels = trans_format('log10', math_format(10^.x))) +
+             labeller = label_wrap_gen(multi_line=FALSE)) +
+  # geom_line() + 
+  #geom_point(pch = 21, fill = 'white', size = 2) +
+  scale_y_log10() +
   geom_line(position = position_dodge(.5)) +
-  geom_pointrange(aes(
-    ymin = population.mean - population.sd, 
-    ymax = population.mean + population.sd), 
-    pch = 21, fill = 'white', position = position_dodge(.5)) +
+  geom_pointrange(aes(ymin = population - population.se, 
+                      ymax = population + population.se), 
+                  pch = 21, fill = 'white', position = position_dodge(.5)) +
   theme_bw() +
-  labs(col = 'Strain', x = 'Time (Days)', y = 'Population Density') +
+  labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
   theme(legend.position = 'bottom')
 ```
-
 
 ## Lotka-Volterra model fitting using GauseR
 We now fit a Lotka-Volterra population model to the data, to determine the intrinsic growth rates and self-interaction parameters ($r$ and $a$, respectively).
 
 ```{r, fitting-parameters, fig.width=10, fig.height=8, fig.cap="Prediction of fitted Lotka-Volterra model"}
 # model fitting
-mod <- mono.data %>% 
-  group_by(strain, treat) %>%
-  summarise(
-    gause.fit = list(gause_wrapper( # gauseR function
-      time = date.time, # sampling intervals
-      species = population.mean, # population densities
-      keeptimes = TRUE, # return prediction at the same time-steps
-      r_starting = ifelse(first(r.estim) < 0, 1e-8, first(r.estim)), # initial guess for r
-      A_starting = -1e-8, # initial guess for a
-      doplot = FALSE))# don't plot the model fitting process
-    ) #%>%
-  # rowwise %>%
-  # mutate(r = gause.fit$parameter_intervals[2,2])
+mod <- in.data %>%
+  summarise(gause.fit = list(gause_wrapper( # gauseR function
+    time = date.time, # sampling intervals
+    species = population, # population densities
+    keeptimes = TRUE, # return prediction at the same time-steps
+    r_starting = 5e-2, # initial guess for r
+    A_starting = -5e-7, # initial guess for a 
+    doplot = FALSE))) # don't plot the model fitting process
 
 # extract model prediction
 pred.data <- mod %>%
@@ -131,18 +81,16 @@ pred.data <- mod %>%
   rename(date.time = time, prediction = `1`) # rename columns
 
 out.data <- pred.data %>% 
-  full_join(mono.data) %>%
-  mutate(d.pred = abs(prediction - population.mean))
+  full_join(in.data) %>%
+  mutate(d.pred = abs(prediction - population))
 
 # plot
 ggplot(out.data, aes(x = date.time, col = strain)) + 
   facet_wrap(strain~treat, scales = 'free_y', nrow = 4, 
-             labeller = label_wrap_gen(multi_line = FALSE)) +
+             labeller = label_wrap_gen(multi_line=FALSE)) +
   #scale_y_log10() +
   geom_line(aes(y = prediction), lty = 2) +
-  geom_pointrange(aes(y = population.mean, ymin = population.mean - population.sd, 
-                      ymax = population.mean + population.sd), 
-                  pch = 21, fill = 'white') +
+  geom_point(aes(y = population), pch = 21, fill = 'white', size = 2) +
   theme_bw() +
   labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
   theme(legend.position = 'bottom')
@@ -151,17 +99,17 @@ ggplot(out.data, aes(x = date.time, col = strain)) +
 ### Accuracy
 We'd like to see how accurate the model-fitting procedure is using the coefficient of determination... ($R^2$)
 
-```{r, coefficient-of-determination, fig.width=7, fig.height=3, fig.cap="Accuracy of model-fitting procedure"}
+```{r, coefficient-of-determination, fig.width=5, fig.height=3, fig.cap="Accuracy of model-fitting procedure"}
 # Data frame with CoD
 CoD.data <- out.data %>%
-  mutate(difference = population.mean - prediction,
+  mutate(difference = population - prediction,
          diff.squared = difference^2) %>%
   group_by(strain, treat) %>%
   summarise(RSS = sum(diff.squared),
-            TSS = sum((population.mean - mean(population.mean))^2),
+            TSS = sum((population - mean(population))^2),
             R2 = 1 - (RSS / TSS),
-            pop.range = population.mean %>% range %>% diff,
-            population = mean(population.mean))
+            pop.range = population %>% range %>% diff,
+            population = mean(population))
 
 # plot
 ggplot(CoD.data, aes(x = strain, y = R2, pch = treat, col = strain)) +
@@ -178,98 +126,55 @@ ggplot(CoD.data, aes(x = strain, y = R2, pch = treat, col = strain)) +
         legend.position = 'bottom')
 ```
 
-We can see that the model fit is mostly good except for strain 2434 in atrazine and atrazine + temperature conditions.
+We can see that the model fit is mostly good except for strain 2383 in atrazine conditions.
+
+```{r}
+in.data %>% dplyr::filter(date > '17-06-2022') %>%
+  mutate(lag.pop = get_lag(population, date.time),
+                   PCGR = percap_growth(lag.pop$x, lag.pop$laggedx, lag.pop$dt)) %>%
+  ggplot(aes(x = lag(population), y = PCGR, col = strain)) + 
+  facet_wrap(strain~treat, scales = 'free', nrow = 4,
+             labeller = label_wrap_gen(multi_line=FALSE)) +
+  scale_x_log10() +
+  geom_point(pch = 21, fill = 'white', size = 2) +
+  theme_bw() +
+  #labs(col = 'Strain', x = 'Time (hours)', y = 'Population Density') +
+  theme(legend.position = 'bottom')
+
+```
+
 
 ### Accuracy and traits
 What if the loss of model accuracy is due to functional trait changes? Let's first view the relevant ones...
 
-```{r, d-traits-vs-acc}
+FSC is...
 
-# sd.traits <- out.data %>% 
-#   group_by(strain, treat) %>%
-#   summarise(across(FSC.HLin.mean:NIR.R.HLin.mean, sd)) %>% 
-#   left_join(CoD.data) %>% 
-#   pivot_longer(FSC.HLin.mean:NIR.R.HLin.mean, names_to = 'channel', values_to = 'SD') %>%
-#   rowwise %>%
-#   mutate(channel = strsplit(channel, '.HLin')[[1]][1])
+SSC is...
 
-# try with Euclidean distance?
-sd.traits <- out.data %>% 
-  group_by(strain, treat) %>%
-  dplyr::select(date.time, contains('HLin.mean')) %>%
-  dplyr::filter(row_number() %in% c(1, n())) %>% 
-  summarise(across(FSC.HLin.mean:NIR.R.HLin.mean, function(i) {
-    abs(i[2] - i[1]) / sum(i)
-    #dist(i)[1] / sum(i)
-    })) %>%
-  pivot_longer(FSC.HLin.mean:NIR.R.HLin.mean) %>%
-  group_by(strain, treat) %>%
-  summarise(mean.d.trait = mean(value)) %>% 
-  left_join(CoD.data)
+RED.B is...
 
-ggplot(sd.traits, 
-       aes(x = mean.d.trait, y = R2, col = treat)) +
-  geom_point(aes(pch = strain)) +
-  geom_smooth(method = 'lm', se = FALSE) +
-  coord_cartesian(ylim = c(0, 1)) +
-  theme_bw() + 
-  labs(y = expression('R'^2),
-       x = 'Mean proportional change between initial & final traits',
-       col = 'Treatment',
-       pch = 'Strain',
-       title = 'Mean proportional trait change vs model fitting accuracy')
+RED.R is...
 
-# we have an issue here, since trait values change even while in lag phase...
-
-```
+YEL.B is...
 
 How do they change over time?
 
 ```{r,traits-over-time, warning=FALSE, fig.width=8, fig.height=9, fig.cap="Changes in strain traits over time"}
 # trait changes
 trait.time <- out.data %>%
-  dplyr::select(-contains('GRN.B'), -contains('NIR.B'), -contains('NIR.R')) %>%
-  pivot_longer(contains('HLin'), names_to = c('channel', 'metric'), names_pattern = '(.*).HLin.(.*)') %>%
-  pivot_wider(names_from = metric, values_from = value)
-  
+  dplyr::select(-GRN.B.HLin, -NIR.B.HLin, -NIR.R.HLin) %>%
+  mutate(across(FSC.HLin:RED.R.HLin, .fns = function(i) {i$mean})) %>%
+  pivot_longer(FSC.HLin:RED.R.HLin, names_to = 'Channel')
+
 # plot
-ggplot(trait.time, aes(x = date.time, y = mean, col = strain, pch = treat)) + 
-  facet_grid(channel~strain, scales = 'free_y') +
+ggplot(trait.time, aes(x = date.time, y = value, col = strain, pch = treat)) + 
+  facet_grid(Channel~strain, scales = 'free_y') +
   geom_line() +
-  geom_pointrange(aes(ymax = mean + sd, ymin = mean - sd), fill = 'white') +
+  geom_point(size = 2, fill = 'white') +
   theme_bw() +
   scale_shape_manual(values = c(21, 22, 23, 24)) +
   labs(col = 'Strain', x = 'Time (hours)', y = 'Trait value') +
   theme(legend.position = 'bottom')
-```
-
-Do the trait values predict per-capita growth?
-
-```{r, traits-percap}
-
-traits.pcgr <- out.data %>%
-  dplyr::select(-contains('.sd')) %>%
-  group_by(strain, treat) %>%
-  mutate(pcgr = percap_growth(population.mean, 
-                              dplyr::lag(population.mean), 
-                              date.time - dplyr::lag(date.time))) %>% 
-  pivot_longer(FSC.HLin.mean:NIR.R.HLin.mean, names_to = 'Channel') %>%
-  rowwise %>%
-  mutate(Channel = strsplit(Channel, '.HLin')[[1]][1]) %>%
-  drop_na(pcgr)
-
-# actually we want to pick channels which are not that different between strains ?
-
-ggplot(traits.pcgr, 
-       aes(x = value, y = pcgr)) +
-  facet_wrap(.~Channel, scales = 'free', labeller = 'label_both') +
-  geom_smooth(method = 'glm', formula = y ~ poly(x, 2), se = T) +
-  geom_hline(yintercept = 0) +
-  geom_point(aes(col = treat, pch = strain)) +
-  theme_bw() +
-  labs(y = 'Per-capita growth rate',
-       x = 'Trait value')
-
 ```
 
 How much does each trait change?
@@ -277,13 +182,13 @@ How much does each trait change?
 ```{r, d-traits, fig.width=8, fig.height=6, fig.cap="Amount of trait change between beginning and end of experiment"}
 # trait CV
 trait.change <- trait.time %>%
-  group_by(strain, treat, channel) %>%
-  summarise(change = (first(mean) - last(mean)) / first(mean))#sd(value) / mean(value) * 100)
+  group_by(strain, treat, Channel) %>%
+  summarise(change = (first(value) - last(value)) / first(value))#sd(value) / mean(value) * 100)
 
 # plot
 ggplot(trait.change, aes(x = strain, y = change, col = strain, pch = treat)) +
-  facet_wrap(.~channel) +
-  geom_hline(lty = 2, yintercept = 0) +
+  facet_wrap(.~Channel) +
+  geom_hline(lty = 2, yintercept = 0)+
   geom_point(size = 2, position = position_dodge(width = .5)) +
   theme_bw() +
   scale_shape_manual(values = 21:24) +
@@ -299,7 +204,7 @@ CoD.traits <- trait.change %>%
 
 # plot
 ggplot(CoD.traits, aes(x = change, y = R2, col = strain, pch = treat)) +
-  facet_wrap(.~channel) +
+  facet_wrap(.~Channel) +
   geom_vline(xintercept = 0, lty = 2) +
   geom_point(size = 2, fill = 'white') +
   theme_bw() +
@@ -319,11 +224,11 @@ mod.df <- mod %>%
   rowwise %>%
   mutate(r = gause.fit$parameter_intervals['r','mu'],
          aii = gause.fit$parameter_intervals['a','mu']) %>%
-  pivot_longer(r:aii, names_to = 'parameter')
+  pivot_longer(r:aii, names_to = 'Parameter')
 
 # plot
 ggplot(mod.df, aes(x = strain, y = value, col = strain, pch = treat)) +
-  facet_wrap(parameter~., scales = 'free_y') +
+  facet_wrap(Parameter~., scales = 'free_y') +
   geom_point(size = 2, fill = 'white', 
              position = position_dodge(.5)) +
   scale_shape_manual(values = 21:24) +
@@ -333,43 +238,23 @@ ggplot(mod.df, aes(x = strain, y = value, col = strain, pch = treat)) +
 
 
 ```{r, traits-growth-par, fig.cap="Fitted model parameters as a function of the mean trait value"}
-# data framing
 mod.traits <- trait.time %>% 
-  group_by(strain, treat, channel) %>%
-  summarise(channel.value = mean(mean),
-            channel.sd = mean(sd)) %>%
+  group_by(strain, treat, Channel) %>%
+  rename(Channel.value = value) %>%
+  summarise(Channel.value = mean(Channel.value)) %>%
   left_join(mod.df) %>%
-  pivot_wider(names_from = parameter, values_from = value)
+  rename(Parameter.value = value)
 
-# intrinsic growth rate
-ggplot(mod.traits, aes(x = channel.value, y = r)) +
-  facet_wrap(~channel, scales = 'free') +
-  scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
-                labels = trans_format('log10', scales::math_format(10^.x))) + 
-  geom_smooth(method = 'lm') +
-  geom_point(aes(col = treat, pch = strain),
-             size = 2, fill = 'white') +
-  scale_shape_manual(values = 21:24) +
-  theme_bw() +
-  labs(x = 'Trait mean value', 
-       y = expression(paste('Intrinsic growth rate (', mu['i'], ')'))) +
-  theme(legend.position = 'bottom')
-
-# density-dependence
-ggplot(mod.traits, aes(x = channel.sd, y = -aii)) +
-  facet_wrap(~channel, scales = 'free') +
-  scale_y_log10(breaks = trans_breaks('log10', function(x){10^x}),
-                labels = trans_format('log10', scales::math_format(10^.x))) + 
+# plot
+ggplot(mod.traits, aes(x = Channel.value, y = Parameter.value, col = strain)) +
+  facet_grid(Parameter~Channel, scales = 'free') +
+  scale_y_continuous(trans = 'pseudo_log') +
+  #geom_path(lty = 2) +
   geom_smooth(method = 'glm') +
-  geom_point(aes(col = treat, pch = strain),
-             size = 2, fill = 'white') +
+  geom_point(aes(pch = treat), size = 2, fill = 'white') +
   scale_shape_manual(values = 21:24) +
   theme_bw() +
-  labs(x = 'Trait standard deviation (SD)', 
-       y = expression(paste('Self-limitation (', alpha['11'], ')'))) +
   theme(legend.position = 'bottom')
-
-
 ```
 
 # Do certain traits predict sensitivity to atrazine exposure?
