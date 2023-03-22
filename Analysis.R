@@ -9,7 +9,7 @@ cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442",
 # IMPORT TOOLS AND DATA -----------------------
 source("Tools and data.R")
 # PICK DATA SOURCE ---------------
-model_system <- "cyano" #cilia or cyano
+model_system <- "cilia" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
 ##check if dd changes with treatment -------
@@ -94,12 +94,12 @@ ggsave(paste("plots/dd_general_trait_",model_system,".pdf", sep=""), plot=plot_d
 ## fit a reference model of dd and trait dependence on density--------
 # This model only uses the control data
 data_ref <- data %>% 
-  filter(atrazine%in%c("0","no"), temperature %in%c("normal", "20")) 
+  filter(atrazine%in%c("0","no"), temperature %in%c("normal", "22")) 
 ###first dd----------------
-ref_model_dd <- lm(data_ref, formula = pcgr ~ poly(density,1)*strain + strain)
+ref_model_dd <- lm(data_ref, formula = pcgr ~ density*strain + strain)
 
 ###then traits----------------
-ref_model_trait <- lm(data_ref,  formula = mean ~ poly(log10(density),1)*strain*trait + 
+ref_model_trait <- lm(data_ref,  formula = mean ~ density*strain*trait + 
                         strain*trait + strain + trait)
 ###add predictions to the original data frame------------
 data$pcgr_ref <- predict.lm(ref_model_dd, newdata = data)#predictions of pcgr
