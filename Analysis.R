@@ -12,27 +12,17 @@ source("Tools and data.R")
 model_system <- "cyano" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
-##check if dd changes with treatment -------
-ggplot(data) +
-  scale_colour_manual(values=c("black", cbPalette)) + 
-  aes(x=density,y=pcgr, col=atrazine) +
-  geom_point() +
-  facet_wrap(vars(strain, temperature), scales="free", 
-             ncol=length(unique(data$temperature)),#,
-             labeller = label_bquote(paste("T=", .(as.character(temperature)),
-                                           ", strain=", .(as.character(strain))))) +
-  geom_smooth(method=lm, aes(x=density, y=pcgr, col=as.factor(atrazine)),
-              formula=y ~ poly(x,1), se=F) + 
-  labs(x="density", y="pcgr", col="atrazine")
-ggsave(paste("plots/dd_",model_system,".pdf", sep=""), width=1+2*length(unique(data$temperature)), 
-       height = 4*length(unique(data$temperature)), device = "pdf")
-### do the stats --------
-stats_result <- modelling(data=data, 
-                          var_to_nest_by = "strain",
-                          formula="pcgr~ atrazine + temperature + density*atrazine + density*temperature") %>%
-  rowwise() %>%
-  mutate(type_of_pred = ifelse(length(grep("density", predictor)>0), "slope", "intercept")) %>%
-  ungroup()
+### do the stats for r and traits (t), only control --------
+data_ref <- data %>% 
+  filter(atrazine%in%c("0","no"), temperature %in%c("normal", "20")) 
+stats_result_r <- modelling(data=data_ref, 
+                          var_to_nest_by = c("strain", "trait"),
+                          formula="pcgr ~ density + mean + density*mean")
+stats_result_t <- modelling(data=data_ref, 
+                            var_to_nest_by = c("strain", "trait"),
+                            formula="dT ~ density + mean + density*mean")
+#Now join these models to all the data (just the coefficients suffice)
+
 n <- length(unique(data$strain))
 plot_dd <- ggplot(stats_result %>% filter(`Pr(>|t|)`<0.05/n)) +
   theme_bw() + 
@@ -93,8 +83,6 @@ ggsave(paste("plots/dd_general_trait_",model_system,".pdf", sep=""), plot=plot_d
 
 ## fit a reference model of dd and trait dependence on density--------
 # This model only uses the control data
-data_ref <- data %>% 
-  filter(atrazine%in%c("0","no"), temperature %in%c("normal", "20")) 
 ###first dd----------------
 ref_model_dd <- lm(data_ref, formula = pcgr ~ poly(density,1)*strain + strain)
 
