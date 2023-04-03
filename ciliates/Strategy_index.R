@@ -142,6 +142,47 @@ ggplot(data = data_cilia, mapping = aes(x = Days_fromstart, y = Strategy_index, 
                                        "24" =  inferno(10, begin = 0, end = 1)[5])) + 
   stat_summary(aes(shape = Atrazine), fun.data = "mean_cl_normal",
                geom = "point", size = 1.5) +
-  geom_smooth() +
+  geom_smooth(aes(linetype = Atrazine), se = F) +
   facet_wrap(facets = .~ ID_spec) +
   theme_bw(base_size = 20)
+
+
+ggplot(data = subset(data_cilia, Species == "Loxo"), mapping = aes(x = Days_fromstart, y = Strategy_index, color = ID_spec)) +
+  stat_summary(fun.data = "mean_cl_normal",
+               geom = "point", size = 1.5) +
+  geom_hline(aes(yintercept = 0), alpha = 0.75, linetype = "dashed") +
+  geom_smooth() +
+  facet_wrap(facets = .~ Temp + Atrazine) +
+  theme_classic(base_size = 20)
+
+ggplot(data = subset(data_cilia, Species == "Spiro"), mapping = aes(x = Days_fromstart, y = Strategy_index, color = ID_spec)) +
+  stat_summary(fun.data = "mean_cl_normal",
+               geom = "point", size = 1.5) +
+  geom_hline(aes(yintercept = 0), alpha = 0.75, linetype = "dashed") +
+  geom_smooth() +
+  facet_wrap(facets = .~ Temp + Atrazine) +
+  theme_classic(base_size = 20)
+
+ggplot(data = subset(data_cilia, Species == "Para"), mapping = aes(x = Days_fromstart, y = Strategy_index, color = ID_spec)) +
+  stat_summary(fun.data = "mean_cl_normal",
+               geom = "point", size = 1.5) +
+  geom_hline(aes(yintercept = 0), alpha = 0.75, linetype = "dashed") +
+  geom_smooth() +
+  facet_wrap(facets = .~ Temp + Atrazine) +
+  theme_classic(base_size = 20)
+
+ggplot(data = subset(data_cilia, Species == "Tetra"), mapping = aes(x = Days_fromstart, y = Strategy_index, color = ID_spec)) +
+  stat_summary(fun.data = "mean_cl_normal",
+               geom = "point", size = 1.5) +
+  geom_hline(aes(yintercept = 0), alpha = 0.75, linetype = "dashed") +
+  geom_smooth() +
+  facet_wrap(facets = .~ Temp + Atrazine) +
+  theme_classic(base_size = 20)
+
+ggplot(data = subset(data_cilia, Species == "Tetra" & Days_fromstart < 10), mapping = aes(x = Days_fromstart, y = Strategy_index, color = ID_spec)) +
+  stat_summary(fun.data = "mean_cl_normal",
+               geom = "point", size = 1.5) +
+  geom_hline(aes(yintercept = 0), alpha = 0.75, linetype = "dashed") +
+  geom_smooth() +
+  facet_wrap(facets = .~ Temp + Atrazine) +
+  theme_classic(base_size = 20)
