@@ -4,23 +4,20 @@ library(mgcv)
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", 
                "#0072B2", "#D55E00", "#CC79A7")#
 #Functions -----------------
-modelling <- function(data=data, var_to_nest_by="strain", formula) {
-  test <- data %>%
-    ungroup()%>%
+modelling <- function(data=data, var_to_nest_by="strain", formulas) {
+  var_to_nest_by <- c(var_to_nest_by, "form")
+  test <- expand_grid(data%>%ungroup(), 
+                      form = formulas) %>%
     nest_by(across({{var_to_nest_by}})) %>%
-    mutate(model = list(lm(as.formula(formula), 
-                                   data = data))) %>%
-    mutate(model_summary = 
-             list(as_tibble(rownames_to_column(as.data.frame(summary(model)$coefficients),
-                                               var = "predictor")))) %>%
-    unnest(model_summary) %>%
-    select(-c("data")) 
+    mutate(model = list(lm(as.formula(form), 
+                                   data = data)))
   return(test)
 }
 
 #Import and make uniform the ciliate data ----------
 data_cilia <- read.csv("data/ciliates/OverviewTraitsFull.csv") %>%
   rename(density = Parts_permL) %>%
+  rename(treat = Treatment) %>%
   mutate(strain = as.factor(ID_spec)) %>%
   mutate(temperature = as.factor(Temp)) %>%
   mutate(atrazine = as.factor(Atrazine)) %>%
@@ -65,7 +62,8 @@ data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
   mutate(cv=sd/mean) %>% 
   group_by(strain, trait, atrazine, temperature) %>%
   mutate(dT = lead(mean, 1)-mean/(lead(day, 1)-day),
-         .after = cv)
+         .after = cv) %>%
+  mutate(treat = as.factor(treat))
   
 data_cyano$atrazine <- relevel(data_cyano$atrazine, ref="no")
 
