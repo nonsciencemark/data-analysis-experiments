@@ -60,14 +60,16 @@ data_preds <- data_preds %>%
 
 ggplot(data_preds %>% filter(response=="growth")) + 
   theme_bw() + 
+  scale_shape_manual(values=0:10) + 
   scale_colour_manual(values=cbPalette) + 
   aes(x=pcgr, y=pred, col=as.factor(treat), pch=strain) + 
   geom_point() + 
   facet_grid(form~trait) + #, scales="free"
   geom_abline(slope=1, intercept=0) 
 
-ggplot(data_preds %>% filter(response=="trait")) + 
+ggplot(data_preds %>% filter(response=="trait change")) + 
   theme_bw() + 
+  scale_shape_manual(values=0:10) + 
   scale_colour_manual(values=cbPalette) + 
   aes(x=dT, y=pred, col=as.factor(treat), pch=strain) + 
   geom_point() + 
