@@ -4,7 +4,7 @@
 # IMPORT TOOLS AND DATA -----------------------
 source("Tools and data.R")
 # PICK DATA SOURCE ---------------
-model_system <- "cyano" #cilia or cyano
+model_system <- "cilia" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
 ### do the stats for r and traits (t), only control --------
@@ -48,8 +48,8 @@ ggplot(data_preds_synth) +
   scale_colour_manual(values=cbPalette) + 
   aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
   geom_jitter(width = 0.25) + 
-  facet_wrap(strain~species, scales="free") +
-  geom_hline(yintercept = 0, lty="dotted")
+  geom_hline(yintercept = 0, lty="dotted") +
+  facet_wrap(vars(species, strain), ncol=2, scales="free")
   
 # Plot model fits
 data_preds <- data_preds %>%

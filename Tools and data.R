@@ -36,6 +36,8 @@ data_cilia <- read.csv("data/ciliates/OverviewTraitsFull.csv") %>%
          .after = cv) %>%
   filter(Temp>20)
 
+data_cilia$species <- factor(data_cilia$species, levels=c("Loxo", "Spiro", "Tetra", "Para"))
+
 #Import and make uniform the cyano data-------------------
 data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
   rename(density = population.mean) %>%
@@ -63,7 +65,8 @@ data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
   group_by(strain, trait, atrazine, temperature) %>%
   mutate(dT = lead(mean, 1)-mean/(lead(day, 1)-day),
          .after = cv) %>%
-  mutate(treat = as.factor(treat))
+  mutate(treat = as.factor(treat)) 
   
 data_cyano$atrazine <- relevel(data_cyano$atrazine, ref="no")
+
 
