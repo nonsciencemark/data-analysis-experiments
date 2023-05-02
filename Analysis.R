@@ -4,7 +4,7 @@
 # IMPORT TOOLS AND DATA -----------------------
 source("Tools and data.R")
 # PICK DATA SOURCE ---------------
-model_system <- "cilia" #cilia or cyano
+model_system <- "cyano" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
 ### do the stats for r and traits (t), only control --------
@@ -44,15 +44,24 @@ data_preds_synth <- data_preds %>%
   pivot_wider(names_from = "predictors", values_from = "AIC") %>%
   mutate(delta_AIC = both - focal) #if <0 then both predict better
 
-ggplot(data_preds_synth) + 
+ggplot(data_preds_synth %>% filter(response=="trait change")) + 
   scale_shape_manual(values=0:10) + 
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 
-  aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
-  geom_jitter(width = 0.25) +
-  geom_hline(yintercept = 0, lty="dotted") +
-  facet_wrap(vars(species, strain), ncol=2, scales="free")
+  aes(x=focal, y=both, col=as.factor(treat), pch=trait) + 
+  #aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
+  #geom_jitter(width = 0.25) +
+  geom_point() +
+  #geom_hline(yintercept = 0, lty="dotted") +
+  geom_abline(intercept = 0, slope=1, lty="dotted") +
+  facet_wrap(vars(species, strain), ncol=2, scales="free") + 
+  labs(x = "AIC, abundance or trait only", y = "AIC, both predictors", col="treatment", pch="trait")
   
+#ggsave(paste0(model_system, ".pdf"), 
+#       width=5, height = 6, device = "pdf")
+ggsave(paste0(model_system, ".pdf"), 
+       width=5, height = 4, device = "pdf")
+
 # Plot model fits
 data_preds <- data_preds %>%
   select(-c("data", "model")) %>%
