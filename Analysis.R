@@ -25,7 +25,9 @@ data_preds <- data %>%
   nest_by(species, strain, trait, treat) %>%
   left_join(stats_result, by=c("strain", "trait", "treat"), multiple = "all") %>%
   mutate(predictions = list(cbind(data, pred=predict.lm(model, newdata=data)))) %>%
-  mutate(AIC=list(AIC(model))) %>%  
+  rowwise() %>%
+  mutate(AIC=AIC(model)) %>%  
+  ungroup() %>%
   mutate(response = case_when(form=="dT ~ density + mean" ~ "trait change",
                               form=="dT ~ mean" ~ "trait change",
                               form=="pcgr ~ mean + density" ~ "growth",
@@ -40,14 +42,14 @@ data_preds_synth <- data_preds %>%
                                 form=="pcgr ~ density" ~ "focal")) %>%
   select(c("species", "strain", "trait", "treat", "response", "AIC", "predictors")) %>%
   pivot_wider(names_from = "predictors", values_from = "AIC") %>%
-  mutate(delta_AIC = unlist(both) - unlist(focal)) #if <0 then both predict better
+  mutate(delta_AIC = both - focal) #if <0 then both predict better
 
 ggplot(data_preds_synth) + 
   scale_shape_manual(values=0:10) + 
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 
   aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
-  geom_jitter(width = 0.25) + 
+  geom_jitter(width = 0.25) +
   geom_hline(yintercept = 0, lty="dotted") +
   facet_wrap(vars(species, strain), ncol=2, scales="free")
   
