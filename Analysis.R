@@ -22,14 +22,39 @@ stats_result <- modelling(data=data,
 #and make the predictions
 data_preds <- data %>%
   ungroup() %>%
-  nest_by(strain, trait, treat) %>%
+  nest_by(species, strain, trait, treat) %>%
   left_join(stats_result, by=c("strain", "trait", "treat"), multiple = "all") %>%
   mutate(predictions = list(cbind(data, pred=predict.lm(model, newdata=data)))) %>%
+  mutate(AIC=list(AIC(model))) %>%  
+  mutate(response = case_when(form=="dT ~ density + mean" ~ "trait change",
+                              form=="dT ~ mean" ~ "trait change",
+                              form=="pcgr ~ mean + density" ~ "growth",
+                              form=="pcgr ~ density" ~ "growth")) %>%
+  ungroup()
+  
+# Plot model fit and compare (AIC)
+data_preds_synth <- data_preds %>%
+  mutate(predictors = case_when(form=="dT ~ density + mean" ~ "both",
+                                form=="dT ~ mean" ~ "focal",
+                                form=="pcgr ~ mean + density" ~ "both",
+                                form=="pcgr ~ density" ~ "focal")) %>%
+  select(c("species", "strain", "trait", "treat", "response", "AIC", "predictors")) %>%
+  pivot_wider(names_from = "predictors", values_from = "AIC") %>%
+  mutate(delta_AIC = unlist(both) - unlist(focal)) #if <0 then both predict better
+
+ggplot(data_preds_synth) + 
+  scale_shape_manual(values=0:10) + 
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
+  geom_jitter(width = 0.25) + 
+  facet_wrap(strain~species, scales="free") +
+  geom_hline(yintercept = 0, lty="dotted")
+  
+# Plot model fits
+data_preds <- data_preds %>%
   select(-c("data", "model")) %>%
-  unnest(predictions) %>%
-  rowwise() %>%
-  mutate(response = list(ifelse(length(grep("dT", form))==0, 
-                                "growth", "trait")), .after="form")
+  unnest(predictions)
 
 ggplot(data_preds %>% filter(response=="growth")) + 
   theme_bw() + 
@@ -47,3 +72,7 @@ ggplot(data_preds %>% filter(response=="trait")) +
   #geom_smooth(method="lm", se=F)+
   facet_wrap(trait~form, scales="free") + #
   geom_abline(slope=1, intercept=0) 
+
+
+  
+
