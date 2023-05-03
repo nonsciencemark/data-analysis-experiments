@@ -46,6 +46,9 @@ data_cilia$species <- factor(data_cilia$species, levels=c("Loxo", "Spiro", "Tetr
 data_cilia$treat <- factor(data_cilia$treat, levels=c("C", "T", 
                                                       "a", "A",
                                                       "aT", "AT"))
+data_cilia$strain <- factor(data_cilia$strain, 
+                            levels=c("Spiro_C", "Spiro_D", "Tetra_1", "Tetra_2", 
+                                     "Loxo_1", "Loxo_2", "Para_4"))
 
 #Import and make uniform the cyano data-------------------
 data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
@@ -66,7 +69,17 @@ data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
          .after = density) %>%
   filter(!is.na(pcgr)) %>%
   ungroup() %>%
-  select(-population.sd) %>%
+  select(-population.sd) 
+
+data_cyano_pca <- data_cyano %>%
+  group_by(strain, treat) %>%
+  nest() %>%
+  mutate(pca_data = map(data, ~.x %>% dplyr::select(contains("mean")))) %>% 
+  mutate(pca_scores = map2(data, pca_data, ~cbind(.x, pca1=prcomp(.y, center=T, scale=T)$x[,1]))) %>%
+  select(c("strain", "treat", "pca_scores")) %>%
+  unnest(cols = c(pca_scores))
+  
+data_cyano <- data_cyano_pca %>%
   pivot_longer(FSC.HLin.mean:NIR.R.HLin.sd, names_to="trait") %>%
   separate(trait, into=c("trait", "stat"), sep="in.") %>%
   pivot_wider(names_from=stat, values_from=value) %>%
@@ -77,5 +90,10 @@ data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
   mutate(treat = as.factor(treat)) 
   
 data_cyano$treat <- factor(data_cyano$treat, levels=c("C", "T", "A", "AT"))
+data_cyano$strain <- paste("Sp. ", data_cyano$species, ", strain ", data_cyano$strain, sep="")
+
+#Add PCA scores
+pca_fit <- data_cyano %>% 
+  
 
 

@@ -7,9 +7,7 @@ source("Tools and data.R")
 model_system <- "cyano" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
-### do the stats for r and traits (t), only control --------
-#data_ref <- data %>% 
-#  filter(atrazine%in%c("0","no"), temperature %in%c("normal", "22")) 
+## How well can we predict pcgr and trait change?-----
 stats_result <- modelling(data=data, 
                           var_to_nest_by = c("strain", "trait", "treat"),
                           formulas=c("dT ~ density + mean", #+ density*mean
@@ -18,8 +16,7 @@ stats_result <- modelling(data=data,
                                      "pcgr ~ density")) %>%
   select(-data)
 
-#Now join these models to all the data (just the coefficients suffice)
-#and make the predictions
+#Now join these models to all the data and make the predictions
 data_preds <- data %>%
   ungroup() %>%
   nest_by(species, strain, trait, treat) %>%
@@ -44,7 +41,10 @@ data_preds_synth <- data_preds %>%
   pivot_wider(names_from = "predictors", values_from = "AIC") %>%
   mutate(delta_AIC = both - focal) #if <0 then both predict better
 
-ggplot(data_preds_synth %>% filter(response=="trait change")) + 
+response <- "trait change"#growth or trait change
+xlab <- ifelse(response=="trait change", 
+               "AIC, trait only", "AIC, abundance only")
+ggplot(data_preds_synth %>% filter(response==response)) + 
   scale_shape_manual(values=0:10) + 
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 
@@ -54,13 +54,13 @@ ggplot(data_preds_synth %>% filter(response=="trait change")) +
   geom_point() +
   #geom_hline(yintercept = 0, lty="dotted") +
   geom_abline(intercept = 0, slope=1, lty="dotted") +
-  facet_wrap(vars(species, strain), ncol=2, scales="free") + 
-  labs(x = "AIC, abundance or trait only", y = "AIC, both predictors", col="treatment", pch="trait")
+  facet_wrap(vars(strain), ncol=2, scales="free") + 
+  labs(x = xlab, y = "AIC, both predictors", col="treatment", pch="trait")
   
-#ggsave(paste0(model_system, ".pdf"), 
-#       width=5, height = 6, device = "pdf")
-ggsave(paste0(model_system, ".pdf"), 
-       width=5, height = 4, device = "pdf")
+#ggsave(paste0(model_system, "_", response, ".pdf"), 
+#width=5, height = 4, device = "pdf")
+ggsave(paste0(model_system, "_", response, ".pdf"), 
+       width=5, height = 5, device = "pdf")
 
 # Plot model fits
 data_preds <- data_preds %>%
@@ -86,6 +86,19 @@ ggplot(data_preds %>% filter(response=="trait change")) +
   facet_wrap(trait~form, scales="free") + #
   geom_abline(slope=1, intercept=0) 
 
-
+## Check correlations between traits and abundance -----
+stats_result <- modelling(data=data, 
+                          var_to_nest_by = c("strain", "trait", "treat"),
+                          formulas=c("density ~ mean")) %>%
+  select(-data)
   
-
+ggplot(data) + 
+  scale_shape_manual(values=0:10) + 
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  aes(x=log10(density), y=log10(mean), col=as.factor(treat), pch=strain) + 
+  #aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
+  #geom_jitter(width = 0.25) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  facet_wrap(vars(trait), ncol=2, scales="free") 
