@@ -87,18 +87,13 @@ ggplot(data_preds %>% filter(response=="trait change")) +
   geom_abline(slope=1, intercept=0) 
 
 ## Check correlations between traits and abundance -----
-stats_result <- modelling(data=data, 
-                          var_to_nest_by = c("strain", "trait", "treat"),
-                          formulas=c("density ~ mean")) %>%
-  select(-data)
-  
 ggplot(data) + 
   scale_shape_manual(values=0:10) + 
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 
-  aes(x=log10(density), y=log10(mean), col=as.factor(treat), pch=strain) + 
+  aes(x=log10(density), y=trait, col=as.factor(treat), pch=strain) + 
   #aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
   #geom_jitter(width = 0.25) +
   geom_point() +
-  geom_smooth(method="lm", se=F) +
-  facet_wrap(vars(trait), ncol=2, scales="free") 
+  #geom_smooth(method="lm", se=F) +
+  facet_wrap(vars(strain), ncol=2)
