@@ -17,9 +17,35 @@ ggplot(data) +
   #geom_jitter(width = 0.25) +
   geom_point(pch=1) +
   #geom_smooth(method="lm", se=F) +
-  facet_wrap(vars(strain), ncol=2)
+  facet_wrap(vars(strain), ncol=2) +
+  labs(col="treatment")
+ggsave(paste0(model_system,"corr.pdf"), 
+       width=5, height = 4, device = "pdf")
 
 # Conclusion: not a very strong link between traits and abundance, with some exceptions for the cyanos
+
+## Just plot of dT vs. trait and pcgr vs. pop. ------
+ggplot(data) +
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  aes(x=density, y=pcgr, col=treat) +
+  geom_point() +
+  geom_smooth(method="lm", se=F, lwd=0.5) +
+  facet_wrap(vars(strain), ncol=2, scales="free") 
+
+ggsave(paste0(model_system,"_pcgr.pdf"), 
+       width=5, height = 4, device = "pdf")
+
+ggplot(data) +
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  aes(x=trait, y=dT, col=treat) +
+  geom_point() +
+  geom_smooth(method="lm", se=F, lwd=0.5) +
+  facet_wrap(vars(strain), ncol=2, scales="free") 
+
+ggsave(paste0(model_system,"_dT.pdf"), 
+       width=5, height = 4, device = "pdf")
 
 ## How well can we predict pcgr and trait change?-----
 stats_result <- modelling(data=data, 
@@ -59,36 +85,38 @@ ggplot(data_preds_synth) +
   scale_shape_manual(values=0:10) + 
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 
-  aes(x=focal, y=both, col=as.factor(treat), pch=response) + 
+  aes(x=response, y=delta_AIC, col=as.factor(treat)) + 
   #aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
-  #geom_jitter(width = 0.25) +
-  geom_point() +
-  #geom_hline(yintercept = 0, lty="dotted") +
-  geom_abline(intercept = 0, slope=1) +
+  geom_jitter(width = 0.25) +
+  #geom_point() +
+  geom_hline(yintercept = 2, lty="dotted") +
+  geom_hline(yintercept = -2, lty="dotted") +
+  geom_hline(yintercept = 0) +
+  #geom_abline(intercept = 0, slope=1) +
   facet_wrap(vars(strain), ncol=2, scales="free") + 
-  labs(x = "AIC, trait or abundance only", y = "AIC, both predictors", 
-       col="treatment", pch="response") + 
-  geom_abline(intercept = -2, slope=1, lty="dotted") +
-  geom_abline(intercept = 2, slope=1, lty="dotted")
+  labs(y=expression(paste("AIC"[full],"-AIC"[single])), col="treatment")
   
 #ggsave(paste0(model_system, "_", response, ".pdf"), 
 #width=5, height = 4, device = "pdf")
-ggsave(paste0(model_system, "_", response, ".pdf"), 
-       width=5, height = 5, device = "pdf")
+ggsave(paste0(model_system,"_AIC.pdf"), 
+       width=5, height = 4, device = "pdf")
 
 # Plot model fits
 data_preds <- data_preds %>%
   select(-c("data", "model")) %>%
   unnest(predictions)
-
+#, form=="pcgr ~ density"
 ggplot(data_preds %>% filter(response=="growth")) + 
   theme_bw() + 
   scale_shape_manual(values=0:10) + 
   scale_colour_manual(values=cbPalette) + 
   aes(x=pcgr, y=pred, col=as.factor(treat), pch=strain) + 
   geom_point() + 
-  facet_grid(form~trait) + #, scales="free"
+  geom_smooth(method="lm", se=F, lwd=0.5)+
+  facet_grid(vars(form)) + #, scales="free"
   geom_abline(slope=1, intercept=0) 
+ggsave(paste0(model_system,"growth.pdf"), 
+       width=5, height = 4, device = "pdf")
 
 ggplot(data_preds %>% filter(response=="trait change")) + 
   theme_bw() + 
@@ -96,7 +124,9 @@ ggplot(data_preds %>% filter(response=="trait change")) +
   scale_colour_manual(values=cbPalette) + 
   aes(x=dT, y=pred, col=as.factor(treat), pch=strain) + 
   geom_point() + 
-  #geom_smooth(method="lm", se=F)+
-  facet_wrap(trait~form, scales="free") + #
+  geom_smooth(method="lm", se=F, lwd=0.5)+
+  facet_grid(vars(form)) + #
   geom_abline(slope=1, intercept=0) 
+ggsave(paste0(model_system,"trait.pdf"), 
+       width=5, height = 4, device = "pdf")
 
