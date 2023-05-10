@@ -4,7 +4,7 @@
 # IMPORT TOOLS AND DATA -----------------------
 source("Tools and data.R")
 # PICK DATA SOURCE ---------------
-model_system <- "cilia" #cilia or cyano
+model_system <- "cyano" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
 ## Check correlations between traits and abundance -----
@@ -64,9 +64,12 @@ ggplot(data_preds_synth) +
   #geom_jitter(width = 0.25) +
   geom_point() +
   #geom_hline(yintercept = 0, lty="dotted") +
-  geom_abline(intercept = 0, slope=1, lty="dotted") +
+  geom_abline(intercept = 0, slope=1) +
   facet_wrap(vars(strain), ncol=2, scales="free") + 
-  labs(x = "AIC, trait or abundance only", y = "AIC, both predictors", col="treatment", pch="trait")
+  labs(x = "AIC, trait or abundance only", y = "AIC, both predictors", 
+       col="treatment", pch="response") + 
+  geom_abline(intercept = -2, slope=1, lty="dotted") +
+  geom_abline(intercept = 2, slope=1, lty="dotted")
   
 #ggsave(paste0(model_system, "_", response, ".pdf"), 
 #width=5, height = 4, device = "pdf")
