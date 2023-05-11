@@ -51,7 +51,10 @@ ggsave(paste0(model_system,"_dT.pdf"),
 stats_result <- modelling(data=data, 
                           var_to_nest_by = c("strain"),
                           formulas=c("dT ~ density*treat")) %>%
-  mutate(summary = map(model, ~summary(.x)))
+  mutate(model_summary = 
+         list(as_tibble(rownames_to_column(as.data.frame(summary(model)$coefficients),
+                                           var = "predictor")))) %>%
+  unnest(model_summary)
 
 ## How well can we predict pcgr and trait change?-----
 stats_result <- modelling(data=data, 
