@@ -47,6 +47,12 @@ ggplot(data) +
 ggsave(paste0(model_system,"_dT.pdf"), 
        width=5, height = 4, device = "pdf")
 
+## Basic stats: treatment effects on dd of pcgr and td of dT -----
+stats_result <- modelling(data=data, 
+                          var_to_nest_by = c("strain"),
+                          formulas=c("dT ~ density*treat")) %>%
+  mutate(summary = map(model, ~summary(.x)))
+
 ## How well can we predict pcgr and trait change?-----
 stats_result <- modelling(data=data, 
                           var_to_nest_by = c("strain", "treat"),
