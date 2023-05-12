@@ -24,27 +24,24 @@ data_cilia <- read.csv("data/ciliates/OverviewTraitsFull.csv") %>%
   group_by(atrazine, temperature, strain) %>%
   mutate(pcgr = log(lead(density, 1)/density)/(lead(Days_fromstart, 1)-Days_fromstart),
          .after = density) %>% 
+  filter(!is.na(pcgr)) %>%
   filter(pcgr > -5, strain!="Spiro_5") %>% #Kick out extremely negative pcgr, as well as Spiro_5 (not enough data to make a ref model)
   ungroup() %>%
   separate(strain, into = c("species", "sp.strain"), remove=F) #link to species
 
 data_cilia_pca <- data_cilia %>%
-  group_by(strain, treat) %>%
+  group_by(strain) %>%
   nest() %>%
   mutate(pca_data = map(data, ~.x %>% dplyr::select(contains("mean")))) %>% 
   mutate(pca_scores = map2(data, pca_data, ~cbind(.x, pca1=prcomp(.y, center=T, scale=T)$x[,1]))) %>%
-  select(c("strain", "treat", "pca_scores")) %>%
+  select(c("strain", "pca_scores")) %>%
   unnest(cols = c(pca_scores))
 
 data_cilia <- data_cilia_pca %>%
-  #pivot_longer(mean_ar:sd_linearity, names_to="trait") %>%
-  #separate(trait, into=c("stat", "trait"), sep="_") %>%
-  #pivot_wider(names_from=stat, values_from=value) %>%
-  #mutate(cv=sd/mean) %>%
-  #group_by(strain, trait, atrazine, temperature) %>%
   rename(trait=pca1) %>%
   group_by(strain, atrazine, temperature) %>%
   mutate(dT = lead(trait, 1)-trait/(lead(Days_fromstart, 1)-Days_fromstart)) %>%
+  filter(!is.na(dT)) %>%
   filter(Temp>20) %>%
   mutate(treat = case_when((Atrazine==0)&(Temp==22) ~ "C",
                            (Atrazine==10)&(Temp==22) ~ "a",
@@ -83,24 +80,21 @@ data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
   select(-population.sd) 
 
 data_cyano_pca <- data_cyano %>%
-  group_by(strain, treat) %>%
+  group_by(strain) %>%
   nest() %>%
   mutate(pca_data = map(data, ~.x %>% dplyr::select(contains("mean")))) %>% 
   mutate(pca_scores = map2(data, pca_data, ~cbind(.x, pca1=prcomp(.y, center=T, scale=T)$x[,1]))) %>%
-  select(c("strain", "treat", "pca_scores")) %>%
+  select(c("strain", "pca_scores")) %>%
   unnest(cols = c(pca_scores))
   
 data_cyano <- data_cyano_pca %>%
-  #pivot_longer(FSC.HLin.mean:NIR.R.HLin.sd, names_to="trait") %>%
-  #separate(trait, into=c("trait", "stat"), sep="in.") %>%
-  #pivot_wider(names_from=stat, values_from=value) %>%
-  #mutate(cv=sd/mean) %>% 
   select(-c("FSC.HLin.mean":"NIR.R.HLin.sd")) %>%
   rename(trait=pca1) %>%
   #group_by(strain, trait, atrazine, temperature) %>%
   group_by(strain, atrazine, temperature) %>%
   #mutate(dT = lead(mean, 1)-mean/(lead(day, 1)-day)) %>%
   mutate(dT = lead(trait, 1)-trait/(lead(day, 1)-day)) %>%
+  filter(!is.na(dT)) %>%
   mutate(treat = as.factor(treat)) 
   
 data_cyano$treat <- factor(data_cyano$treat, levels=c("C", "T", "A", "AT"))
