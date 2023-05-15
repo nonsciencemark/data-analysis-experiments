@@ -30,6 +30,14 @@ ggplot(data) +
 ggsave(paste0("plots/", model_system,"_dT.pdf"), 
        width=5, height = 4, device = "pdf")
 
+###Result--------
+#Ciliates: 
+#negative dd, but different for different treatments; 
+#negative td, not different for different treatments.
+#Cyanos:
+#dd (mostly negative); different for different treatments. 
+#td (mostly negative); different for different treatments.
+
 ## Task 1: Predict next time point within condition: single vs. two variables-----
 stats_result <- modelling(data=data, 
                           var_to_nest_by = c("strain", "treat"),
@@ -113,6 +121,12 @@ ggplot(data_preds %>% filter(response=="trait change")) +
 ggsave(paste0("plots/", model_system,"trait.pdf"), 
        width=5, height = 4, device = "pdf")
 
+###Result--------
+#Ciliates: 
+#Combining two predictors rarely helped to predict growth or trait change
+#Cyanos:
+#Combining two predictors rarely helped to predict growth, but did improve trait change prediction
+
 ## Task 2: Predict next time point across conditions: single vs. two predictors-----
 stats_result <- modelling(data=data%>%filter(treat=="C"), 
                           var_to_nest_by = c("strain"),
@@ -180,6 +194,12 @@ ggplot(data_preds_synth) +
   facet_wrap(vars(strain), ncol=2) + 
   labs(y=expression(paste("Error"[full],"-Error"[single])), 
        col="treatment")
+
+###Result--------
+#Ciliates: 
+#Combining two predictors rarely helped to predict growth or trait change to other conditions
+#Cyanos:
+#Combining two predictors rarely helped to predict growth but could improve or worsen trait change prediction.
 
 ## Leftovers -------
 ## Check correlations between traits and abundance -----
