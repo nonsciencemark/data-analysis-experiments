@@ -130,29 +130,56 @@ data_preds <- data %>%
   mutate(response = case_when(length(grep("dT", form))>0 ~ "trait change",
                               length(grep("pcgr", form))>0 ~ "growth")) %>%
   mutate(predictor = case_when(length(grep("trait + density", form, fixed=T))>0 ~ "both",
-                               length(grep("density", form))>0 ~ "density",
-                               length(grep("trait", form))>0 ~ "traits")) %>%
-  select(-form) %>%
+                               length(grep("density", form))>0 ~ "one",
+                               length(grep("trait", form))>0 ~ "one")) %>%
+  #select(-form) %>%
   mutate(data_and_pred = list(cbind(data, prediction=predict.lm(object=model, newdata=data)))) %>%
-  select(c("strain", "response", "predictor", "data_and_pred")) %>%
+  select(c("strain", "response", "form", "predictor", "data_and_pred")) %>%
   unnest(c("data_and_pred")) %>%
   #pivot_wider(values_from = "prediction", names_from = "response")
   mutate(error =  case_when(response=="trait change" ~ abs(prediction - dT),
                             response=="growth" ~ abs(prediction - pcgr)))
 
-#Stopped here. Now plot the damn thing, basic plot first
-ggplot(data_preds) + 
-  aes(x=pcgr, y=pcgr_pred, col=treat) + #
+#Now plot, basic plot first: growth
+ggplot(data_preds %>% filter(response=="growth")) + 
+  aes(x=pcgr, y=prediction, col=treat, pch=strain) + #
   geom_point() +
-  geom_smooth(method="lm", se=F) + 
+  geom_smooth(method="lm", se=F, lwd=0.5) + 
   #scale_shape_manual(values=0:10) + 
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 
-  facet_wrap(vars(predictor,strain), ncol=4, scales="free") +
+  facet_grid(vars(form)) + #
   geom_abline(intercept=0, slope=1)
 
-#Now plot the damn thing, now R2 plot
+#Now plot trait change
+ggplot(data_preds %>% filter(response=="trait change")) + 
+  aes(x=dT, y=prediction, col=treat, pch=strain) + #
+  geom_point() +
+  geom_smooth(method="lm", se=F, lwd=0.5) + 
+  #scale_shape_manual(values=0:10) + 
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  facet_grid(vars(form)) + #
+  geom_abline(intercept=0, slope=1)
 
+#Now error plot
+data_preds_synth <- data_preds %>%
+  group_by(strain, response, predictor, treat) %>%
+  summarise(error = sum(error)) %>%
+  pivot_wider(names_from = predictor, values_from = error) %>%
+  mutate(delta_error = (both - one)/one)
+
+ggplot(data_preds_synth) + 
+  scale_shape_manual(values=0:10) + 
+  theme_bw() + 
+  scale_colour_manual(values=cbPalette) + 
+  aes(x=response, y=delta_error, col=as.factor(treat)) + 
+  #aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
+  geom_jitter(width = 0.25) +
+  geom_hline(yintercept = 0) +
+  facet_wrap(vars(strain), ncol=2) + 
+  labs(y=expression(paste("Error"[full],"-Error"[single])), 
+       col="treatment")
 
 ## Leftovers -------
 ## Check correlations between traits and abundance -----
