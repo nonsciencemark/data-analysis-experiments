@@ -22,7 +22,7 @@ library(tidyverse)
 library(ggplot2)
 library(car)
 
-Traj.avg <- read.csv("U:/DIVERCE_experiments/DIVERCE_WP01_exp01/Analysis/Overview_dataframe/OverviewTraitsFull.csv") %>%
+Traj.avg <- read.csv("C:/Users/debruin/OneDrive - UCL/Bio/UCL/GitHub/TeamWork/data-analysis-experiments/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
   filter(ID_spec != "Spiro_5") %>%  
   group_by(Atrazine, Temp, ID_spec) %>%
   mutate(pcgr = log(lead(Parts_permL, 1)/Parts_permL)/(lead(Days_fromstart, 1)-Days_fromstart),
