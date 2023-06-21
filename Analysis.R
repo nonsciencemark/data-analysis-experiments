@@ -4,7 +4,7 @@
 # IMPORT TOOLS AND DATA -----------------------
 source("Tools and data.R")
 # PICK DATA SOURCE ---------------
-model_system <- "cyano" #cilia or cyano
+model_system <- "cilia" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
 # DO ANALYSES --------------------
 ## Just plot of dT vs. trait and pcgr vs. pop. ------
