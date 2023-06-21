@@ -106,6 +106,7 @@ ggplot(data_preds %>% filter(response=="growth")) +
   geom_smooth(method="lm", se=F, lwd=0.5)+
   facet_grid(vars(form)) + #, scales="free"
   geom_abline(slope=1, intercept=0) 
+
 ggsave(paste0("plots/", model_system,"growth.pdf"), 
        width=5, height = 4, device = "pdf")
 
@@ -118,6 +119,7 @@ ggplot(data_preds %>% filter(response=="trait change")) +
   geom_smooth(method="lm", se=F, lwd=0.5)+
   facet_grid(vars(form)) + #
   geom_abline(slope=1, intercept=0) 
+
 ggsave(paste0("plots/", model_system,"trait.pdf"), 
        width=5, height = 4, device = "pdf")
 
@@ -214,6 +216,7 @@ ggplot(data) +
   #geom_smooth(method="lm", se=F) +
   facet_wrap(vars(strain), ncol=2) +
   labs(col="treatment")
+
 ggsave(paste0("plots/", model_system,"corr.pdf"), 
        width=5, height = 4, device = "pdf")
 
@@ -231,6 +234,7 @@ stats_result <- modelling(data=data,
   mutate(type_of_pred = ifelse(length(grep("density", predictor)>0)|length(grep("trait", predictor)>0), "slope", "intercept")) %>%
   ungroup() %>%
   mutate(Estimate_sig = ifelse(`Pr(>|t|)`<0.05, Estimate, NA))
+
 plot <- ggplot(stats_result) +#%>% filter(`Pr(>|t|)`<0.05)
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 

@@ -64,8 +64,9 @@ data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
   separate(date.time, sep=" ", into = c("date", "time")) %>%
   mutate(day = yday(date), .after = date) %>%
   select(-c(date, time)) %>%
-  mutate(species = case_when(strain%in%c(2375,2524)~"one",
-                             TRUE ~ "two")) %>%#link to species
+  # fixed species names
+  mutate(species = case_when(strain%in%c(2375,2524)~"V",
+                             TRUE ~ "VIII")) %>%#link to species
   mutate(strain = as_factor(strain)) %>%
   mutate(atrazine = as_factor(case_when(treat%in%c("C", "T")~"no",
                               TRUE ~ "yes"))) %>%
@@ -81,6 +82,8 @@ data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
 
 data_cyano_pca <- data_cyano %>%
   group_by(strain) %>%
+  # not really a good idea to include non-functional traits
+  select(-c('SSC.HLin.mean', 'NIR.B.HLin.mean', 'NIR.R.HLin.mean', 'GRN.B.HLin.mean')) %>%
   nest() %>%
   mutate(pca_data = map(data, ~.x %>% dplyr::select(contains("mean")))) %>% 
   mutate(pca_scores = map2(data, pca_data, ~cbind(.x, pca1=prcomp(.y, center=T, scale=T)$x[,1]))) %>%
@@ -88,7 +91,8 @@ data_cyano_pca <- data_cyano %>%
   unnest(cols = c(pca_scores))
   
 data_cyano <- data_cyano_pca %>%
-  select(-c("FSC.HLin.mean":"NIR.R.HLin.sd")) %>%
+  # fixed here too
+  select(-c("FSC.HLin.mean":"YEL.B.HLin.sd")) %>%
   rename(trait=pca1) %>%
   #group_by(strain, trait, atrazine, temperature) %>%
   group_by(strain, atrazine, temperature) %>%
@@ -98,5 +102,6 @@ data_cyano <- data_cyano_pca %>%
   mutate(treat = as.factor(treat)) 
   
 data_cyano$treat <- factor(data_cyano$treat, levels=c("C", "T", "A", "AT"))
-data_cyano$strain <- paste("Sp. ", data_cyano$species, ", strain ", data_cyano$strain, sep="")
+# this is more consistent with ciliate method
+data_cyano$strain <- paste(data_cyano$species, "_", data_cyano$strain, sep="")
 
