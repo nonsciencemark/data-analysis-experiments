@@ -1,12 +1,6 @@
-#devtools::install_github("ctkremer/growthTools")
-#library(growthTools)
-
 # IMPORT TOOLS AND DATA ----
 source("Tools and data.R")
 source("Plotting functions.R")
-
-# PICK DATA SOURCE ----
-# model_system <- "cilia" #cilia or cyano
 
 # PLOT BASIC OUTPUTS ----
 basic_plots("cyano")
@@ -69,4 +63,3 @@ third_plots("cilia")
 
 td_general_plots("cyano")
 td_general_plots("cilia")
-
