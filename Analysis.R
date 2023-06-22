@@ -3,9 +3,11 @@
 
 # IMPORT TOOLS AND DATA -----------------------
 source("Tools and data.R")
+
 # PICK DATA SOURCE ---------------
-model_system <- "cyano" #cilia or cyano
+model_system <- "cilia" #cilia or cyano
 data         <- get(paste("data_",model_system, sep=""))
+
 # DO ANALYSES --------------------
 ## Just plot of dT vs. trait and pcgr vs. pop. ------
 ggplot(data) +
@@ -45,7 +47,7 @@ stats_result <- modelling(data=data,
                                      "dT ~ trait",
                                      "pcgr ~ trait + density",# + density*mean
                                      "pcgr ~ density")) %>%
-  select(-data)
+  dplyr::select(-data)
 
 #Now join these models to all the data and make the predictions
 data_preds <- data %>%
@@ -63,39 +65,61 @@ data_preds <- data %>%
   ungroup()
   
 # Plot model fit and compare (AIC)
+library('qpcR')
+
 data_preds_synth <- data_preds %>%
   mutate(predictors = case_when(form=="dT ~ density + trait" ~ "both",
                                 form=="dT ~ trait" ~ "focal",
                                 form=="pcgr ~ trait + density" ~ "both",
                                 form=="pcgr ~ density" ~ "focal")) %>%
-  select(c("species", "strain", "treat", "response", "AIC", "predictors")) %>%
+  dplyr::select(c("species", "strain", "treat", "response", "AIC", "predictors")) %>%
   pivot_wider(names_from = "predictors", values_from = "AIC") %>%
-  mutate(delta_AIC = both - focal) #if <0 then both predict better
+  rowwise %>% # group_by(strain, treat, response) %>%
+  mutate(p.better = akaike.weights(c(both, focal))$weights[1]) 
+  # mutate(delta_AIC = max(c(both, focal)) - min(c(both, focal))) #if <0 then both predict better
+
+ #OOPS THIS HAS STOPPED SHOWING WHICH IS BETTER
 
 ggplot(data_preds_synth) + 
   scale_shape_manual(values=0:10) + 
   theme_bw() + 
   scale_colour_manual(values=cbPalette) + 
-  aes(x=response, y=delta_AIC, col=as.factor(treat)) + 
+  aes(x=response, y=p.better, fill=as.factor(treat)) + 
   #aes(x=response, y=delta_AIC, col=as.factor(treat), pch=trait) + 
-  geom_jitter(width = 0.25) +
+  # ggpattern::geom_rect_pattern(
+  #   xmin = -Inf, xmax = Inf, ymin = 0, ymax = 2, inherit.aes = FALSE,
+  #   data = data.frame(response = 'growth', treatment = 'C'), 
+  #   pattern = 'crosshatch', 
+  #   pattern_fill = 'grey', pattern_colour = 'grey', 
+  #   pattern_density = 0.1, pattern_angle = 45, pattern_alpha = 0.5,
+  #   fill = NA, colour = 'grey') +
+  # geom_jitter(width = 0.25) +
+  geom_col(position = position_dodge(width = 0.5), width = 0.25) +
   #geom_point() +
-  geom_hline(yintercept = 2, lty="dotted") +
-  geom_hline(yintercept = -2, lty="dotted") +
-  geom_hline(yintercept = 0) +
+  # geom_hline(yintercept = c(2, 7, 10), lty="dotted") +
+  geom_hline(yintercept = c(0, 1)) +
   #geom_abline(intercept = 0, slope=1) +
   facet_wrap(vars(strain), ncol=2, scales="free") + 
-  labs(y=expression(paste("AIC"[full],"-AIC"[single])), col="treatment")
+  # scale_y_sqrt() +
+  labs(col = "treatment", 
+       y = expression("Probability that full model outperforms single model"))
+  # labs(y=expression(paste("AIC"[full],"-AIC"[single])), col="treatment")
   
 #ggsave(paste0(model_system, "_", response, ".pdf"), 
 #width=5, height = 4, device = "pdf")
-ggsave(paste0("plots/", model_system,"_AIC.pdf"), 
-       width=5, height = 4, device = "pdf")
+if (model_system == 'cyano') {
+  ggsave(paste0("plots/", model_system,"_AIC.pdf"), 
+         width = 4.5, height = 3.5, device = "pdf")
+} else {
+  ggsave(paste0("plots/", model_system,"_AIC.pdf"), # ciliate plot bigger
+         width = 4.5, height = 7, device = "pdf")
+}
 
 # Plot model fits
 data_preds <- data_preds %>%
-  select(-c("data", "model")) %>%
+  dplyr::select(-c("data", "model")) %>%
   unnest(predictions)
+
 #, form=="pcgr ~ density"
 ggplot(data_preds %>% filter(response=="growth")) + 
   theme_bw() + 
@@ -108,7 +132,7 @@ ggplot(data_preds %>% filter(response=="growth")) +
   geom_abline(slope=1, intercept=0) 
 
 ggsave(paste0("plots/", model_system,"growth.pdf"), 
-       width=5, height = 4, device = "pdf")
+       width = 4, height = 4.5, device = "pdf")
 
 ggplot(data_preds %>% filter(response=="trait change")) + 
   theme_bw() + 
@@ -136,7 +160,7 @@ stats_result <- modelling(data=data%>%filter(treat=="C"),
                                      "dT ~ trait + density",
                                      "pcgr ~ density",
                                      "pcgr ~ trait + density")) %>%
-  select(-data)
+  dplyr::select(-data)
 
 #Now join these models to all the data and make the predictions
 data_preds <- data %>%
@@ -148,9 +172,9 @@ data_preds <- data %>%
   mutate(predictor = case_when(length(grep("trait + density", form, fixed=T))>0 ~ "both",
                                length(grep("density", form))>0 ~ "one",
                                length(grep("trait", form))>0 ~ "one")) %>%
-  #select(-form) %>%
+  #dplyr::select(-form) %>%
   mutate(data_and_pred = list(cbind(data, prediction=predict.lm(object=model, newdata=data)))) %>%
-  select(c("strain", "response", "form", "predictor", "data_and_pred")) %>%
+  dplyr::select(c("strain", "response", "form", "predictor", "data_and_pred")) %>%
   unnest(c("data_and_pred")) %>%
   #pivot_wider(values_from = "prediction", names_from = "response")
   mutate(error =  case_when(response=="trait change" ~ abs(prediction - dT),

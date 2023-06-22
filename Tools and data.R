@@ -15,16 +15,16 @@ modelling <- function(data=data, var_to_nest_by="strain", formulas) {
 }
 
 #Import and make uniform the ciliate data ----------
-data_cilia <- read.csv("data/ciliates/OverviewTraitsFull.csv") %>%
+data_cilia <- read.csv("data/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
   rename(density = Parts_permL) %>%
   rename(treat = Treatment) %>%
   mutate(strain = as.factor(ID_spec)) %>%
   mutate(temperature = as.factor(Temp)) %>%
   mutate(atrazine = as.factor(Atrazine)) %>%
   group_by(atrazine, temperature, strain) %>%
-  mutate(pcgr = log(lead(density, 1)/density)/(lead(Days_fromstart, 1)-Days_fromstart),
+  mutate(pcgr = log(lead(density, 1)/density)/(lead(Time_Days, 1)-Time_Days),
          .after = density) %>% 
-  filter(!is.na(pcgr)) %>%
+  # filter(!is.na(pcgr)) %>%
   filter(pcgr > -5, strain!="Spiro_5") %>% #Kick out extremely negative pcgr, as well as Spiro_5 (not enough data to make a ref model)
   ungroup() %>%
   separate(strain, into = c("species", "sp.strain"), remove=F) #link to species
@@ -34,13 +34,13 @@ data_cilia_pca <- data_cilia %>%
   nest() %>%
   mutate(pca_data = map(data, ~.x %>% dplyr::select(contains("mean")))) %>% 
   mutate(pca_scores = map2(data, pca_data, ~cbind(.x, pca1=prcomp(.y, center=T, scale=T)$x[,1]))) %>%
-  select(c("strain", "pca_scores")) %>%
+  dplyr::select(c("strain", "pca_scores")) %>%
   unnest(cols = c(pca_scores))
 
 data_cilia <- data_cilia_pca %>%
   rename(trait=pca1) %>%
   group_by(strain, atrazine, temperature) %>%
-  mutate(dT = lead(trait, 1)-trait/(lead(Days_fromstart, 1)-Days_fromstart)) %>%
+  mutate(dT = lead(trait, 1)-trait/(lead(Time_Days, 1)-Time_Days)) %>%
   filter(!is.na(dT)) %>%
   filter(Temp>20) %>%
   mutate(treat = case_when((Atrazine==0)&(Temp==22) ~ "C",
@@ -60,45 +60,42 @@ data_cilia$strain <- factor(data_cilia$strain,
 
 #Import and make uniform the cyano data-------------------
 data_cyano <- read.csv("data/cyanobacteria/mono_data.csv") %>%
-  rename(density = population.mean) %>%
-  separate(date.time, sep=" ", into = c("date", "time")) %>%
-  mutate(day = yday(date), .after = date) %>%
-  select(-c(date, time)) %>%
+  rename(density = Population.density, day = date) %>%
+  # separate(date.time, sep=" ", into = c("date", "time")) %>%
+  # mutate(day = yday(date), .after = date) %>%
+  # dplyr::select(-c(date, time)) %>%
   # fixed species names
-  mutate(species = case_when(strain%in%c(2375,2524)~"V",
-                             TRUE ~ "VIII")) %>%#link to species
+  mutate(species = case_when(strain %in% c(2375, 2524) ~ "V", TRUE ~ "VIII")) %>% #link to species
   mutate(strain = as_factor(strain)) %>%
-  mutate(atrazine = as_factor(case_when(treat%in%c("C", "T")~"no",
-                              TRUE ~ "yes"))) %>%
-  mutate(temperature = as_factor(case_when(treat%in%c("A", "C")~"normal",
-                          TRUE ~ "hot"))) %>%
+  mutate(atrazine = as_factor(case_when(treat %in% c("C", "T") ~ "no", TRUE ~ "yes"))) %>%
+  mutate(temperature = as_factor(case_when(treat %in% c("A", "C") ~ "normal", TRUE ~ "hot"))) %>%
   group_by(atrazine, temperature, strain) %>%
-  mutate(day = day - min(day)) %>%
-  mutate(pcgr = log(lead(density,1)/density)/(lead(day,1)-day),
-         .after = density) %>%
-  filter(!is.na(pcgr)) %>%
-  ungroup() %>%
-  select(-population.sd) 
+  # mutate(day = day - min(day)) %>%
+  # mutate(pcgr = log(lead(density,1)/density)/(lead(day,1)-day),
+  #        .after = density) %>%
+  # filter(!is.na(pcgr)) %>% # removed this b/c it gets done later and it was causing data loss
+  ungroup() #%>%
+  # dplyr::select(-population.sd) 
 
 data_cyano_pca <- data_cyano %>%
   group_by(strain) %>%
   # not really a good idea to include non-functional traits
-  select(-c('SSC.HLin.mean', 'NIR.B.HLin.mean', 'NIR.R.HLin.mean', 'GRN.B.HLin.mean')) %>%
+  # dplyr::select(-c('SSC.HLin.mean', 'NIR.B.HLin.mean', 'NIR.R.HLin.mean', 'GRN.B.HLin.mean')) %>%
   nest() %>%
-  mutate(pca_data = map(data, ~.x %>% dplyr::select(contains("mean")))) %>% 
+  mutate(pca_data = map(data, ~.x %>% dplyr::select(Size:Phycocyanin))) %>% 
   mutate(pca_scores = map2(data, pca_data, ~cbind(.x, pca1=prcomp(.y, center=T, scale=T)$x[,1]))) %>%
-  select(c("strain", "pca_scores")) %>%
+  dplyr::select(c("strain", "pca_scores")) %>%
   unnest(cols = c(pca_scores))
   
 data_cyano <- data_cyano_pca %>%
   # fixed here too
-  select(-c("FSC.HLin.mean":"YEL.B.HLin.sd")) %>%
+  # dplyr::select(-c("FSC.HLin.mean":"YEL.B.HLin.sd")) %>%
   rename(trait=pca1) %>%
   #group_by(strain, trait, atrazine, temperature) %>%
-  group_by(strain, atrazine, temperature) %>%
+  group_by(strain, atrazine, temperature, repl) %>%
   #mutate(dT = lead(mean, 1)-mean/(lead(day, 1)-day)) %>%
   mutate(dT = lead(trait, 1)-trait/(lead(day, 1)-day)) %>%
-  filter(!is.na(dT)) %>%
+  filter(!is.na(dT)) %>% 
   mutate(treat = as.factor(treat)) 
   
 data_cyano$treat <- factor(data_cyano$treat, levels=c("C", "T", "A", "AT"))
