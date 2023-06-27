@@ -17,10 +17,10 @@ basic_plots <- function(model_system) {
     facet_wrap(vars(strain), ncol = 2, scales = "free") 
   
   if (model_system ==  'cyano') {
-    ggsave(paste0("plots/", model_system, "_pcgr.pdf"), 
+    ggsave(paste0("plots/cyano/", model_system, "_pcgr.pdf"), 
            width = 5, height = 4, device = "pdf")
   } else {
-    ggsave(paste0("plots/", model_system, "_pcgr.pdf"), 
+    ggsave(paste0("plots/cilia/", model_system, "_pcgr.pdf"), 
            width = 5, height = 8, device = "pdf")
   }
   
@@ -34,10 +34,10 @@ basic_plots <- function(model_system) {
     facet_wrap(vars(strain), ncol = 2, scales = "free") 
   
   if (model_system ==  'cyano') {
-    ggsave(paste0("plots/", model_system, "_dT.pdf"), 
+    ggsave(paste0("plots/cyano/", model_system, "_dT.pdf"), 
            width = 5, height = 4, device = "pdf")
   } else {
-    ggsave(paste0("plots/", model_system, "_dT.pdf"), 
+    ggsave(paste0("plots/cilia/", model_system, "_dT.pdf"), 
            width = 5, height = 8, device = "pdf")
   }
 }
@@ -75,7 +75,7 @@ AIC_plots <- function(model_system) {
   ggplot(data_preds_synth) + 
     scale_shape_manual(values = 0:10) + 
     theme_bw() + 
-    scale_colour_manual(values = cbPalette) + 
+    scale_fill_manual(values = cbPalette) + 
     aes(x   = response, y = p.better, fill = treat) + 
     geom_col(position = position_dodge(width = 0.5), width = 0.25) +
     geom_hline(yintercept = c(0, 1)) +
@@ -84,10 +84,10 @@ AIC_plots <- function(model_system) {
          y = expression("Prob. full model outperforms single model"))
   
   if (model_system ==  'cyano') {
-    ggsave(paste0("plots/", model_system, "_AIC.pdf"), 
+    ggsave(paste0("plots/cyano/", model_system, "_AIC.pdf"), 
            width = 4.5, height = 3.5, device = "pdf")
   } else {
-    ggsave(paste0("plots/", model_system, "_AIC.pdf"), # ciliate plot bigger
+    ggsave(paste0("plots/cilia/", model_system, "_AIC.pdf"), # ciliate plot bigger
            width = 4.5, height = 7, device = "pdf")
   }
   
@@ -109,10 +109,10 @@ AIC_plots <- function(model_system) {
     labs(col = "treatment")
   
   if (model_system ==  'cyano') {
-    ggsave(paste0("plots/", model_system, "_growth.pdf"), 
+    ggsave(paste0("plots/cyano/", model_system, "_growth.pdf"), 
            width = 4, height = 4.5, device = "pdf")
   } else {
-    ggsave(paste0("plots/", model_system, "_growth.pdf"), 
+    ggsave(paste0("plots/cilia/", model_system, "_growth.pdf"), 
            width = 4, height = 4.5, device = "pdf")
   }
   
@@ -128,10 +128,10 @@ AIC_plots <- function(model_system) {
     labs(col = "treatment")
   
   if (model_system ==  'cyano') {
-    ggsave(paste0("plots/", model_system, "_trait.pdf"), 
+    ggsave(paste0("plots/cyano/", model_system, "_trait.pdf"), 
            width = 4, height = 4.5, device = "pdf")
   } else {
-    ggsave(paste0("plots/", model_system, "_trait.pdf"), 
+    ggsave(paste0("plots/cilia/", model_system, "_trait.pdf"), 
            width = 4, height = 4.5, device = "pdf")
   }
   
@@ -221,10 +221,10 @@ third_plots <- function(model_system) {
     labs(col = "treatment")
   
   if (model_system == 'cyano') {
-    ggsave(paste0("plots/", model_system,"_corr.pdf"), 
+    ggsave(paste0("plots/cyano/", model_system,"_corr.pdf"), 
            width = 5, height = 4, device = "pdf")
   } else {
-    ggsave(paste0("plots/", model_system,"_corr.pdf"), 
+    ggsave(paste0("plots/cilia/", model_system,"_corr.pdf"), 
            width = 5, height = 8, device = "pdf")
   }
 }
@@ -265,10 +265,10 @@ td_general_plots <- function(model_system) {
     labs(col = "treatment")
   
   if (model_system == 'cyano') {
-    ggsave(paste("plots/", model_system,"_td_general.pdf", sep = ""), plot = plot, 
+    ggsave(paste("plots/cyano/", model_system,"_td_general.pdf", sep = ""), plot = plot, 
            width = 7, height = 7)
   } else {
-    ggsave(paste("plots/", model_system,"_td_general.pdf", sep = ""), plot = plot, 
+    ggsave(paste("plots/cilia/", model_system,"_td_general.pdf", sep = ""), plot = plot, 
            width = 7, height = 7)
   }
   
@@ -353,10 +353,10 @@ granger_plots <- function(model_system) {
     labs(col = "treatment", x = "lag steps")
   
   if (model_system == 'cyano') {
-    ggsave(paste("plots/", model_system,"_Granger.pdf", sep = ""), plot = plot, 
+    ggsave(paste("plots/cyano/", model_system,"_Granger.pdf", sep = ""), plot = plot, 
            width = 5, height = 5.5)
   } else {
-    ggsave(paste("plots/", model_system,"_Granger.pdf", sep = ""), plot = plot, 
+    ggsave(paste("plots/cilia/", model_system,"_Granger.pdf", sep = ""), plot = plot, 
            width = 5, height = 8)
   }
   

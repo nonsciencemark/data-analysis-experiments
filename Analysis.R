@@ -1,6 +1,7 @@
 # IMPORT TOOLS AND DATA ----
 source("Tools and data.R")
 source("Plotting functions.R")
+library("lmtest") # for granger causality
 
 # PLOT BASIC OUTPUTS ----
 basic_plots("cyano")
@@ -35,6 +36,9 @@ eqs <- expand.grid('LHS' = LHSs, 'RHS' = RHSs) %>%
 
 AIC_plots("cyano")
 AIC_plots("cilia")
+
+granger_plots("cyano")
+granger_plots("cilia")
 
 ## Results ----
 
