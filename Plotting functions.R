@@ -1,5 +1,6 @@
-# for AIC comparison
-library('qpcR')
+library("qpcR") # for AIC comparison
+library("lmtest") # for Granger causality
+
 
 basic_plots <- function(model_system) {
   
@@ -58,7 +59,8 @@ AIC_plots <- function(model_system) {
     left_join(stats_result, by = c("strain", "treat"), multiple = "all") %>%
     mutate(predictions = list(cbind(data, pred = predict.lm(model, newdata = data)))) %>%
     rowwise() %>%
-    mutate(AIC = AIC(model)) %>%  
+    mutate(AIC = AIC(model),
+           ) %>%  
     ungroup() %>%
     mutate(response = ifelse(grepl('dT ~ ', form), "trait change", "growth")) %>%
     ungroup()
@@ -268,6 +270,94 @@ td_general_plots <- function(model_system) {
   } else {
     ggsave(paste("plots/", model_system,"_td_general.pdf", sep = ""), plot = plot, 
            width = 7, height = 7)
+  }
+  
+}
+
+granger_plots <- function(model_system) {
+  
+  # max lag
+  max.order <- 2
+  
+  # GET THE DATA
+  data <- get(paste("data_", model_system, sep = ""))
+  
+  if (model_system == 'cyano') {
+    
+    # get the p values of causality
+    stats_result <- data %>%
+      mutate(order = list(1:max.order)) %>%
+      unnest(order) %>%
+      group_by(strain, treat, repl, order) %>%
+      # for time series data we need to inject NAs between the different sets
+      summarise(dat = list(
+        data.frame(
+          density = c(density, rep(NA, max.order)),
+          trait = c(trait, rep(NA, max.order))
+        )
+      )) %>%
+      group_by(strain, treat, order) %>%
+      summarise(dat = list(bind_rows(dat))) %>%
+      rowwise %>%
+      mutate(dens_causes_trait = list(
+        grangertest(trait ~ density, order = order, data = dat)),
+        trait_causes_dens = list(
+          grangertest(density ~ trait, order = order, data = dat))) %>% 
+      dplyr::select(-dat) %>%
+      rowwise %>%
+      mutate(dens_causes_trait = na.omit(dens_causes_trait$`Pr(>F)`),
+             trait_causes_dens = na.omit(trait_causes_dens$`Pr(>F)`)) %>%
+      pivot_longer(cols = dens_causes_trait:trait_causes_dens, 
+                   names_to = 'model', values_to = 'p value') 
+    
+  } else {
+    
+    # get the p values of causality
+    stats_result <- data %>%
+      mutate(order = list(1:max.order)) %>%
+      unnest(order) %>%
+      group_by(strain, treat, order) %>%
+      summarise(dat = list(
+        data.frame(
+          density = density,
+          trait = trait
+        )
+      )) %>%
+      rowwise %>%
+      mutate(dens_causes_trait = list(
+        grangertest(trait ~ density, order = order, data = dat)),
+        trait_causes_dens = list(
+          grangertest(density ~ trait, order = order, data = dat))) %>% 
+      dplyr::select(-dat) %>%
+      rowwise %>%
+      mutate(dens_causes_trait = dens_causes_trait$`Pr(>F)`[2],
+             trait_causes_dens = trait_causes_dens$`Pr(>F)`[2]) %>%
+      pivot_longer(cols = dens_causes_trait:trait_causes_dens, 
+                   names_to = 'model', values_to = 'p value') 
+    
+  }
+  
+  stats_result <- stats_result %>%
+    mutate(model = ifelse(grepl('dens_causes', model), 
+                          'Density~causes~trait', 'Trait~causes~density'))
+  
+  plot <- ggplot(stats_result, aes(x = as.factor(order), y = `p value`)) +
+    theme_bw() + 
+    scale_colour_manual(values = cbPalette) + 
+    geom_boxplot() + 
+    geom_point(aes(col = treat), shape = 16, size = 3, position = position_dodge(width = 0.5)) +
+    # critical value = 0.05 / number of models of different lags fitted 
+    geom_hline(yintercept = 0.05 / max.order, linetype = "dashed") +
+    facet_grid(strain ~ model, scales = "free", labeller = label_parsed) + 
+    scale_y_log10() + 
+    labs(col = "treatment", x = "lag steps")
+  
+  if (model_system == 'cyano') {
+    ggsave(paste("plots/", model_system,"_Granger.pdf", sep = ""), plot = plot, 
+           width = 5, height = 5.5)
+  } else {
+    ggsave(paste("plots/", model_system,"_Granger.pdf", sep = ""), plot = plot, 
+           width = 5, height = 8)
   }
   
 }
