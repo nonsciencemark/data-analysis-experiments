@@ -1,0 +1,226 @@
+\documentclass{getwriting}
+\usepackage{bm}
+\usepackage{subcaption} %% remove this later when figs fixed
+
+\begin{document}
+
+ %% title page is a separate doc bc it gets in the way
+\include{titlepage}
+
+\pagebreak
+
+\hl{\textbf{Things to fix}}
+\begin{enumerate}
+    \item I've included my entire bib file for now please add whatever is needed and we'll remove redundant later
+    \item we may need to include the PCA loadings
+    \item missing methodology for ciliates
+\end{enumerate}
+
+\section{Introduction}
+
+The dynamics of populations are described by rate of change which must generally remain positive in order to ensure their persistence \cite{}. It is vital to understand the processes that govern population change in different environmental conditions, especially in the highly-disrupted Anthropocene era. Density-dependence --- the mechanism by which the rate of change of a population is affected by its current value --- is generally the foundation population dynamics. Traditionally, density-dependence is a fixed (usually linear and negative) parameter which acts on populations to limit their growth. Allowing density-dependence to be dynamic, rather than fixed is an important change that may fundamentally alter the stability of populations.
+
+The importance of density-dependent population regulation has been known for centuries but, more recently, the functional traits exhibited by individual organisms have also been found to be crucial for determining the population’s dynamics. While density-dependence is classically the most significant factor studied when attempting to predict the dynamics of populations, functional traits, particularly when varied within a population, may have large impacts on the trajectory of populations. Trait-dependent growth may, itself, be density-dependent — an optimal trait in one context (i.e., low population density) is not necessarily beneficial in different context. Feedbacks between populations and traits, therefore, are important to consider as the dynamics of both properties are clearly entangled and one cannot be understood or predicted without the other.
+
+Functional traits are dynamic, much like population densities, but which generally change within different timescales e.g., behavioural, epigenetic, and genetic changes to the phenotype do not act at the same speed as ecological processes. Heritable phenotypic change can occur within just a few generations and may have important consequences on the dynamics of the community.
+
+Furthermore, these reciprocal effects between traits and population growth need to be evaluated in a environmental conditions as temperature and other abiotic variables are highly-linked to trait-dependent growth \cite{Brown2004, Gillooly2001, Kremer2017a}. 
+
+We aim to investigate these dynamics in a range of environmental conditions --- essential to properly understand the scope of their effects --- for a number of different organisms.
+
+\subsection{Research questions}
+
+We outline three main research questions that we aim to answer here:
+
+\begin{enumerate}
+    \item Is population growth best described by density-dependence or both density- and trait-dependence?
+    \item Is trait change best described by trait-dependence or both density- and trait-dependence?
+    \item Does these relationships depend on environmental context and will increasing environmental change exacerbate potential feedbacks between traits and populations?
+\end{enumerate}
+
+We explored these questions experimentally with microcosms of ciliate and cyanbacteria populations. We found that evidence for trait-population feedbacks was system- and environmental-specific as well as highly variable. The effects of traits on populations and vice versa should be well-explored for a given study system using mechanistically-linked across a range of environmental conditions in order to be able to properly predict dynamics \cite{Collins2022}.
+
+\section{Materials and Methods}
+
+\subsection{Experiments}
+
+\subsubsection{Study systems}
+
+We addressed the research questions using a number of clonally-reproducing strains from two model systems: seven strains from several ciliate genera and four strains from the picocyanobacteria genus \textit{Synechococcus}. 
+
+These organisms are both globally-distributed and ecologically-relevant. *Synechoccoccus* makes up a substantial proportion of marine phytoplankton biomass and photosynthesis and \hl{the ciliate genera represent...}. We examine the effects of changing environmental conditions, represented here by temperature and a pollutant. Specifically, we consider an ``altered'' environment to have increased temperature, increased concentrations of the herbicide atrazine, or both. Temperature change is a ubiquitously-relevant driver to consider as anthropogenically-driven climate change continues to intensify. Atrazine, present in many ecosystems, represents a broad class of herbicides that act via the inhibition of photosynthesis but which also has negative consequences on the fitness of heterotrophic orgnaisms. 
+
+We grew the strains in monoculture for sufficient time for them to reach their carrying capacity, enabling us to quantify their maximum growth rate and density-dependence. Population densities and trait values were measured frequently \ref{tab:treatment_table}.
+
+\begin{table}[h]
+    \centering
+    \caption{Experimental design of the two model systems, showing how long the experiment lasted, how frequently they were sampled, the number of strains used, the temperature of the warming treatments in degrees Celsius, and the concentration of the pollutant (atrazine) treatments in micrograms per litre. All combinations of pollution and temperature were included in the experiment design. Treatments in bold indicate the reference conditions.}
+    \begin{tabular}{|m{2.5cm}|m{2cm}|m{2.5cm}|m{1.25cm}|m{2cm}|m{2.25cm}|}
+        \hline
+        Model system & Exp. length (days)& Sampling freq. ($\mathrm{day}^{-1}$) & No. of strains & Temp. ($\mathrm{^\circ C}$) & Poll. (\textmu $\mathrm{g\,L}^{-1}$) \\
+        \hline
+        Ciliates & $??$ & $??$ & $7$ & $\bm{20}, 22, 24$ & $\bm{0}, 10, 20$\\
+        Cyanobacteria &$10$ & $1$ & $4$ & $\bm{22}, 24$ & $\bm{0}, 0.1$ \\
+        \hline
+    \end{tabular}
+    \label{tab:treatment_table}
+\end{table}
+
+\subsubsection{Experimental setup}
+
+For the ciliate system \hl{similar paragraph for ciliates}
+
+For the cyanobacteria system, the microcosms were inoculated at $\approx 5000 \, \mathrm{cells} \, \mathrm{mL}^{-1}$ with abundant resources in $6 \mathrm{mL}$ of PCRS-11 Red Sea medium (\cite{Rippka2000}) inside six-well plates (Sarstedt standard flat 6 well plate, 83.3920) inside temperature-controlled incubators (Lovibond Thermostatic Cabinet). They were cultured in white light (6500K using LedAquaristik Sky Bar) with a 12 hour day/night cycle. The six-well plates were constantly mixed 150 RPM (using VWR mini shaker).
+
+\subsubsection{Sampling procedure}
+
+Populations and traits were measured using an \hl{imaging details here for ciliates} and a flow cytometer for the ciliate and cyanobacteria systems, respectively.
+
+\hl{similar paragraph for ciliates}
+
+The flow cytometer (Guava easyCyte 12HT) measures cell densities and trait values using several channels, which correspond to specific excitation and flouresence combinations by lasers detectors. We used this to distinguish living cells from dead cells and debris. The flow cytometer channels correspond approximately to cell size and concentration of three photosynthetic pigments present in \textit{Synechococcus} - chlorophyll-a, phycocyanin, and phycoerythrin. 
+
+\subsection{Analyses}
+
+The objectives of our analyses were to investigate whether it is best to predict the population per-capita growth rate (hereafter ``growth'', $\gamma$) from density only, or if adding trait data improves this prediction. Similarly, we tested if adding density data to a model using trait data improves our capacity to predict trait change. 
+
+The functional traits examined are all relevant to the growth of the organisms by affecting their rate of resource uptake. For ciliates, the traits were cell size, cell aspect ratio, linearity of the cell's movement pathways, and its speed. Cell morphology influences the maintenance requirement and resource uptake rates and the motility traits affect the encounter rate of ciliates for their resources (\hl{bacteria?}). Cyanobacterial traits consist of fluorescence parameters measured using a flow cytometer indicative of cell size and concentrations of chlorophyll-a, phycocyanin, \& phycoerythrin. Cell size again influences resource uptake and maintenance and the photosynthetic pigments influence the light absorption. 
+
+Because we had multiple traits to choose from, we first summarized the traits to a single aggregate trait (hereafter ``trait'', $\tau$) using a principal component analysis, PCA, per strain and treatment. We use only the first component of this PCA, which contains the most explained variance and, if the traits are linked to the growth, is most likely to be the best-performing predictor of growth. We then applied a model comparison approach to if the trait improved our capacity to predict growth, and if density improved our capacity to predict trait change using two approaches. We computed the probability that the model including both densities and traits as predictors outperformed the single-variable model by  computing the Akaike weights \cite{Burnham2004}. 
+
+More specifically, we first calculated, for all combinations of strain, temperature, and atrazine treatments, the growth rate at every time point $\gamma_t$, as $\gamma_t=\Delta^{-1}\textrm{log}(N_{t+\Delta}/N_t)$, where $N$ is population density, $\Delta$ is the time between consecutive sampling times. We then performed two regressions, for every combination of strain, temperature, and pesticide treatment, of $\gamma_t$ against $N_t$: 
+
+\begin{equation}
+\label{eq:pcgr}
+\gamma_t = \beta_0 + \beta_1 N_t  
+\end{equation}
+
+\begin{equation}
+\label{eq:pcgrExtd}
+\gamma_t = \beta_0 + \beta_1 N_t + \beta_2 T_t,
+\end{equation}
+
+where $N_t$ (density, continuous) and $T_t$ (trait value, continuous) are predictors, and the $\beta_i$ are regression coefficients. 
+
+Similarly, for all combinations of strain, temperature, and pesticide treatments, the trait rate of change at every date $\tau_t$, as $\tau_t=\Delta^{-1}(T_{t+\Delta}-T_{t})$, where $T$ is the trait value, and $\Delta$ is again the time between consecutive sampling times. We again fitted two models, but now using each of the trait values in turn as a response variable: 
+
+\begin{equation}
+\label{eq:dT}
+\tau_t = \beta_0 + \beta_1 T_t  
+\end{equation}
+
+\begin{equation}
+\label{eq:dTExtd}
+\tau_t = \beta_0 + \beta_1 T_t + \beta_2 N_t,
+\end{equation}
+
+where $N_t$ (density, continuous) and $T_t$ (trait value, continuous) are predictors, and the $\beta_i$ are regression coefficients. 
+
+Finally, we computed the AIC for all models and compared them between Eq.~\ref{eq:pcgr} and ~\ref{eq:pcgrExtd}, and between Eq.~\ref{eq:dT} and ~\ref{eq:dTExtd} to decide which model predicted best the data, using a difference of $2$ AIC units as a rule of thumb. \hl{update this - i turned the AIC into p-values or probabilities, don't remember}
+
+\section{Results}
+
+\subsection{Growth and trait change}
+
+\hl{i don't think we need this subsection}
+
+In both systems, the populations exhibited density-dependent growth across all environmental conditions (i.e., nonzero intrinsic growth and self-interaction parameters). The treatments had notable effects on the parameters, particularly atrazine treatments which radically altered the growth dynamics of cyanobacteria.
+
+In the ciliate system, the intrinsic growth rates, $r$, of \emph{Tetrahymena} strains were consistently higher than that of the other strains (Fig. \ref{fig:dd_general_cilia}, left panel). All ciliate strains had negative density-dependence (Fig. \ref{fig:dd_general_cilia}, right panel), across all environmental conditions. 
+
+In the cyanobacteria system, intrinsic growth rates and density-dependence were comparable across strains. Intrinsic growth rates were depressed by the pesticide treatment (Fig. \ref{fig:dd_general_cyano}, upper panel). 
+
+In both systems, we observed negative trait-dependence of trait change, across most strains and environmental conditions. 
+
+In the ciliate system, intrinsic trait change (Fig.\ref{fig:td_general_cilia}, left panel) was mostly not different from zero, but estimates varied more across environmental conditions in \emph{Tetrahymena} strains. Trait-dependence of trait change in ciliates was strongest for these latter strains (Fig.\ref{fig:td_general_cilia}, right panel). 
+
+In the cyanobacteria system, intrinsic trait change was mostly absent, except in some treatments involving atrazine addition (Fig.\ref{fig:td_general_cyano}, left panel). Again, trait change was negatively affected by the trait value (Fig.\ref{fig:td_general_cyano}, right panel). 
+
+\subsection{Regressions}
+
+\begin{figure}[H]
+    \begin{subfigure}{0.4\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cilia/cilia_growth.pdf}
+      \caption{}
+    \label{fig:ciliagrowth}
+    \end{subfigure}\hfill
+        \begin{subfigure}{0.4\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cilia/cilia_trait.pdf}
+      \caption{}
+      \label{fig:ciliatrait}
+    \end{subfigure}\hfill
+    \centering
+    \caption{Observed (x-axis) and predicted (y-axis) population growth (a) and trait change (b), including either density (top panels) or traits (bottom panels), for various strains of ciliates and across environmental conditions.}
+  \label{fig:ciliagrowthandtrait}
+\end{figure}
+
+\begin{figure}[H]
+    \begin{subfigure}{0.4\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cyano/cyano_growth.pdf}
+      \caption{}
+    \label{fig:cyanogrowth}
+    \end{subfigure}\hfill
+        \begin{subfigure}{0.4\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cyano/cyano_trait.pdf}
+      \caption{}
+      \label{fig:cyanotrait}
+    \end{subfigure}\hfill
+    \centering
+    \caption{Observed (x-axis) and predicted (y-axis) population growth (a) and trait change (b), including either density (top panels) or traits (bottom panels), for various strains of \textit{Synechococcus} and across environmental conditions.}
+  \label{fig:cyanogrowthandtrait}
+\end{figure}
+
+\subsection{Effects of traits on growth and of density on trait change}
+
+Overall, cross-system evidence for links between population dynamics and trait dynamics was mixed. In ciliates, the full model was on average 42.3\% likely to better predict either $\gamma$ or $\tau$, while in cyanobacteria, this was on average 66.7\%. \hl{do we need to discuss general performance? b/c the R squared values are bad...}
+
+In ciliates, including traits and population density as co-variates did not improve prediction of population growth (Fig.\ref{fig:ciliagrowth}), and density almost never improved prediction of trait change (Fig.\ref{fig:ciliatrait}). Quantitative analysis of model performance through the AIC confirmed this result \hl{()}. Growth, $\gamma$, was 46.96\% more likely to predicted when including traits, while trait change, $\tau$, was 37.8\% likely to be best.
+
+In cyanobacteria, traits rarely improved prediction of population growth, but density consistently improved prediction of trait change. affected trait dynamics in ciliates, but traits do not seem to affect population growth. This result is consistent across environmental conditions. Growth, $\gamma$, was 61.6\% more likely to predicted when including traits, while trait change, $\tau$, was 71.8\% more likely.
+
+\begin{figure}[H]
+    \begin{subfigure}{0.4\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cilia/cilia_AIC.pdf}
+      \caption{}
+    \label{fig:cilia_AIC}
+    \end{subfigure}\hfill
+        \begin{subfigure}{0.4\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cyano/cyano_AIC.pdf}
+      \caption{}
+      \label{fig:cyano_AIC}
+    \end{subfigure}\hfill
+    \centering
+    \caption{Differences in model performance when adding traits or density to predict growth or trait change (x axis) in ciliate (a) and \textit{Synechococcus} (b) strains, respectively. $AIC_{full}$ and $AIC_{single}$ indicate the AIC for a model with two and one predictors, respectively. A negative value indicates the full model predicts better.}
+  \label{fig:both_AIC}
+\end{figure}
+
+\section{Discussion}
+
+\begin{itemize}
+    \item \textbf{We see a system-specific range of responses}. Differences in model performance by including both densities and trait values are variable. While in the cyanobacteria model system, both population and trait dynamics were generally improved by the using the full model. This improvement was not consistent across environmental conditions overall we see a range of responses. predictions of the dynamics of the \textit{Synechococcus} systems are generally improved by using the full model, while predictions of the ciliate systems less so.
+    \item for example, particularly for growth, we observe that the full model is near-certainly the best for strains 2375 and 2383
+    \item we believe that this is due to differences in the mechanistic interpretations of the traits. the cyanobacteria traits are, while abstract, highly and directly linked to biological mechanisms that control the growth rate. cell size and pigmentation have very direct effects on growth while the ciliate traits may require more system-specific model construction than simply decomposing the traits in a PCA. \hl{this is where the other paper comes in Tessa}
+    \item differences in the accuracy of model predictions across different environmental conditions indicates that the functional relationships between traits and populations is context dependent
+    \item Check \cite{Bernhardt2018}. \hl{don't think that their conclusions are the same as ours?} 
+\end{itemize} 
+
+other citations to use
+
+\begin{itemize}
+    \item \cite{Violle2007}
+    \item \cite{Wieczynski2021}
+\end{itemize}
+
+\bibliography{bibliography}
+
+\pagebreak
+
+\include{supplements} %% suppl is a separate doc bc it's enormous
+
+\end{document}
