@@ -32,7 +32,7 @@ data_cilia <- read_csv("data/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
     # link to species
     separate(strain, into = c("species", "sp.strain"), remove = FALSE) %>%
     # PCA
-    group_by(strain) %>%
+    group_by(strain, treat) %>%
     nest %>%
     rowwise %>%
     mutate(
@@ -40,7 +40,7 @@ data_cilia <- read_csv("data/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
         pca = list(prcomp(pca_data, center = TRUE, scale = TRUE)),
         data = list(cbind(data, pca1 = pca$x[, 1])),
         pca_varexp = (pca$sdev^2)[1] / sum(pca$sde^2)) %>%
-    dplyr::select(strain, data, pca_varexp) %>%
+    dplyr::select(strain, treat, data, pca_varexp) %>%
     unnest(data) %>%
     # epxand pca and compute dT and clean up stuff
     rename(trait = pca1) %>%
@@ -73,7 +73,7 @@ data_cyano <- read_csv("data/cyanobacteria/mono_data.csv") %>%
     group_by(atrazine, temperature, strain) %>%
     ungroup %>%
     # PCA
-    group_by(strain) %>%
+    group_by(strain, treat) %>%
     nest %>%
     rowwise %>%
     mutate(
@@ -81,7 +81,7 @@ data_cyano <- read_csv("data/cyanobacteria/mono_data.csv") %>%
         pca = list(prcomp(pca_data, center = TRUE, scale = TRUE)),
         data = list(cbind(data, pca1 = pca$x[, 1])),
         pca_varexp = (pca$sdev^2)[1] / sum(pca$sde^2)) %>%
-    dplyr::select(strain, data, pca_varexp) %>%
+    dplyr::select(strain, treat, data, pca_varexp) %>%
     unnest(data) %>%
     rename(trait = pca1) %>%
     group_by(strain, atrazine, temperature, repl) %>%

@@ -116,9 +116,38 @@ for (model_system in c("cilia", "cyano")) {
             response = ifelse(grepl("dT ~ ", form), "trait change", "growth"),
             response = factor(response, levels = c("growth", "trait change")),
             predictor = ifelse(grepl("\\+", form), "both", "one"),
-            predictor = factor(predictor, levels = c("one", "both")))
+            predictor = factor(predictor, levels = c("one", "both"))
+            ) %>%
+        left_join(data %>% 
+            dplyr::select(strain, treat, pca_varexp) %>%
+            distinct, relationship = "many-to-many")
 
     print(paste("Created", model_system, "statistics"))
+
+    # Plot the PCA variance explained
+    ggplot(stats_result) +
+        aes(x = strain, y = pca_varexp, fill = treat) +
+        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+        geom_vline(xintercept = vline_pos, color = "grey92") +
+        labs(y = "Variance explained by\nfirst principal component",
+            x = "Strain",
+            fill = "Treatment") +
+        theme_bw() +
+        scale_fill_manual(values = cbPalette) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.05)),
+            labels = scales::percent)
+        theme(panel.grid.major.x = element_blank(),
+            panel.grid.minor = element_blank())
+
+    if (model_system == "cyano") {
+        ggsave(paste0(outpath, "PC_var_explained.pdf"),
+            width = 5.5, height = 2.5, device = "pdf")
+    } else {
+        ggsave(paste0(outpath, "PC_var_explained.pdf"),
+            width = 5.5, height = 2.5, device = "pdf")
+    }
+
+    print(paste("Saved", model_system, "R-squared plots"))
 
     # plot R squared
 
@@ -191,7 +220,7 @@ for (model_system in c("cilia", "cyano")) {
         rowwise %>%
         mutate(delta_error = (error_both - error_one) / error_one,
             AIC.weights = list(akaike.weights(c(aic_both, aic_one))$weights),
-            p.better = AIC.weights[1])
+            p_better = AIC.weights[1])
 
     # view the delta error of using the full model vs single model
     ggplot(data_synth) +
@@ -227,15 +256,15 @@ for (model_system in c("cilia", "cyano")) {
         theme_bw() +
         scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
         scale_fill_manual(values = cbPalette) +
-        aes(x = strain, y = p.better, fill = treat) +
+        aes(x = strain, y = p_better, fill = treat) +
         geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         geom_vline(xintercept = vline_pos, color = "grey92") +
         # geom_col(position = position_dodge(width = 0.5), width = 0.25) +
         geom_hline(yintercept = c(0, 1)) +
         facet_grid(response ~ .) +
         labs(x = "Strain",
-            fill = "treatment",
-            y = expression("Prob. full model outperforms single model")) +
+            fill = "Treatment",
+            y = "Probability that full model is best") +
         theme(panel.grid.major.x = element_blank(),
             panel.grid.minor = element_blank()
         )
@@ -250,9 +279,35 @@ for (model_system in c("cilia", "cyano")) {
 
     print(paste("Saved", model_system, "AIC plots"))
 
+    ggplot(data_synth) +
+        aes(pch = strain, x = p_better, y = -delta_error, col = treat) +
+        scale_shape_manual(values = 0:10) +
+        theme_bw() +
+        scale_x_log10() +
+        scale_y_continuous(labels = scales::percent) +
+        scale_fill_manual(values = cbPalette) +
+        geom_hline(yintercept = 0, lty = 2) +
+        geom_point(size = 2) +
+        facet_wrap(response ~ .) +
+        labs(pch = "Strain",
+            y = "Predictive accuracy difference",
+            color = "Treatment",
+            x = "Probability that full model is best") +
+        theme(legend.position = "bottom", legend.box = "vertical")
+
+    if (model_system == "cyano") {
+        ggsave(paste0(outpath, "AIC_deltaerror.pdf"),
+            width = 6, height = 4, device = "pdf")
+    } else {
+        ggsave(paste0(outpath, "AIC_deltaerror.pdf"),
+            width = 6, height = 4.5, device = "pdf")
+    }
+
+    print(paste("Saved", model_system, "AIC vs delta error plots"))
+
     # results about regression coefficients ----
     stats_coef <- stats_result %>%
-        dplyr::select(strain, treat, form, response, 
+        dplyr::select(strain, treat, form, response,
             predictor, model_summary) %>%
         unnest(model_summary) %>%
         ungroup() %>%
