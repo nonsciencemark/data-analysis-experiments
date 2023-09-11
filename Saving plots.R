@@ -41,7 +41,7 @@ for (model_system in c("cilia", "cyano")) {
     }
 
     print(paste("Saved", model_system, "PCGR plots"))
-    
+
     # plot dT vs. trait ----
     ggplot(data) +
         theme_bw() +
@@ -115,8 +115,8 @@ for (model_system in c("cilia", "cyano")) {
             aic = AIC(model),
             response = ifelse(grepl("dT ~ ", form), "trait change", "growth"),
             response = factor(response, levels = c("growth", "trait change")),
-            predictor = ifelse(grepl("\\+", form), "both", "one"),
-            predictor = factor(predictor, levels = c("one", "both"))
+            predictor = ifelse(grepl("\\+", form), "both", "single"),
+            predictor = factor(predictor, levels = c("single", "both"))
             ) %>%
         left_join(data %>% 
             dplyr::select(strain, treat, pca_varexp) %>%
@@ -124,18 +124,27 @@ for (model_system in c("cilia", "cyano")) {
 
     print(paste("Created", model_system, "statistics"))
 
+    # create bars to better separate strains
+    vline_pos <- (1.5):(length(unique(stats_result$strain)) - 0.5)
+
     # Plot the PCA variance explained
     ggplot(stats_result) +
         aes(x = strain, y = pca_varexp, fill = treat) +
-        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+        scale_x_discrete() +
         geom_vline(xintercept = vline_pos, color = "grey92") +
+        stat_summary(
+            inherit.aes = FALSE,
+            fun.y = mean,
+            aes(x = 2, y = pca_varexp, yintercept = after_stat(y)),
+            geom = "hline", lty = 2) +
+        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         labs(y = "Variance explained by\nfirst principal component",
             x = "Strain",
             fill = "Treatment") +
         theme_bw() +
         scale_fill_manual(values = cbPalette) +
         scale_y_continuous(expand = expansion(mult = c(0, 0.05)),
-            labels = scales::percent)
+            labels = scales::percent) +
         theme(panel.grid.major.x = element_blank(),
             panel.grid.minor = element_blank())
 
@@ -147,12 +156,9 @@ for (model_system in c("cilia", "cyano")) {
             width = 5.5, height = 2.5, device = "pdf")
     }
 
-    print(paste("Saved", model_system, "R-squared plots"))
+    print(paste("Saved", model_system, "PCA variance explained plots"))
 
     # plot R squared
-
-    # create bars to better separate strains
-    vline_pos <- (1.5):(length(unique(stats_result$strain)) - 0.5)
 
     # plot
     ggplot(stats_result) +
@@ -161,8 +167,14 @@ for (model_system in c("cilia", "cyano")) {
         scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
         scale_fill_manual(values = cbPalette) +
         aes(x = strain, y = R2, fill = treat) +
-        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+        scale_x_discrete() +
         geom_vline(xintercept = vline_pos, color = "grey92") +
+        stat_summary(
+            inherit.aes = FALSE,
+            fun.y = mean,
+            aes(x = 2, y = R2, yintercept = after_stat(y)),
+            geom = "hline", lty = 2) +
+        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         geom_hline(yintercept = c(0, 1)) +
         facet_grid2(response + predictor ~ ., scales = "free",
             strip = strip_nested()) +
@@ -218,8 +230,8 @@ for (model_system in c("cilia", "cyano")) {
         summarise(error = sum(error), aic = first(aic)) %>%
         pivot_wider(names_from = predictor, values_from = error:aic) %>%
         rowwise %>%
-        mutate(delta_error = (error_both - error_one) / error_one,
-            AIC.weights = list(akaike.weights(c(aic_both, aic_one))$weights),
+        mutate(delta_error = (error_both - error_single) / error_single,
+            AIC.weights = list(akaike.weights(c(aic_both, aic_single))$weights),
             p_better = AIC.weights[1])
 
     # view the delta error of using the full model vs single model
@@ -228,9 +240,14 @@ for (model_system in c("cilia", "cyano")) {
         theme_bw() +
         scale_fill_manual(values = cbPalette) +
         aes(x = strain, y = delta_error, fill = treat) +
-        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
-        # geom_col(position = position_dodge(width = 0.5), width = 0.25) +
+        scale_x_discrete() +
         geom_vline(xintercept = vline_pos, color = "grey92") +
+        stat_summary(
+            inherit.aes = FALSE,
+            fun.y = mean,
+            aes(x = 2, y = delta_error, yintercept = after_stat(y)),
+            geom = "hline", lty = 2) +
+        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         geom_hline(yintercept = 0) +
         facet_grid(response ~ .) +
         labs(x = "Strain",
@@ -249,7 +266,7 @@ for (model_system in c("cilia", "cyano")) {
     }
 
     print(paste("Saved", model_system, "delta error plots"))
-
+    
     # view the probability that full model is best
     ggplot(data_synth) +
         scale_shape_manual(values = 0:10) +
@@ -257,9 +274,15 @@ for (model_system in c("cilia", "cyano")) {
         scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
         scale_fill_manual(values = cbPalette) +
         aes(x = strain, y = p_better, fill = treat) +
-        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+        scale_x_discrete() +
         geom_vline(xintercept = vline_pos, color = "grey92") +
-        # geom_col(position = position_dodge(width = 0.5), width = 0.25) +
+        stat_summary(
+            inherit.aes = FALSE,
+            fun.y = mean,
+            aes(x = 2, y = p_better, yintercept = after_stat(y)),
+            geom = "hline", lty = 2) +
+        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+        # stat_summary(geom = "hline", fun. = "mean") +
         geom_hline(yintercept = c(0, 1)) +
         facet_grid(response ~ .) +
         labs(x = "Strain",
@@ -286,8 +309,8 @@ for (model_system in c("cilia", "cyano")) {
         scale_x_log10() +
         scale_y_continuous(labels = scales::percent) +
         scale_fill_manual(values = cbPalette) +
-        geom_hline(yintercept = 0, lty = 2) +
-        geom_point(size = 2) +
+        geom_hline(yintercept = 0) +
+        geom_point(size = 2, stroke = 1.5) +
         facet_wrap(response ~ .) +
         labs(pch = "Strain",
             y = "Predictive accuracy difference",
@@ -316,6 +339,7 @@ for (model_system in c("cilia", "cyano")) {
     # coefficient values and significance
     ggplot(stats_coef) +
         aes(y = strain, x = estimate, col = treat) +
+        geom_abline(intercept = 0, slope = 1e16) +
         geom_point(shape = 1, size = 3,
             position = position_dodge(width = 0.5)) +
         geom_errorbarh(
@@ -329,8 +353,7 @@ for (model_system in c("cilia", "cyano")) {
         theme(axis.text.x = element_text(angle = 90)) +
         labs(x = "Estimate", y = "Strain", col = "Treatment") +
         theme_bw() +
-        scale_colour_manual(values = cbPalette) +
-        geom_abline(intercept = 0, slope = 1e16, lty = 2)
+        scale_colour_manual(values = cbPalette)
 
     if (model_system == "cyano") {
         ggsave(paste(outpath, "td_general.pdf", sep = ""),
