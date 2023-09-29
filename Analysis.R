@@ -1,7 +1,6 @@
 # IMPORT TOOLS AND DATA ----
 source("Tools and data.R")
-source("Plotting functions.R")
-library("lmtest") # for granger causality
+source("Saving plots.R")
 
 # PLOT BASIC OUTPUTS ----
 basic_plots("cyano")

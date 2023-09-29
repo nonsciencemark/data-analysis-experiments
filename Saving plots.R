@@ -307,6 +307,7 @@ for (model_system in c("cilia", "cyano")) {
         scale_shape_manual(values = 0:10) +
         theme_bw() +
         scale_x_log10() +
+        scale_color_manual(values = cbPalette) +
         scale_y_continuous(labels = scales::percent) +
         scale_fill_manual(values = cbPalette) +
         geom_hline(yintercept = 0) +
