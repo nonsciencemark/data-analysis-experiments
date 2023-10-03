@@ -6,6 +6,12 @@ library("lmtest") # for Granger causality
 library("ggh4x") # plotting stuff
 library("qpdf") # merging pdf at the end
 
+# from here https://ggplot2.tidyverse.org/reference/labeller.html
+capitalise <- function(string) {
+  substr(string, 1, 1) <- toupper(substr(string, 1, 1))
+  string
+}
+
 # model_system <- "cilia"
 # model_system <- "cyano"
 
@@ -177,6 +183,7 @@ for (model_system in c("cilia", "cyano")) {
         geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         geom_hline(yintercept = c(0, 1)) +
         facet_grid2(response + predictor ~ ., scales = "free",
+            labeller = labeller(.default = capitalise),
             strip = strip_nested()) +
         theme(panel.grid.major.x = element_blank(),
             panel.grid.minor = element_blank()) +
@@ -207,7 +214,8 @@ for (model_system in c("cilia", "cyano")) {
         aes(x = obs, y = pred, col = treat, pch = strain) +
         geom_point() +
         geom_smooth(method = "lm", se = FALSE, lwd = 0.5, formula = "y ~ x") +
-        facet_grid2(predictor ~ response, scales = "free", independent = TRUE) +
+        facet_grid2(predictor ~ response, scales = "free",
+            labeller = labeller(.default = capitalise), independent = TRUE) +
         geom_abline(slope = 1, intercept = 0) +
         labs(x = "Observed value",
             y = "Predicted value",
@@ -249,7 +257,7 @@ for (model_system in c("cilia", "cyano")) {
             geom = "hline", lty = 2) +
         geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         geom_hline(yintercept = 0) +
-        facet_grid(response ~ .) +
+        facet_grid(response ~ ., labeller = labeller(.default = capitalise)) +
         labs(x = "Strain",
             fill = "treatment",
             y = expression(paste(
@@ -284,7 +292,7 @@ for (model_system in c("cilia", "cyano")) {
         geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         # stat_summary(geom = "hline", fun. = "mean") +
         geom_hline(yintercept = c(0, 1)) +
-        facet_grid(response ~ .) +
+        facet_grid(response ~ ., labeller = labeller(.default = capitalise)) +
         labs(x = "Strain",
             fill = "Treatment",
             y = "Probability that full model is best") +
@@ -312,7 +320,7 @@ for (model_system in c("cilia", "cyano")) {
         scale_fill_manual(values = cbPalette) +
         geom_hline(yintercept = 0) +
         geom_point(size = 2, stroke = 1.5) +
-        facet_wrap(response ~ .) +
+        facet_wrap(response ~ ., labeller = labeller(.default = capitalise)) +
         labs(pch = "Strain",
             y = "Predictive accuracy difference",
             color = "Treatment",
@@ -328,6 +336,25 @@ for (model_system in c("cilia", "cyano")) {
     }
 
     print(paste("Saved", model_system, "AIC vs delta error plots"))
+
+    # data_synth %>%
+    #     group_by(strain, response) %>% 
+    #     summarise(
+    #         ymin = min(p_better),
+    #         ymax = max(p_better),
+    #         p_better = mean(p_better),
+    #         ) %>%
+    #     ggplot() +
+    #         aes(x = strain, fill = response) +
+    #         facet_wrap(. ~ response, ncol = 2,
+    #             labeller = labeller(.default = capitalise)) +
+    #         scale_y_continuous(expand = expansion(mult = c(0,0.05))) +
+    #         geom_bar(aes(y = p_better), stat = "identity", col = "black") +
+    #         geom_errorbar(aes(ymin = ymin, ymax = ymax), width = 0.25) +
+    #         geom_hline(yintercept = 0.5) +
+    #         theme_bw() +
+    #         scale_fill_discrete(guide = "none") +
+    #         labs(y = "Probability that full model fits better")
 
     # results about regression coefficients ----
     stats_coef <- stats_result %>%
@@ -350,7 +377,8 @@ for (model_system in c("cilia", "cyano")) {
             position = position_dodge(width = 0.5),
             pch = "*", cex = 5, show.legend = FALSE) +
         facet_grid2(response + predictor ~ coefficient, scales = "free_x",
-            independent = "x", render_empty = FALSE, strip = strip_nested()) +
+            independent = "x", render_empty = FALSE, strip = strip_nested(),
+            labeller = labeller(.default = capitalise)) +
         theme(axis.text.x = element_text(angle = 90)) +
         labs(x = "Estimate", y = "Strain", col = "Treatment") +
         theme_bw() +

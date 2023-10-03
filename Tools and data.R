@@ -46,16 +46,16 @@ data_cilia <- read_csv("data/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
     rename(trait = pca1) %>%
     group_by(strain, atrazine, temperature) %>%
     mutate(dT = lead(trait, 1) - trait / (lead(Time_Days, 1) - Time_Days)) %>%
-    dplyr::filter(!is.na(dT), Temp > 20) %>%
+    dplyr::filter(!is.na(dT), Temp > 20, Atrazine != 10) %>%
     mutate(treat = case_when(
             (Atrazine == 0) & (Temp == 22) ~ "C",
-            (Atrazine == 10) & (Temp == 22) ~ "a",
+            # (Atrazine == 10) & (Temp == 22) ~ "a",
             (Atrazine == 20) & (Temp == 22) ~ "A",
             (Atrazine == 0) & (Temp == 24) ~ "T",
-            (Atrazine == 10) & (Temp == 24) ~ "aT",
+            # (Atrazine == 10) & (Temp == 24) ~ "aT",
             (Atrazine == 20) & (Temp == 24) ~ "AT"),
         species = factor(species, levels = c("Loxo", "Spiro", "Tetra", "Para")),
-        treat = factor(treat, levels = c("C", "T", "a", "A", "aT", "AT")),
+        treat = factor(treat, levels = c("C", "T", "A", "AT")),
         strain = factor(strain, levels = c(
             "Spiro_C", "Spiro_D", "Tetra_1", "Tetra_2",
                 "Loxo_1", "Loxo_2", "Para_4")))
