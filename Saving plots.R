@@ -121,8 +121,8 @@ for (model_system in c("cilia", "cyano")) {
             aic = AIC(model),
             response = ifelse(grepl("dT ~ ", form), "trait change", "growth"),
             response = factor(response, levels = c("growth", "trait change")),
-            predictor = ifelse(grepl("\\+", form), "both", "single"),
-            predictor = factor(predictor, levels = c("single", "both"))
+            predictor = ifelse(grepl("\\+", form), "augmented", "single"),
+            predictor = factor(predictor, levels = c("single", "augmented"))
             ) %>%
         left_join(data %>% 
             dplyr::select(strain, treat, pca_varexp) %>%
@@ -238,11 +238,11 @@ for (model_system in c("cilia", "cyano")) {
         summarise(error = sum(error), aic = first(aic)) %>%
         pivot_wider(names_from = predictor, values_from = error:aic) %>%
         rowwise %>%
-        mutate(delta_error = (error_both - error_single) / error_single,
-            AIC.weights = list(akaike.weights(c(aic_both, aic_single))$weights),
+        mutate(delta_error = (error_augmented - error_single) / error_single,
+            AIC.weights = list(akaike.weights(c(aic_augmented, aic_single))$weights),
             p_better = AIC.weights[1])
 
-    # view the delta error of using the full model vs single model
+    # view the delta error of using the augmented model vs single model
     ggplot(data_synth) +
         scale_shape_manual(values = 0:10) +
         theme_bw() +
@@ -261,7 +261,7 @@ for (model_system in c("cilia", "cyano")) {
         labs(x = "Strain",
             fill = "treatment",
             y = expression(paste(
-                "(Error"[full], " - Error"[single], ") /  Error"[single]))) +
+                "(Error"[augmented], " - Error"[single], ") /  Error"[single]))) +
         theme(panel.grid.major.x = element_blank(),
             panel.grid.minor = element_blank())
 
@@ -275,7 +275,7 @@ for (model_system in c("cilia", "cyano")) {
 
     print(paste("Saved", model_system, "delta error plots"))
     
-    # view the probability that full model is best
+    # view the probability that augmented model is best
     ggplot(data_synth) +
         scale_shape_manual(values = 0:10) +
         theme_bw() +
@@ -295,7 +295,7 @@ for (model_system in c("cilia", "cyano")) {
         facet_grid(response ~ ., labeller = labeller(.default = capitalise)) +
         labs(x = "Strain",
             fill = "Treatment",
-            y = "Probability that full model is best") +
+            y = "Probability that augmented model is best") +
         theme(panel.grid.major.x = element_blank(),
             panel.grid.minor = element_blank()
         )
@@ -324,7 +324,7 @@ for (model_system in c("cilia", "cyano")) {
         labs(pch = "Strain",
             y = "Predictive accuracy difference",
             color = "Treatment",
-            x = "Probability that full model is best") +
+            x = "Probability that augmented model is best") +
         theme(legend.position = "bottom", legend.box = "vertical")
 
     if (model_system == "cyano") {
@@ -354,7 +354,7 @@ for (model_system in c("cilia", "cyano")) {
     #         geom_hline(yintercept = 0.5) +
     #         theme_bw() +
     #         scale_fill_discrete(guide = "none") +
-    #         labs(y = "Probability that full model fits better")
+    #         labs(y = "Probability that augmented model fits better")
 
     # results about regression coefficients ----
     stats_coef <- stats_result %>%
