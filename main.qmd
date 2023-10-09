@@ -39,7 +39,7 @@ We found limited evidence to support general feedbacks between population and tr
 
 We addressed these research questions using a number of unicellular, clonally-reproducing strains from two model systems: seven strains from four ciliate genera and four strains from two ecotypes of the picocyanobacteria genus *Synechococcus* (Farrant et al. 2016; Grébert et al. 2018; Sohm et al. 2016). The ciliate genera represent globally-distributed mixotrophs (Weisse and Montagnes 2022; Lu, Gao, and Weisse 2021) and *Synechoccoccus* makes up a substantial proportion of marine phytoplankton biomass and photosynthesis (Dvořák et al. 2014).
 
-We examined the effects in a range of environmental conditions, represented here by temperature and a pollutant --- both commonly-encountered environmental pressures in natural systems. Specifically, we consider an "altered" environment to have increased temperature, increased concentrations of the herbicide atrazine, or both. Temperature change is a ubiquitously-relevant driver to consider as anthropogenically-driven climate change continues to intensify. Atrazine, present in many ecosystems, represents a broad class of herbicides that act via the inhibition of photosynthesis but which also has negative consequences on the fitness of heterotrophic orgnanisms (Shim et al. 2022). Control conditions are hereafter indicated by "C," temperature changes by "T," atrazine changes by "A," and the combined atrazine and temperature changes by "AT."
+We examined the effects in a range of environmental conditions, represented here by temperature and a pollutant --- both commonly-encountered environmental pressures in natural systems. Specifically, we consider an "altered" environment to have increased temperature, increased concentrations of the herbicide atrazine, or both. Temperature change is a ubiquitously-relevant driver to consider as anthropogenically-driven climate change continues to intensify. Atrazine, present in many ecosystems, represents a broad class of herbicides that act via the inhibition of photosynthesis but which also has negative consequences on the fitness of heterotrophic orgnanisms (Shim et al. 2022). Control conditions are hereafter indicated by "C", temperature changes by "T", atrazine changes by "A", and the combined atrazine and temperature changes by "AT".
 
 We grew the strains in monoculture for sufficient time for them to reach their carrying capacity, enabling us to quantify their intrinsic growth rate and density-dependence. Population densities and trait values were measured at regular, frequent intervals ([\[tab:treatment_table,sec:sampling_times\]](#tab:treatment_table,sec:sampling_times){reference-type="ref" reference="tab:treatment_table,sec:sampling_times"}).
 
@@ -52,7 +52,7 @@ We grew the strains in monoculture for sufficient time for them to reach their c
 : Experimental design of the two model systems, showing how long the experiment lasted, how frequently they were sampled, the number of strains used, the temperature of the warming treatments in degrees Celsius, and the concentration of the pollutant (atrazine). All combinations of pollution and temperature were included in the experiment design. Treatments in bold indicate the reference conditions.
 :::
 
-[\[tab:treatment_table\]]{#tab:treatment_table label="tab:treatment_table"}
+[]{#tab:treatment_table label="tab:treatment_table"}
 
 ### Experimental setup
 
@@ -72,7 +72,7 @@ Cyanobacteria microcosms were sampled using a flow cytometer (Guava easyCyte 12H
 
 ## Analyses
 
-The objectives of our analyses were to investigate whether we could best predict the population per-capita growth rate (hereafter "growth," $\gamma$) from density only, or if augmenting our prediction using trait data improved this prediction in our model systems. Similarly, we tested if augmenting this model using trait data to predict trait change
+The objectives of our analyses were to investigate whether we could best predict the population per-capita growth rate (hereafter "growth", $\gamma$) from density only, or if augmenting our prediction using trait data improved this prediction in our model systems. Similarly, we tested if augmenting this model using trait data to predict trait change
 (hereafter $\tau$) with density data improved predictive capacity.
 
 Since there were multiple traits to incorporate, we first summarised the traits into a single aggregate trait (hereafter "trait") using a principal component analysis, PCA, per strain and treatment. This eliminates the impact of trait covariance and collinearity, and ensures that trait information is represented by a single variable, as is population density. We use only the first component of this PCA to represent the traits, which contains most of the explained variance ([\[fig:cilia_PC_var_explained,fig:cyano_PC_var_explained\]](#fig:cilia_PC_var_explained,fig:cyano_PC_var_explained){reference-type="ref" reference="fig:cilia_PC_var_explained,fig:cyano_PC_var_explained"}).
@@ -291,7 +291,7 @@ Jacob, Staffan, Alexis S. Chaine, Michèle Huet, Jean Clobert, and Delphine Legr
 :::
 
 ::: {#ref-Kiorboe1995 .csl-entry}
-Kiørboe, Thomas, and Enric Saiz. 1995. "Planktivorous Feeding in Calm and Turbulent Environments, with Emphasis on Copepods." *Marine Ecology Progress Series* 122 (1/3): 135--45. <http://www.jstor.org/stable/24852263>.
+Kiørboe, Thomas, and Enric Saiz. 1995. "Planktivorous Feeding in Calm and Turbulent Environments, with Emphasis on Copepods." *Marine Ecology Progress Series* 122 (1/3): 135--45. <https://www.jstor.org/stable/24852263>.
 :::
 
 ::: {#ref-Kremer2017a .csl-entry}
@@ -362,12 +362,12 @@ Sibly, Richard M., Daniel Barker, Michael C. Denham, Jim Hone, and Mark Pagel. 2
 Sohm, Jill A, Nathan A Ahlgren, Zachary J Thomson, Cheryl Williams, James W Moffett, Mak A Saito, Eric A Webb, and Gabrielle Rocap. 2016. "Co-Occurring Synechococcus Ecotypes Occupy Four Major Oceanic Regimes Defined by Temperature, Macronutrients and Iron." *The ISME Journal* 10 (2): 333--45. <https://doi.org/10.1038/ismej.2015.115>.
 :::
 
-::: {#ref-Stomp2004 .csl-entry}
-Stomp, M., J. Huisman, F. De Jongh, A. J. Veraart, D. Gerla, M. Rijkeboer, B. W. Ibelings, U. I. Wollenzien, and L. J. Stal. 2004. "Adaptive Divergence in Pigment Composition Promotes Phytoplankton Biodiversity." *Nature* 432 (7013): 104--7. <https://doi.org/10.1038/nature03044>.
-:::
-
 ::: {#ref-Stomp2007a .csl-entry}
 Stomp, Maayke, Jef Huisman, Lucas J. Stal, and Hans C. P. Matthijs. 2007. "Colorful Niches of Phototrophic Microorganisms Shaped by Vibrations of the Water Molecule." *ISME Journal* 1 (4): 271--82. <https://doi.org/10.1038/ismej.2007.59>.
+:::
+
+::: {#ref-Stomp2004 .csl-entry}
+Stomp, M., J. Huisman, F. De Jongh, A. J. Veraart, D. Gerla, M. Rijkeboer, B. W. Ibelings, U. I. Wollenzien, and L. J. Stal. 2004. "Adaptive Divergence in Pigment Composition Promotes Phytoplankton Biodiversity." *Nature* 432 (7013): 104--7. <https://doi.org/10.1038/nature03044>.
 :::
 
 ::: {#ref-VanRossum2022 .csl-entry}
