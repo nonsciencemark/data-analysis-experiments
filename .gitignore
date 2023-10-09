@@ -87,3 +87,12 @@ Manifest.toml
 # R Markdown outputs
 *.pdf
 *.html
+*.gz
+*.aux
+*.log
+*.out
+*.ttf
+*.cls
+*.fdb_latexmk
+*.bbl
+*.fls
