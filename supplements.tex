@@ -1,260 +1,120 @@
-\title{Supplements}
+\title{\Huge Supplementary materials}
 
 \maketitle
 
-\begin{figure}
+\setcounter{section}{0}
+\setcounter{figure}{0}
+\renewcommand{\figurename}{Fig.}
+\renewcommand{\thefigure}{S\arabic{figure}}
+
+\section{Sampling regime} \label{sec:sampling_times}
+
+\subsection{Ciliate}
+
+Due to the large differences in cilate population dynamics, the sampling differed between species. Furthermore, since the most important information required to fit growth curves was towards the start of the experiment (in the exponential growth phase), sampling was more frequent at the beginning of the experiment and then declined in frequency as the populations stabilised. \textit{Tetrahhymena} strains were sampled twice a day during the first week at 09:00 and 17:00. All other species were sampled once a day during the first week at 13:00. During the second week, all species were sample once a day at 13:00. During the third week, all species were sampled every second day at 13:00. Finally, during the fourth and fifth weeks, all species were sampled twice a week on Mondays and Thursdays at 13:00.
+
+\subsection{Cyanobacteria}
+
+The cyanobacteria microcosms were sampled every day at the same time for each microcosm: between 09:00 and 13:00 depending on the population, as the sampling procedure took some time. Additionally, each microcosm of the cyanobacteria system had three replicates.
+
+\section{Population density and population change}
+
+\subsection{Ciliate}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.8]{figures/cilia/dd_general_cilia.pdf}
-    \caption{\hl{need to fix facet labels, hard to see anything in the slope - change scale?} Intrinsic growth rates (left) and density dependence (right) in seven strains of ciliates. Asterisks indicate parameters are significantly different from zero. \hl{not sure why we care if they are different from zero?}}
-    \label{fig:dd_general_cilia}
+    \includegraphics[width=0.75\linewidth]{figures/cilia/cilia_pcgr.pdf}
+    \caption{}
+    \label{fig:cilia_pcgr}
 \end{figure}
 
-\begin{figure}
+\subsection{Cyanobacteria}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.8]{figures/cyano/dd_general_cyano.pdf}
-    \caption{\hl{need to fix facet labels} As Fig. \ref{fig:dd_general_cilia}, but for four strains of the cyanobacteria genus \emph{Synechococcus}. Asterisks indicate parameters are significantly different from zero.}
-    \label{fig:dd_general_cyano}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.8]{figures/cilia/cilia_td_general.pdf}
-    \caption{Intrinsic trait change (left) and trait dependence (right) in seven strains of ciliates. Asterisks indicate parameters are significantly different from zero. \hl{again need to update facet labels}}
-    \label{fig:td_general_cilia}
+    \includegraphics[width=0.75\linewidth]{figures/cyano/cyano_pcgr.pdf}
+    \caption{}
+    \label{fig:cyano_pcgr}
 \end{figure}
 
-\begin{figure}
+\section{Trait values and trait change}
+
+\subsection{Ciliate}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.8]{figures/cyano/cyano_td_general.pdf}
-    \caption{As Fig. \ref{fig:td_general_cilia}, but for four strains of the cyanobacteria genus \emph{Synechococcus}. Asterisks indicate parameters are significantly different from zero. \hl{again need to update facet labels}}
-    \label{fig:td_general_cyano}
+    \includegraphics[width=0.75\linewidth]{figures/cilia/cilia_dT.pdf}
+    \caption{}
+    \label{fig:cilia_dT}
 \end{figure}
 
-\subsection{Ciliate plots}
+\subsubsection{Cyanobacteria}
 
-\subsubsection{Growth}
-
-\begin{figure}[hbt!]
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.7]{figures/cilia/cilia_pcgr.pdf}
-    \caption{Density dependence of the per capita growth rate (pcgr) at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:dd_cilia}
+    \includegraphics[width=0.75\linewidth]{figures/cyano/cyano_dT.pdf}
+    \caption{}
+    \label{fig:cyano_dT}
 \end{figure}
 
-\clearpage
+\section{Principal component variance explained}
 
-\subsubsection{Traits}
+\subsection{Ciliate}
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.7]{figures/cilia/dd_cilia_area.pdf}
-    \caption{Density dependence of size at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:dd_cilia_area}
+    \includegraphics[width=\linewidth]{figures/cilia/cilia_PC_var_explained.pdf}
+    \caption{The explained variance for the first principal component for the cilia models.}
+    \label{fig:cilia_PC_var_explained}
 \end{figure}
 
-\begin{figure}[hbt!]
+\subsection{Cyanobacteria}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.7]{figures/cilia/dd_cilia_linearity.pdf}
-    \caption{Density dependence of linearity at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:dd_cilia_linearity}
+    \includegraphics[width=\linewidth]{figures/cyano/cyano_PC_var_explained.pdf}
+    \caption{The explained variance for the first principal component for the cyanobacteria models.}
+    \label{fig:cyano_PC_var_explained}
 \end{figure}
 
-\begin{figure}[hbt!]
+\section{Observed vs predicted trait and population change}
+
+\subsection{Ciliate}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.7]{figures/cilia/dd_cilia_ar.pdf}
-    \caption{Density dependence of aspect ratio at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:dd_cilia_ar}
+    \includegraphics[width=\linewidth]{figures/cilia/cilia_growth_dtrait.pdf}
+    \caption{Observed (x-axis) and predicted (y-axis) population growth (left column) and trait change (left column), including either one (top row) or both predictors (bottom row), for various strains (point types) of ciliates and across environmental conditions (colours).}
+    \label{fig:cilia_growth_dtrait}
 \end{figure}
 
-\begin{figure}[hbt!]
+\subsection{Cyanobacteria}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.7]{figures/cilia/dd_cilia_speed.pdf}
-    \caption{Density dependence of speed at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:dd_cilia_speed}
+    \includegraphics[width=\linewidth]{figures/cyano/cyano_growth_dtrait.pdf}
+    \caption{Observed (x-axis) and predicted (y-axis) population growth (left column) and trait change (left column), including either one (top row) or both predictors (bottom row), for various strains of cyanobacteria (point types) and across environmental conditions (colours).}
+    \label{fig:cyano_growth_dtrait}
 \end{figure}
 
-\clearpage
+\section{Model goodness-of-fit}
 
-\subsubsection{Growth vs. traits}
+\subsection{Ciliate}
 
-\begin{figure}[hbt!]
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.7]{figures/cilia/delta_cilia_ar.pdf}
-    \caption{Effects on pcgr and on aspect ratio at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:delta_cilia_ar}
+    \includegraphics[width=\linewidth]{figures/cilia/cilia_R2.pdf}
+    \caption{The coefficient of determination i.e., r-squared, for the cilia system models. The mean values across strains and treatments are shown by the horizontal dashed lines.}
+    \label{fig:cilia_R2}
 \end{figure}
 
-\begin{figure}[hbt!]
+\subsection{Cyanobacteria}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[scale=0.7]{figures/cilia/delta_cilia_area.pdf}
-    \caption{Effects on pcgr and on size at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:delta_cilia_area}
+    \includegraphics[width=0.833\linewidth]{figures/cyano/cyano_R2.pdf}
+    \caption{As \cref{fig:cilia_R2} but for the cyanobacteria system models.}
+    \label{fig:cyano_R2}
 \end{figure}
 
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cilia/delta_cilia_speed.pdf}
-    \caption{Effects on pcgr and on speed at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:delta_cilia_speed}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cilia/delta_cilia_linearity.pdf}
-    \caption{Effects on pcgr and on linearity at various temperature and pesticide treatments, and for seven strains of ciliates.}
-    \label{fig:delta_cilia_linearity}
-\end{figure}
-
-% \subsubsection{Causality}
-
-% \begin{figure}[hbt!]
-%     \centering
-%     \includegraphics[scale=0.7]{figures/cilia/cilia_Granger.pdf}
-%     \caption{Granger causality of traits and population for ciliates}
-%     \label{fig:cilia_granger}
-% \end{figure}
-
-
-\clearpage
-
-\subsection{Cyanobacteria plots}
-
-\subsubsection{Growth}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano.pdf}
-    \caption{Density dependence of the per capita growth rate (pcgr) at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano}
-\end{figure}
-
-\clearpage
-
-\subsubsection{Traits}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_FSC.HL.pdf}
-    \caption{Density dependence of forward scatter at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_FSC.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_GRN.B.HL.pdf}
-    \caption{Density dependence of GRN at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_GRN.B.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_NIR.B.HL.pdf}
-    \caption{Density dependence of NIR.B at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_NIR.B.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_NIR.R.HL.pdf}
-    \caption{Density dependence of NIR.R at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_NIR.R.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_RED.B.HL.pdf}
-    \caption{Density dependence of RED.B at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_RED.B.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_RED.R.HL.pdf}
-    \caption{Density dependence of RED.B at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_RED.R.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_SSC.HL.pdf}
-    \caption{Density dependence of SSC at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_SSC.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/dd_cyano_YEL.B.HL.pdf}
-    \caption{Density dependence of YEL.B at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:dd_cyano_YEL.B.HL}
-\end{figure}
-
-\clearpage
-
-\subsubsection{Growth vs. traits}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_FSC.HL.pdf}
-    \caption{Effects on pcgr and on FSC at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_FSC.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_GRN.B.HL.pdf}
-    \caption{Effects on pcgr and on GRN at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_GRN.B.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_NIR.B.HL.pdf}
-    \caption{Effects on pcgr and on NIR.B at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_NIR.B.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_NIR.R.HL.pdf}
-    \caption{Effects on pcgr and on NIR.R at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_NIR.R.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_RED.B.HL.pdf}
-    \caption{Effects on pcgr and on RED.B at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_RED.B.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_RED.R.HL.pdf}
-    \caption{Effects on pcgr and on RED.R at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_RED.R.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_SSC.HL.pdf}
-    \caption{Effects on pcgr and on SSC.HL at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_SSC.HL}
-\end{figure}
-
-\begin{figure}[hbt!]
-    \centering
-    \includegraphics[scale=0.7]{figures/cyano/delta_cyano_YEL.B.HL.pdf}
-    \caption{Effects on pcgr and on YEL.B at various temperature and pesticide treatments, and for four strains of cyanobacteria.}
-    \label{fig:delta_cyano_YEL.B.HL}
-\end{figure}
-
-\subsubsection{Causality}
-
-% \begin{figure}[hbt!]
-%     \centering
-%     \includegraphics[scale=0.7]{figures/cyano/cyano_Granger.pdf}
-%     \caption{Granger causality of traits and population for cyanobacteria}
-%     \label{fig:cyano_grangerl}
-% \end{figure}
-
-\clearpage
-
+In the ciliate system, the $R^2$ of the model fit was generally below 0.5 for both growth and trait changes for all treatments and was generally unaffected by whether the single- or both-predictor model was used (\cref{fig:cilia_R2}). \textit{Tetrahymena} strains were generally better-fitting but still without substantial model support. In the cyanobacteria system, the treatments without atrazine were substantially better-fitting than those with atrazine added (\cref{fig:cyano_R2}). Additionally, while the goodness-of-fit of the growth predictions were only marginally improved by the addition of the full model, the trait change predictions were greatly improved by including the full model.
