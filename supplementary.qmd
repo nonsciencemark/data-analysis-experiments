@@ -58,7 +58,7 @@ The cyanobacteria microcosms were sampled every day at the same time for each mi
 
 ## Cyanobacteria
 
-![As @fig-fig-cilia_growth_dtrait but for the cyanobacteria system.]("figures/cyano/cyano_growth_dtrait.pdf"){#fig-cyano_growth_dtrait}
+![As @fig-cilia_growth_dtrait but for the cyanobacteria system.]("figures/cyano/cyano_growth_dtrait.pdf"){#fig-cyano_growth_dtrait}
 
 # Model goodness-of-fit
 
