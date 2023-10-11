@@ -1,6 +1,6 @@
 ---
 bibliography: bibliography.bib
-title: Supplementary materials
+title: "Environment- and system-specific interactions between traits and population growth"
 link-citations: true
 format:
   pdf:
