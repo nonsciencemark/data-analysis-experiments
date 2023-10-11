@@ -120,15 +120,15 @@ The traits of both systems exhibited generally negative trait-dependence (@fig-c
 
 ### Model selection
 
-![Differences in model performance when adding traits or density to predict growth (top panel) or trait change (bottom panel) different cilia strains (x-axis) in different treatments (colour). The mean values across strains and treatments are shown by the horizontal dashed lines. Values greater than 0.5 indicate that the full model is likely to be better, values less than 0.5 indicate that the single-variable model is likely to better, and values around 0.5 indicate that the two models are approximately equal.](figures/cilia/cilia_AIC.pdf) {#fig-cilia_AIC}
+![Differences in model performance when adding traits or density to predict growth (top panel) or trait change (bottom panel) different cilia strains (x-axis) in different treatments (colour). The mean values across strains and treatments are shown by the horizontal dashed lines. Values greater than 0.5 indicate that the full model is likely to be better, values less than 0.5 indicate that the single-variable model is likely to better, and values around 0.5 indicate that the two models are approximately equal.](figures/cilia/cilia_AIC.pdf){#fig-cilia_AIC}
 
 In the ciliate system, using the augmented model (including both traits and population densities) to predict growth/trait change generally did not improve predictions (@fig-cilia_AIC_deltaerror). For predictions of growth, only in a few cases (particularly *Tetrahymena* strains and *Loxocephalus* 1) was the augmented model more likely in some environmental conditions. Predictions of trait change with the augmented model were even less likely to outperform the trait-only model.
 
-![As @fig-cilia_AIC but for the cyanobacteria system.](figures/cyano/cyano_AIC.pdf) {#fig-cyano_AIC}
+![As @fig-cilia_AIC but for the cyanobacteria system.](figures/cyano/cyano_AIC.pdf){#fig-cyano_AIC}
 
 In the cyanobacteria system, for treatments without atrazine, the augmented models were generally notably better at predicting the system dynamics (@fig-cyano_AIC). For predictions of population growth, the augmented model was generally likely to best describe the data, with some exceptions in which the added trait data provided no benefit to predictions. For predictions of trait change, the augmented model was more consistently more likely to be better, with only some cases in the treatments with atrazine where it failed to improve the predictive ability.
 
-![Comparing the change in predictive accuracy using the augmented model (both population and traits) as a response to the probability that the augmented model is best for the ciliate system. Model accuracy was calculated using the R-squared statistic. ](figures/cilia/cilia_AIC_deltaerror.pdf) {#fig-cilia_AIC_deltaerror}
+![Comparing the change in predictive accuracy using the augmented model (both population and traits) as a response to the probability that the augmented model is best for the ciliate system. Model accuracy was calculated using the R-squared statistic. ](figures/cilia/cilia_AIC_deltaerror.pdf){#fig-cilia_AIC_deltaerror}
 
 In the ciliate system, the probability that the augmented model fitted best was more beneficial when making predictions of population growth than trait change (@fig-cilia_AIC_deltaerror). In other words, the cases in which the augmented model was substantially-better fitting (e.g. predictions of growth in *Tetrahymena* 1, control) yielded more accurate predictions of population growth than trait changes.
 
