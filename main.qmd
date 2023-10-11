@@ -158,7 +158,7 @@ Alternative model-fitting approaches such as autoregressive models may also be u
 
 In conclusion, we found that the relationships between populations and functional traits vary with model system and environmental context. While reciprocal interactions between density and traits were apparent for the cyanobacteria system, we did not find broad support for strong feedbacks between population and trait change. More work is needed to unveil the context dependence of growth-trait connections.
 
-## References
+<!-- ## References
 
 ::: {#refs}
-:::
+::: -->
