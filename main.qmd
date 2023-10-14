@@ -18,7 +18,7 @@ format:
 title: "Environment- and system-specific interactions between traits and population growth"
 ---
 
-## Introduction
+## Introduction {#sec-DAE_introduction}
 
 Forecasting ecological change requires an understanding of population dynamics, the trajectory of population density through time. A prime predictor of a population's growth rate is its current density. Density-dependence of population growth is generally negative, stimulating growth at low density, and limiting it when density gets high, which effectively puts a cap on population size. Since the classic experiments by Gause [@Gause1934] and Gill [@Gill1972], evidence of negative density-dependence is abundant across biological systems [@Sibly2005]. However, means of functional traits across individuals in a population have also been proposed as essential predictors of population growth [@Ozgul2012; @Edwards2013; @Perez-Ramos2019; @Litchman2008; @Violle2007].
 
@@ -38,7 +38,7 @@ Here, we investigate the reciprocal links between population and trait dynamics 
 
 We found limited evidence to support general feedbacks between population and trait dynamics. Improvements to predictions of these dynamics by including both trait values and population densities was system- and environment-specific. In cases when the augmented model outperformed the single-state model, the prediction increase was substantial.
 
-## Materials and Methods
+## Materials and Methods{#sec-DAE_methods}
 
 ### Experiments
 
@@ -106,7 +106,7 @@ where $N_t$ (density, continuous) and $T_t$ (trait value, continuous) are predic
 
 With these models at hand, we then tested whether the the augmented model improved predictions of population/trait dynamics by comparing the prediction accuracy of the augmented models relative to the basic models. We compared the AIC of these models to determine which model best predicted the data, transforming these AIC values into Akaike scores representing the probability that the augmented models (@eq-pcgrExtd, @eq-dTExtd) were better than the basic models (@eq-pcgr, @eq-dT) [@Wagenmakers2004; @Burnham2004]. Finally, in conjunction with the likelihood that the augmented model was best, we compared the relative change in predictive accuracy, relative to the single-variable model, using the coefficient of determination (R-squared).
 
-## Results
+## Results{#sec-DAE_results}
 
 ### Growth and trait change
 
@@ -138,7 +138,7 @@ In the cyanobacteria system, improvement in predictive accuracy by using the aug
 
 We do not observe a consistent, cross-system result as to whether population growth or trait changes are better-predicted by the augmented model. The relationships are clearly environmentally-dependent and system-specific, and variation in augmented model performance is strongly dependent on environmental conditions. That said, for a large number of the cyanobacteria microcosms, particularly in those without atrazine added, the augmented model substantially outperforms the single-variable model (@fig-cyano_AIC_deltaerror).
 
-## Discussion
+## Discussion{#sec-DAE_discussion}
 
 We have analysed population and trait dynamics in two microbial systems, across various environmental conditions. Our results do not support a general reciprocal relationship between both types of dynamics, but do indicate that trait dynamics are better predicted when considering population density for the cyanobacteria system, in particular. Furthermore, trait effects on growth are dependent on the environment: a given trait value has differently effects on growth, depending on the (a)biotic conditions (@fig-cilia_td_general,@fig-cyano_td_general) [@Gibert2022; @Wieczynski2021].
 
