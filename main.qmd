@@ -50,12 +50,12 @@ We examined the effects in a range of environmental conditions, represented here
 
 We grew the strains in monoculture for sufficient time for them to reach their carrying capacity, enabling us to quantify their intrinsic growth rate and density-dependence. Population densities and trait values were measured at regular, frequent intervals (@tbl-treatment_table, supplementary materials).
 
-| Model system  |  Exp. length (days)  |  No. of strains  |  Temperature ($\mathrm{^\circ C}$)   | Atrazine, $\mathrm{mg\,L}^{-1}$ |
+| Model system  |  Exp. length (days)  |  No. of strains  |  Temperature ($\mathrm{^\circ C}$)   | Atrazine ($\mathrm{mg\,L}^{-1}$) |
 | --------------- | -------------------- | ---------------- | ----------------------------------- | --------------------------------------------- |
 | Ciliates        | $37$                |  $7$             |  $\mathbf{22}, 24$                      |  $\mathbf{0}, 20$ |
 | Cyanobacteria   | $10$                |  $4$             |  $\mathbf{22}, 24$                      |  $\mathbf{0}, 0.1$ |
 
-: Experimental design of the two model systems, showing how long the experiment lasted, how frequently they were sampled, the number of strains used, the temperature of the warming treatments in degrees Celsius, and the concentration of the pollutant (atrazine). All combinations of pollution and temperature were included in the experiment design. Treatments in bold indicate the reference conditions. {#tbl-treatment_table}
+: Experimental design of the two model systems, showing how long the experiment lasted, how frequently they were sampled, the number of strains used, the temperature of the warming treatments in degrees Celsius, and the concentration of the pollutant (atrazine). All combinations of pollution and temperature were included in the experiment design. Treatments in bold indicate the reference conditions. {#tbl-treatment_table tbl-colwidths="[0.2,0.2,0.2,0.2,0.2]"}
 
 #### Experimental setup
 
