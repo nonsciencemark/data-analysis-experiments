@@ -36,7 +36,7 @@ The cyanobacteria microcosms were sampled every day at the same time for each mi
 
 ![Trait-dependence of ciliate trait change in the different treatments.](figures/cilia/cilia_dT.pdf){#fig-cilia_dT}
 
-#### Cyanobacteria
+### Cyanobacteria
 
 ![As @fig-cilia_dT but the cyanobacteria system.](figures/cyano/cyano_dT.pdf){#fig-cyano_dT}
 
