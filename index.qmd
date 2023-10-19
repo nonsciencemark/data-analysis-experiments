@@ -1,0 +1,22 @@
+---
+format:
+  pdf:
+    toc: false
+    keep-tex: false
+    colorlinks: true
+    include-in-header: preamble.tex
+bibliography: bibliography.bib
+---
+
+{{< include main.qmd >}}
+
+## References
+
+::: {#refs}
+:::
+
+{{< pagebreak >}}
+
+# Supplementary
+
+{{< include supplementary.qmd >}}
