@@ -10,7 +10,7 @@ format:
     include-in-header: preamble.tex
 ---
 
-## Sampling regime {#sec:sampling_times}
+## Sampling regime {#sec-sampling_times}
 
 ### Ciliate
 
