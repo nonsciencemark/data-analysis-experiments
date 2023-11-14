@@ -44,7 +44,12 @@ We found limited evidence to support general feedbacks between population and tr
 
 #### Study systems
 
+- **justify the ciliate genera selection and how these choices could affect the results.**
+- **phylogeny of syn vs cilia**
+
 We addressed these research questions using a number of unicellular, clonally-reproducing strains from two model systems: seven strains from four ciliate genera and four strains from two ecotypes of the picocyanobacteria genus *Synechococcus* [@Farrant2016; @Grebert2018; @Sohm2016]. The ciliate genera represent globally-distributed mixotrophs [@Weisse2022; @Lu2021] and *Synechococcus* makes up a substantial proportion of marine phytoplankton biomass and photosynthesis [@Dvorak2014].
+
+- **also why the stressors that we chose?**
 
 We examined the effects in a range of environmental conditions, represented here by temperature and a pollutant --- both commonly-encountered environmental pressures in natural systems. Specifically, we consider an "altered" environment to have increased temperature, increased concentrations of the herbicide atrazine, or both. Temperature change is a ubiquitously-relevant driver to consider as anthropogenically-driven climate change continues to intensify. Atrazine, present in many ecosystems, represents a broad class of herbicides that act via the inhibition of photosynthesis but which also has negative consequences on the fitness of heterotrophic organisms [@Shim2022]. Control conditions are hereafter indicated by "C", temperature changes by "T", atrazine changes by "A", and the combined atrazine and temperature changes by "AT".
 
@@ -110,9 +115,18 @@ With these models at hand, we then tested whether the the augmented model improv
 
 ### Growth and trait change
 
+- **nicer figures and captions and discussion is a bit brief**
+
 ![Fitted model parameters showing intrinsic population/trait change (left), density-dependence (centre), and trait dependence (right) in seven strains of ciliates. Large rows indicate whether growth or trait change is being examined and subrows indicate whether the coefficients are from the single-variable or augmented model. Points indicate the mean, error bars indicate the standard error, and asterisks indicate parameters are significantly different from zero (vertical black line).](figures/cilia/cilia_td_general.pdf){#fig-cilia_td_general width="4in"}
 
 ![As @fig-cilia_td_general, but for four strains of the cyanobacteria genus *Synechococcus*.](figures/cyano/cyano_td_general.pdf){#fig-cyano_td_general width="4in"}
+
+- **maybe 5.1 and 5.2 are too big and complicated for the benefit that they give**
+- **needs more detail - how do the traits change over time and how do these affect growth?**
+- **are density and traits correlated? etc.**
+- **Population size for Synechoccocus is very high so more capacity for evolution.**
+- **how do the cells, at a metabolic level, deal with atrazine (rather than how are they affected by atrazine)?**
+- **think a bit more deeply about the traits measured and how do they adapt to the conditions.**
 
 Populations of both systems exhibited mostly nonzero intrinsic growth and negative density-dependence (@fig-cilia_td_general, @fig-cyano_td_general). Intrinsic growth rates of *Tetrahymena* strains were consistently higher than that of the other strains and *Spirostomum* strains exhibited stronger negative density-dependence (i.e. stronger self-limitation). Environmental conditions had moderate and variable effects on how ciliate populations grew. In the cyanobacteria system, intrinsic growth and density-dependence were comparable across strains (@fig-cyano_pcgr). However, environmental conditions had greater effects on these parameters; the addition of atrazine substantially reduced intrinsic growth rates (to the point of being negative in cases).
 
@@ -149,6 +163,8 @@ By contrast, in the cyanobacteria system, the augmented model outperformed the p
 There are several possible explanations for the patterns observed. Firstly, while we assess the linear relationships between traits and growth rates, it is possible that nonlinear models could more accurately predict the system dynamics. Nonlinear effects of traits on growth are commonplace in natural systems [e.g. the effects of body on growth are generally non-linear, @Fernandez-Gonzalez2021] and such specifics are lost in the simple model formulation here although, for the most part, the linear models used seem appropriate (@fig-cilia_pcgr, @fig-cilia_dT, @fig-cyano_pcgr, @fig-cyano_dT).
 
 In a similar manner, the better performance of the augmented model in the cyanobacteria system than in the ciliate system may be due to differences in the kind of the traits we measured. The cyanobacteria traits are more directly linked to growth than the ciliate traits. For example, the concentration of photosynthetic pigments within a cell controls absorption of incoming light and therefore growth. Similarly, the effectiveness of light harvesting is likely density-dependent, which makes the pigmentation content subject to plastic change in the time frame of our experiment [@Stomp2004]. Indeed, high cell densities cause shading, which can alter pigmentation. Pigmentation, therefore may both influence and depend on population growth [@Maranon2015; @Stomp2007a]. In contrast, the ciliate traits are as such less-easily linked to growth and thus may require more system-specific analyses. For example, one could summarise the movement and cell size traits into a clearance rate, which may be more strongly-linked to the growth rate of the heterotrophic ciliates [@Kiorboe1995; @Jacob2019].
+
+- **why ciliates are "less mechanistic"? explain more in-text**
 
 While we have analysed growth curves and trait dynamics to infer coupling between density and traits, akin to time series analysis, a more direct approach would have consisted of a space-for-time approach. In said approach, one experimentally crosses density and trait values, and then monitors short-term growth and trait change [e.g. @Wieczynski2021]. While manipulating density is feasible, manipulating traits is far less so. One approach could be to grow cultures at different densities, which we know will lead to different traits (@fig-cilia_td_general, @fig-cyano_td_general), and then create density gradients by dilution. However, such space-for-time approaches do not guarantee a reliable gradient of functional traits and are more experimentally demanding.
 
