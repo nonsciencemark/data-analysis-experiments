@@ -1,3 +1,40 @@
+---
+title: "Environment- and system-specific interactions between traits and population growth"
+abstract-title: "Abstract"
+abstract: >
+  **Abstract:** Understanding the factors that influence population dynamics across environmental contexts is essential to predict ecological stability. Functional traits influence population growth, which can in turn influence traits and thus create a feedback between population and trait dynamics. We analysed the reciprocal connections between population and trait dynamics in two microbial systems (one autotrophic and one heterotrophic system) and across a range of environmental conditions. When augmenting models of population (trait) dynamics with trait (population density) data, we found no consistent improvement of predictive capacity: this improvement was environment- and system-dependent. Notably, in the cyanobacteria system, models augmented with population density did predict trait dynamics better. In addition, when augmented models were superior, the improvement was substantial. Further investigation of the environmental dependence of trait-growth relationships is recommended.
+author:
+  - Mark Holmes
+  - Tessa de Bruin 
+  - Nicolas Schtickzelle 
+  - Frederik De Laender
+
+bibliography: 
+  - bibliography.bib
+  - extra-refs.bib
+reference-links: true
+link-citations: true
+reference-location: document
+reference-section-title: "Bibliography"
+# csl: the-american-naturalist.csl
+
+crossref:
+  appendix-title: "Appendix"
+  appendix-delim: ":"
+
+format:
+  pdf:
+    documentclass: scrartcl
+    include-in-header: preamble.tex
+    # fontfamily: libertinus
+    # fontfamilyoptions: sans
+    toc: false
+    keep-tex: true
+    colorlinks: true
+    number-sections: false
+    # output-file: manuscript.pdf
+---
+
 ## Introduction {#sec-DAE_introduction}
 
 Forecasting ecological change requires an understanding of population dynamics, the trajectory of population density through time. A prime predictor of a population's growth rate is its current density. Density-dependence of population growth is generally negative, stimulating growth at low density, and limiting it when density gets high, which effectively puts a cap on population size. Since the classic experiments by @Gause1934 and @Gill1972, evidence of negative density-dependence is abundant across biological systems [@Sibly2005]. However, means of functional traits across individuals in a population have also been proposed as essential predictors of population growth [@Ozgul2012; @Edwards2013; @Perez-Ramos2019; @Litchman2008; @Violle2007].
