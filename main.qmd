@@ -1,23 +1,3 @@
----
-abstract-title: "Abstract"
-abstract: >
-  **Abstract:** Understanding the factors that influence population dynamics across environmental contexts is essential to predict ecological stability. Functional traits influence population growth, which can in turn influence traits and thus create a feedback between population and trait dynamics. We analysed the reciprocal connections between population and trait dynamics in two microbial systems (one autotrophic and one heterotrophic system) and across a range of environmental conditions. When augmenting models of population (trait) dynamics with trait (population density) data, we found no consistent improvement of predictive capacity: this improvement was environment- and system-dependent. Notably, in the cyanobacteria system, models augmented with population density did predict trait dynamics better. In addition, when augmented models were superior, the improvement was substantial. Further investigation of the environmental dependence of trait-growth relationships is recommended.
-author:
-- Mark Holmes
-- Tessa de Bruin 
-- Nicolas Schtickzelle 
-- Frederik De Laender
-bibliography: bibliography.bib
-link-citations: true
-format:
-  pdf:
-    toc: false
-    keep-tex: false
-    colorlinks: true
-    include-in-header: preamble.tex
-title: "Environment- and system-specific interactions between traits and population growth"
----
-
 ## Introduction {#sec-DAE_introduction}
 
 Forecasting ecological change requires an understanding of population dynamics, the trajectory of population density through time. A prime predictor of a population's growth rate is its current density. Density-dependence of population growth is generally negative, stimulating growth at low density, and limiting it when density gets high, which effectively puts a cap on population size. Since the classic experiments by @Gause1934 and @Gill1972, evidence of negative density-dependence is abundant across biological systems [@Sibly2005]. However, means of functional traits across individuals in a population have also been proposed as essential predictors of population growth [@Ozgul2012; @Edwards2013; @Perez-Ramos2019; @Litchman2008; @Violle2007].
@@ -66,7 +46,7 @@ We grew the strains in monoculture for sufficient time for them to reach their c
 
 For the ciliate system, the microcosms consisted of 250 mL square bottles with vented caps (DURAN®) containing 100 mL nutrient medium, inoculated with enough cells to initiate population growth. We obtained the required cell density by a injecting a species-specific volume of 1-week old preculture into new medium (100 \textmu L, 5 mL, 10 mL, and 10 mL for *Tetrahymena thermophila*, *Loxocephalus* sp., *Paramecium caudatum* and *Spirostomum teres*, respectively). The microcosms were kept in an incubator with a 10:14h light/dark cycle. The nutrient medium consisted of Chalkey's solution supplemented with crushed protist pellets (Carolina biological supply; 0.55 $\mathrm{gL}^{-1}$), filtered through a 0.22 \textmu m filter system (BT50 500 mL) to remove all particulate matter and consecutively bacterized with *Bacillus brevis*, *Brevibacillus subtilis* and *Serratia fonticola*. Following bacterization, the medium was incubated for two days at 20°C on a shaker to allow the bacteria to grow before ciliates were added. During the experiment, we replaced 20% of the medium every third day by replacing 4 mL culture with 4 mL 5x concentrated unbacterized nutrient medium, supplemented with atrazine as needed.
 
-For the cyanobacteria system, the microcosms consisted of 6 mL six-well plates (Sarstedt standard flat 6 well plate, 83.3920) of PCRS-11 Red Sea medium [@Rippka2000], inoculated at 5̃000 cells $\mathrm{mL}^{-1}$ inside temperature-controlled incubators (Lovibond Thermostatic Cabinet). They were cultured in white light (6500K LedAquaristik Sky Bar) in a 12:12h light/dark cycle. The six-well plates were constantly mixed 150 RPM with a VWR mini shaker.
+For the cyanobacteria system, the microcosms consisted of 6 mL six-well plates (Sarstedt standard flat 6 well plate, 83.3920) of PCRS-11 Red Sea medium [@Rippka2000], inoculated at 5000 cells $\mathrm{mL}^{-1}$ inside temperature-controlled incubators (Lovibond Thermostatic Cabinet). They were cultured in white light (6500K LedAquaristik Sky Bar) in a 12:12h light/dark cycle. The six-well plates were constantly mixed 150 RPM with a VWR mini shaker.
 
 Growth media were adjusted to include the appropriate amount of atrazine and microcosms were kept at a constant temperature throughout. All sampling was undertaken in sterile environments to prevent contamination.
 

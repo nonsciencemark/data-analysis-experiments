@@ -1,15 +1,3 @@
----
-bibliography: bibliography.bib
-title: "Environment- and system-specific interactions between traits and population growth"
-link-citations: true
-format:
-  pdf:
-    toc: false
-    keep-tex: false
-    colorlinks: true
-    include-in-header: preamble.tex
----
-
 ## Sampling regime {#sec-sampling_times}
 
 ### Ciliate
