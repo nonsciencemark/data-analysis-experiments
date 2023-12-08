@@ -40,7 +40,7 @@ for (model_system in c("cilia", "cyano")) {
                 } else {
 
         trait_levels <- c("mean_area", "mean_speed", "mean_ar", "mean_linearity", "trait")
-        trait_labels <- c("Cell~area", "Speed", "Aspect~ratio", "Linearity", "Trait")
+        trait_labels <- c("Size", "Speed", "Aspect~ratio", "Linearity", "Trait")
         long_data <- data %>%
             mutate(density = log10(density)) %>%
             pivot_longer(all_of(c("density", trait_levels))) %>%
@@ -64,9 +64,7 @@ for (model_system in c("cilia", "cyano")) {
         theme(
             legend.position = "bottom",
             strip.placement.y = "outside",
-            strip.background.y = element_rect(fill = NA, color = NA),
-            strip.text.x = element_text(color = "white"),
-            strip.background.x = element_rect(fill = "black"))
+            strip.background.y = element_rect(fill = NA, color = NA))
 
     if (model_system == "cyano") {
         p

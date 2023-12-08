@@ -224,18 +224,18 @@ Schtickzelle \and Frederik De Laender}
 \textbf{Abstract:} Understanding the factors that influence population
 dynamics across environmental contexts is essential to predict
 ecological stability. Functional traits influence population growth,
-which can in turn influence traits and thus create a feedback between
-population and trait dynamics. We analysed the reciprocal connections
-between population and trait dynamics in two microbial systems (one
-autotrophic and one heterotrophic system) and across a range of
-environmental conditions. When augmenting models of population (trait)
-dynamics with trait (population density) data, we found no consistent
-improvement of predictive capacity: this improvement was environment-
-and system-dependent. Notably, in the cyanobacteria system, models
-augmented with population density did predict trait dynamics better. In
-addition, when augmented models were superior, the improvement was
-substantial. Further investigation of the environmental dependence of
-trait-growth relationships is recommended.
+which can in turn influence the traits and thus create a feedback
+between population and trait dynamics. We analysed the reciprocal
+relationship between population and trait dynamics in two microbial
+systems (one autotrophic and one heterotrophic system) and across a
+range of environmental conditions. When augmenting models of population
+(trait) dynamics with trait (population density) data, we found no
+consistent improvement of predictive capacity: this improvement was
+environment- and system-dependent. Notably, in the cyanobacteria system,
+models augmented with population density did predict trait dynamics
+better. In addition, when augmented models were superior, the
+improvement was substantial. Further investigation of the environmental
+dependence of trait-growth relationships is recommended.
 \end{abstract}
 \subsection{Introduction}\label{sec-DAE_introduction}
 
@@ -355,10 +355,11 @@ picocyanobacteria genus \emph{Synechococcus}
 (\citeproc{ref-Farrant2016}{Farrant et al. 2016};
 \citeproc{ref-Grebert2018}{Grébert et al. 2018};
 \citeproc{ref-Sohm2016}{Sohm et al. 2016}). The ciliate genera are
-globally-distributed freshwater mixotrophs
+globally-distributed freshwater mixotrophs and represent an important
+ecological link between primary producers and higher trophic levels
 (\citeproc{ref-Weisse2022}{Weisse and Montagnes 2022};
-\citeproc{ref-Lu2021}{Lu, Gao, and Weisse 2021}) and
-\emph{Synechococcus} makes up a substantial proportion of marine
+\citeproc{ref-Lu2021}{Lu, Gao, and Weisse 2021}). The
+\emph{Synechococcus} genus makes up a substantial proportion of marine
 phytoplankton biomass and photosynthesis
 (\citeproc{ref-Dvorak2014}{Dvořák et al. 2014}). Both study systems
 harbor considerable diversity, as the freshwater ciliates span several
@@ -367,7 +368,9 @@ order-level diversity, while, however, being less well-defined
 phylogenetically due to the frequency of horizontal gene transfer events
 (\citeproc{ref-Salazar2020}{\textbf{Salazar2020?}};
 \citeproc{ref-Dvorak2015}{Dvořák et al. 2015};
-\citeproc{ref-Zhaxybayeva2006}{Zhaxybayeva et al. 2006}).
+\citeproc{ref-Zhaxybayeva2006}{Zhaxybayeva et al. 2006}). Both taxa are
+commonly-used as model organisms in experiments due to their rapid
+growth and relative simplicity.
 
 The ciliate strains selected exhibit substantial diversity in their
 functional traits and demography - \emph{Spirostomum} is a large,
@@ -611,8 +614,8 @@ densities an order of magnitude greater than the others.
 
 \caption{\label{fig-cilia_pop_traits_time}Log-transformed populations
 and trait changes over time for the ciliate system. The traits show the
-mean values in the sampled population at each time point. Cell area
-indicates the top-down area in \textmu\(\mathrm{m}^{-2}\). Speed
+mean values in the sampled population at each time point. Size indicates
+the top-down area of the cell in \textmu\(\mathrm{m}^{-2}\). Speed
 indicates the average movement speed in \textmu\(\mathrm{m \, s}^{-1}\).
 Aspect ratio is the ratio of the longest cell dimension relative to the
 shortest. Linearity indicates the cell movement linearity i.e.~a value
@@ -943,16 +946,16 @@ approximate cell division rates of once per hour and once per day for
 the ciliate and cyanobacteria systems, repectively,
 (\citeproc{ref-DeLong2009}{\textbf{DeLong2009?}};
 \citeproc{ref-Binder1995}{\textbf{Binder1995?}}) and accounting for
-experiment length (\(\leq 30\) days and \(10\) days), average population
-size (\(8.92 \times 10^{2}\) and \(2.38 \times 10^{4}\) cells), and
+experiment length (\(\leq 37\) days and \(10\) days), average population
+density (\(1.04 \times 10^{3}\) and \(2.23 \times 10^{7}\) cells), and
 microcosm volumes (100 mL and 6 mL) gives the number of cell divisions
-between \(9.6 \times 10^6\) and \(9.6 \times 10^8\) for the ciliate
-system and \(6 \times 10^7\) and \(2.1 \times 10^{10}\) for the
-cyanobacteria system. Therefore, we may expect that the cyanobacteria
-system possessed greater potential for evolution during the course of
-the experiment, as it is likely that more cell division events took
-place. This increased likelihood of mutation events have resulted in
-more prominent eco-evolutionary dynamics in the cyanobacteria system.
+as \(9.20 \times 10^{7}\) for the ciliate system and
+\(1.34 \times 10^{9}\) for the cyanobacteria system. Therefore, we may
+expect that the cyanobacteria system possessed somewhat greater
+potential for evolution during the course of the experiment, as it is
+likely that more cell division events took place. This increased
+likelihood of mutation events have resulted in more prominent
+eco-evolutionary dynamics in the cyanobacteria system.
 
 Alternative model-fitting approaches such as autoregressive models may
 also be used to determine the co-dependence of populations and traits.
