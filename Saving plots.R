@@ -5,6 +5,7 @@ library("qpcR") # for AIC comparison
 library("lmtest") # for Granger causality
 library("ggh4x") # plotting stuff
 library("qpdf") # merging pdf at the end
+# library("grid")
 
 # from here https://ggplot2.tidyverse.org/reference/labeller.html
 capitalise <- function(string) {
@@ -24,6 +25,74 @@ for (model_system in c("cilia", "cyano")) {
     data <- get(paste("data_", model_system, sep = ""))
 
     print(paste("Loaded", model_system, "data"))
+
+    if (model_system == "cyano") {
+
+        trait_levels <- c("Size", "Chlorophyll", "Phycocyanin", "Phycoerythrin", "trait")
+        trait_labels <- c("Size", "Chlorophyll", "Phycocyanin", "Phycoerythrin", "Trait")
+        long_data <- data %>%
+            mutate(density = log10(density)) %>%
+            pivot_longer(all_of(c("density", trait_levels))) %>%
+            mutate(name = factor(name,
+                levels = c("density", trait_levels),
+                labels = c("log[10]~density", trait_labels))) 
+
+                } else {
+
+        trait_levels <- c("mean_area", "mean_speed", "mean_ar", "mean_linearity", "trait")
+        trait_labels <- c("Cell~area", "Speed", "Aspect~ratio", "Linearity", "Trait")
+        long_data <- data %>%
+            mutate(density = log10(density)) %>%
+            pivot_longer(all_of(c("density", trait_levels))) %>%
+            mutate(name = factor(name,
+                levels = c("density", trait_levels),
+                labels = c("log[10]~density", trait_labels)),
+                day = Time_Days)
+    }
+
+    # plot pcgr vs. pop. ----
+    p <- ggplot(long_data) +
+        theme_bw() +
+        scale_colour_manual(values = cbPalette) +
+        aes(x = day, y = value, col = treat) +
+        geom_point(size = 1) +
+        facet_grid2(name ~ strain, independent = "y",
+            scales = "free", switch = "y", labeller = label_parsed) +
+        labs(x = "Time (days)",
+            y = NULL,
+            col = "Treatment") +
+        theme(
+            legend.position = "bottom",
+            strip.placement.y = "outside",
+            strip.background.y = element_rect(fill = NA, color = NA),
+            strip.text.x = element_text(color = "white"),
+            strip.background.x = element_rect(fill = "black"))
+
+    if (model_system == "cyano") {
+        p
+        ggsave(paste0(outpath, "pop-traits-time.png"),
+                     width = 5, height = 6.5, device = "png", dpi = 450)
+    } else {
+        # pdf(paste0(outpath, "pop-traits-time.pdf"), width = 8, height = 5.5)
+        # print(p, vp=viewport(angle=-90, clip = "off"))
+        # dev.off()
+        p
+        ggsave(paste0(outpath, "pop-traits-time.png"),
+                     width = 8, height = 6.5, device = "png", dpi = 450)
+    }
+
+    print(paste("Saved", model_system, "basic plots"))
+
+    # ggplot(data) +
+    #     theme_bw() +
+    #     scale_colour_manual(values = cbPalette) +
+    #     aes(x = density, y = trait, col = treat) +
+    #     geom_point() +
+    #     scale_x_log10() +
+    #     facet_wrap(vars(strain), ncol = 2, scales = "free") +
+    #     labs(x = "Density",
+    #         y = "Aggregate trait",
+    #         col = "Treatment")
 
     # plot pcgr vs. pop. ----
     ggplot(data) +
