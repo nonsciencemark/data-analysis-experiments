@@ -122,7 +122,7 @@ $$ {#eq-dTExtd}
 
 where $N_t$ (density, continuous) and $T_t$ (trait value, continuous) are predictors, and the $\beta_i$ are regression coefficients. Again, @eq-dTExtd is the augmented version of @eq-dT.
 
-With these models at hand, we then tested whether the the augmented model improved predictions of population/trait dynamics by comparing the prediction accuracy of the augmented models relative to the basic models. We compared the AIC of these models to determine which model best predicted the data, transforming these AIC values into Akaike scores representing the probability that the augmented models (@eq-pcgrExtd, @eq-dTExtd) were better than the basic models (@eq-pcgr, @eq-dT) [@Wagenmakers2004; @Burnham2004]. Finally, in conjunction with the likelihood that the augmented model was best, we compared the relative change in predictive accuracy, relative to the single-variable model, using the coefficient of determination (R-squared).
+With these models at hand, we then tested whether the augmented model improved predictions of population/trait dynamics by comparing the prediction accuracy of the augmented models relative to the basic models. We compared the AIC of these models to determine which model best predicted the data, transforming these AIC values into Akaike scores representing the probability that the augmented models (@eq-pcgrExtd, @eq-dTExtd) were better than the basic models (@eq-pcgr, @eq-dT) [@Wagenmakers2004; @Burnham2004]. Finally, in conjunction with the likelihood that the augmented model was best, we compared the relative change in predictive accuracy, relative to the single-variable model, using the coefficient of determination (R-squared).
 
 ## Results{#sec-DAE_results}
 
