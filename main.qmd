@@ -17,11 +17,9 @@ link-citations: true
 reference-location: document
 reference-section-title: "Bibliography"
 # csl: the-american-naturalist.csl
-
 crossref:
   appendix-title: "Appendix"
   appendix-delim: ":"
-
 format:
   pdf:
     documentclass: scrartcl
@@ -78,7 +76,7 @@ We grew the strains in monoculture for sufficient time for them to reach their c
 
 #### Experimental setup
 
-For the ciliate system, the microcosms consisted of 250 mL square bottles with vented caps (DURAN®) containing 100 mL nutrient medium, inoculated with enough cells to initiate population growth. We obtained the required cell density by a injecting a species-specific volume of 1-week old preculture into new medium (100 \textmu L, 5 mL, 10 mL, and 10 mL for *Tetrahymena thermophila*, *Loxocephalus* sp., *Paramecium caudatum* and *Spirostomum teres*, respectively). The microcosms were kept in an incubator with a 10:14h light/dark cycle. The nutrient medium consisted of Chalkey's solution supplemented with crushed protist pellets (Carolina biological supply; 0.55 $\mathrm{gL}^{-1}$), filtered through a 0.22 \textmu m filter system (BT50 500 mL) to remove all particulate matter and consecutively bacterized with *Bacillus brevis*, *Brevibacillus subtilis* and *Serratia fonticola*. Following bacterization, the medium was incubated for two days at 20°C on a shaker to allow the bacteria to grow before ciliates were added. During the experiment, we replaced 20% of the medium every third day by replacing 4 mL culture with 4 mL 5x concentrated unbacterized nutrient medium, supplemented with atrazine as needed.
+For the ciliate system, the microcosms consisted of 250 mL square bottles with vented caps (DURAN®) containing 100 mL nutrient medium, inoculated with enough cells to initiate population growth. We obtained the required cell density by injecting a species-specific volume of 1-week old preculture into new medium (100 \textmu L, 5 mL, 10 mL, and 10 mL for *Tetrahymena thermophila*, *Loxocephalus* sp., *Paramecium caudatum* and *Spirostomum teres*, respectively). The microcosms were kept in an incubator with a 10:14h light/dark cycle. The nutrient medium consisted of Chalkey's solution supplemented with crushed protist pellets (Carolina biological supply; 0.55 $\mathrm{gL}^{-1}$), filtered through a 0.22 \textmu m filter system (BT50 500 mL) to remove all particulate matter and consecutively bacterized with *Bacillus brevis*, *Brevibacillus subtilis* and *Serratia fonticola*. Following bacterization, the medium was incubated for two days at 20°C on a shaker to allow the bacteria to grow before ciliates were added. During the experiment, we replaced 20% of the medium every third day by replacing 4 mL culture with 4 mL 5x concentrated unbacterized nutrient medium, supplemented with atrazine as needed.
 
 For the cyanobacteria system, the microcosms consisted of 6 mL six-well plates (Sarstedt standard flat 6 well plate, 83.3920) of PCRS-11 Red Sea medium [@Rippka2000], inoculated at 5000 cells $\mathrm{mL}^{-1}$ inside temperature-controlled incubators (Lovibond Thermostatic Cabinet). They were cultured in white light (6500K LedAquaristik Sky Bar) in a 12:12h light/dark cycle. The six-well plates were constantly mixed 150 RPM with a VWR mini shaker.
 
@@ -122,7 +120,7 @@ $$ {#eq-dTExtd}
 
 where $N_t$ (density, continuous) and $T_t$ (trait value, continuous) are predictors, and the $\beta_i$ are regression coefficients. Again, @eq-dTExtd is the augmented version of @eq-dT.
 
-With these models at hand, we then tested whether the augmented model improved predictions of population/trait dynamics by comparing the prediction accuracy of the augmented models relative to the basic models. We compared the AIC of these models to determine which model best predicted the data, transforming these AIC values into Akaike scores representing the probability that the augmented models (@eq-pcgrExtd, @eq-dTExtd) were better than the basic models (@eq-pcgr, @eq-dT) [@Wagenmakers2004; @Burnham2004]. Finally, in conjunction with the likelihood that the augmented model was best, we compared the relative change in predictive accuracy, relative to the single-variable model, using the coefficient of determination (R-squared).
+With these models at hand, we then tested whether the augmented model improved predictions of population/trait dynamics by comparing the prediction accuracy of the augmented models relative to the basic models. We compared the AICc [Akaike information criterion corrected for small sample size @Burnham2004] of these models to determine which model best predicted the data, transforming these AICc values into Akaike scores representing the probability that the augmented models (@eq-pcgrExtd, @eq-dTExtd) were better than the basic models (@eq-pcgr, @eq-dT) [@Wagenmakers2004; @Burnham2004]. Finally, in conjunction with the likelihood that the augmented model was best, we compared the relative change in predictive accuracy, relative to the single-variable model, using the coefficient of determination (R-squared).
 
 ## Results{#sec-DAE_results}
 

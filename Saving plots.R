@@ -185,7 +185,7 @@ for (model_system in c("cilia", "cyano")) {
                 error = abs(model$residuals)
                 )),
             R2 = abs(summary(model)$r.squared),
-            aic = AIC(model),
+            aic = MuMIn::AICc(model),
             response = ifelse(grepl("dT ~ ", form), "trait change", "growth"),
             response = factor(response, levels = c("growth", "trait change")),
             predictor = ifelse(grepl("\\+", form), "augmented", "single"),
