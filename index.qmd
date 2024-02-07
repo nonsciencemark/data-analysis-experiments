@@ -10,8 +10,9 @@ author:
   - Frederik De Laender
 
 bibliography: 
-  - bibliography.bib
-  - extra-refs.bib
+  # - bibliography.bib
+  - bibliography_new.bib
+  # - extra-refs.bib
 reference-links: true
 link-citations: true
 reference-location: document

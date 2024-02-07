@@ -1,5 +1,16 @@
 ---
 title: "Environment- and system-specific interactions between traits and population growth"
+format:
+  pdf:
+    documentclass: scrartcl
+    include-in-header: preamble.tex
+    # fontfamily: libertinus
+    # fontfamilyoptions: sans
+    toc: false
+    keep-tex: true
+    colorlinks: true
+    number-sections: false
+    # output-file: manuscript.pdf
 ---
 
 ## Sampling regime {#sec-sampling_times}
@@ -16,50 +27,50 @@ The cyanobacteria microcosms were sampled every day at the same time for each mi
 
 ### Ciliate
 
-![Density-dependence of ciliate per-capita growth rate in the different treatments.](figures/cilia/cilia_pcgr.pdf){#fig-cilia_pcgr width="4in"}
+![Density-dependence of ciliate per-capita growth rate in the different treatments.](figures/cilia/cilia_pcgr.pdf){#fig-cilia-pcgr width="4in"}
 
 ### Cyanobacteria
 
-![As @fig-cilia_pcgr but for the cyanobacteria system](figures/cyano/cyano_pcgr.pdf){#fig-cyano_pcgr width="4in"}
+![As @fig-cilia-pcgr but for the cyanobacteria system](figures/cyano/cyano_pcgr.pdf){#fig-cyano-pcgr width="4in"}
 
 ## Trait values and trait change
 
 ### Ciliate
 
-![Trait-dependence of ciliate trait change in the different treatments.](figures/cilia/cilia_dT.pdf){#fig-cilia_dT width="4in"}
+![Trait-dependence of ciliate trait change in the different treatments.](figures/cilia/cilia_dT.pdf){#fig-cilia-dT width="4in"}
 
 ### Cyanobacteria
 
-![As @fig-cilia_dT but the cyanobacteria system.](figures/cyano/cyano_dT.pdf){#fig-cyano_dT width="4in"}
+![As @fig-cilia-dT but the cyanobacteria system.](figures/cyano/cyano_dT.pdf){#fig-cyano-dT width="4in"}
 
 ## Fitted regression coefficients
 
 ### Ciliate
 
-![Fitted model parameters showing intrinsic population/trait change (left), density-dependence (centre), and trait dependence (right) in seven strains of ciliates. Large rows indicate whether growth or trait change is being examined and subrows indicate whether the coefficients are from the single-variable or augmented model. Points indicate the mean, error bars indicate the standard error, and asterisks indicate parameters are significantly different from zero (vertical black line).](figures/cilia/cilia_td_general.pdf){#fig-cilia_td_general width="4in"}
+![Fitted model parameters showing intrinsic population/trait change (left), density-dependence (centre), and trait dependence (right) in seven strains of ciliates. Large rows indicate whether growth or trait change is being examined and subrows indicate whether the coefficients are from the single-variable or augmented model. Points indicate the mean, error bars indicate the standard error, and asterisks indicate parameters are significantly different from zero (vertical black line).](figures/cilia/cilia_td_general.pdf){#fig-cilia-td-general width="4in"}
 
 ### Cyanobacteria
 
-![As @fig-cilia_td_general, but for four strains of the cyanobacteria genus *Synechococcus*.](figures/cyano/cyano_td_general.pdf){#fig-cyano_td_general width="4in"}
+![As @fig-cilia-td-general, but for four strains of the cyanobacteria genus *Synechococcus*.](figures/cyano/cyano_td_general.pdf){#fig-cyano-td-general width="4in"}
 
 ## Observed vs predicted trait and population change
 
 ### Ciliate
 
-![Observed (x-axis) and predicted (y-axis) population growth (left column) and trait change (left column), including either one (top row) or both predictors (bottom row), for various strains (point types) of ciliates and across environmental conditions (colours).](figures/cilia/cilia_growth_dtrait.pdf){#fig-cilia_growth_dtrait}
+![Observed (x-axis) and predicted (y-axis) population growth (left column) and trait change (left column), including either one (top row) or both predictors (bottom row), for various strains (point types) of ciliates and across environmental conditions (colours).](figures/cilia/cilia_growth_dtrait.pdf){#fig-cilia-growth-dtrait}
 
 ### Cyanobacteria
 
-![As @fig-cilia_growth_dtrait but for the cyanobacteria system.](figures/cyano/cyano_growth_dtrait.pdf){#fig-cyano_growth_dtrait}
+![As @fig-cilia-growth-dtrait but for the cyanobacteria system.](figures/cyano/cyano_growth_dtrait.pdf){#fig-cyano-growth-dtrait}
 
 ## Model goodness-of-fit
 
 ### Ciliate
 
-![The coefficient of determination i.e., r-squared, for the cilia system models. The mean values across strains and treatments are shown by the horizontal dashed lines.](figures/cilia/cilia_R2.pdf){#fig-cilia_R2}
+![The coefficient of determination i.e., r-squared, for the cilia system models. The mean values across strains and treatments are shown by the horizontal dashed lines.](figures/cilia/cilia_R2.pdf){#fig-cilia-R2}
 
 ### Cyanobacteria
 
-![As @fig-cilia_R2 but for the cyanobacteria system.](figures/cyano/cyano_R2.pdf){#fig-cyano_R2}
+![As @fig-cilia-R2 but for the cyanobacteria system.](figures/cyano/cyano_R2.pdf){#fig-cyano-R2}
 
-In the ciliate system, the $R^2$ of the model fit was generally below 0.5 for both growth and trait changes for all treatments and was generally unaffected by whether the single- or both-predictor model was used (@fig-cilia_R2). *Tetrahymena* strains were generally better-fitting but still without substantial model support. In the cyanobacteria system, the treatments without atrazine were substantially better-fitting than those with atrazine added (@fig-cyano_R2). Additionally, while the goodness-of-fit of the growth predictions were only marginally improved by the addition of the full model, the trait change predictions were greatly improved by including the full model.
+In the ciliate system, the $R^2$ of the model fit was generally below 0.5 for both growth and trait changes for all treatments and was generally unaffected by whether the single- or both-predictor model was used (@fig-cilia-R2). *Tetrahymena* strains were generally better-fitting but still without substantial model support. In the cyanobacteria system, the treatments without atrazine were substantially better-fitting than those with atrazine added (@fig-cyano-R2). Additionally, while the goodness-of-fit of the growth predictions were only marginally improved by the addition of the full model, the trait change predictions were greatly improved by including the full model.

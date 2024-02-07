@@ -104,3 +104,5 @@ Manifest.toml
 *.ipynb
 *.woff
 _manuscript/*
+data/cyanobacteria/generating_clean_data/monoculture_data_full.RData
+supplementary.tex
