@@ -4,8 +4,7 @@ source("Tools and data.R")
 library("qpcR") # for AIC comparison
 library("lmtest") # for Granger causality
 library("ggh4x") # plotting stuff
-library("qpdf") # merging pdf at the end
-# library("grid")
+library("ggpubr") # combining cilia and cyano plots
 
 # from here https://ggplot2.tidyverse.org/reference/labeller.html
 capitalise <- function(string) {
@@ -16,39 +15,17 @@ capitalise <- function(string) {
 # model_system <- "cilia"
 # model_system <- "cyano"
 
+# some plots separate
 for (model_system in c("cilia", "cyano")) {
 
     # path to save figures in ----
-    outpath <- paste0("figures/", model_system, "/", model_system, "_")
+    # outpath <- paste0("figures/plot_data/", model_system, "_")
+    outpath <- paste0("figures/", model_system, "_")
 
     # load the raw data ----
     data <- get(paste("data_", model_system, sep = ""))
 
     print(paste("Loaded", model_system, "data"))
-
-    if (model_system == "cyano") {
-
-        trait_levels <- c("Size", "Chlorophyll", "Phycocyanin", "Phycoerythrin", "trait")
-        trait_labels <- c("Size", "Chlorophyll", "Phycocyanin", "Phycoerythrin", "Trait")
-        long_data <- data %>%
-            mutate(density = log10(density)) %>%
-            pivot_longer(all_of(c("density", trait_levels))) %>%
-            mutate(name = factor(name,
-                levels = c("density", trait_levels),
-                labels = c("log[10]~density", trait_labels))) 
-
-                } else {
-
-        trait_levels <- c("mean_area", "mean_speed", "mean_ar", "mean_linearity", "trait")
-        trait_labels <- c("Size", "Speed", "Aspect~ratio", "Linearity", "Trait")
-        long_data <- data %>%
-            mutate(density = log10(density)) %>%
-            pivot_longer(all_of(c("density", trait_levels))) %>%
-            mutate(name = factor(name,
-                levels = c("density", trait_levels),
-                labels = c("log[10]~density", trait_labels)),
-                day = Time_Days)
-    }
 
     # plot pcgr vs. pop. ----
     p <- ggplot(long_data) +
@@ -67,33 +44,20 @@ for (model_system in c("cilia", "cyano")) {
             strip.background.y = element_rect(fill = NA, color = NA))
 
     if (model_system == "cyano") {
-        p
+        # p
         ggsave(paste0(outpath, "pop-traits-time.png"),
                      width = 5, height = 6.5, device = "png", dpi = 450)
+        
     } else {
-        # pdf(paste0(outpath, "pop-traits-time.pdf"), width = 8, height = 5.5)
-        # print(p, vp=viewport(angle=-90, clip = "off"))
-        # dev.off()
-        p
+        # p
         ggsave(paste0(outpath, "pop-traits-time.png"),
                      width = 8, height = 6.5, device = "png", dpi = 450)
     }
 
     print(paste("Saved", model_system, "basic plots"))
 
-    # ggplot(data) +
-    #     theme_bw() +
-    #     scale_colour_manual(values = cbPalette) +
-    #     aes(x = density, y = trait, col = treat) +
-    #     geom_point() +
-    #     scale_x_log10() +
-    #     facet_wrap(vars(strain), ncol = 2, scales = "free") +
-    #     labs(x = "Density",
-    #         y = "Aggregate trait",
-    #         col = "Treatment")
-
     # plot pcgr vs. pop. ----
-    ggplot(data) +
+    p <- ggplot(data) +
         theme_bw() +
         scale_colour_manual(values = cbPalette) +
         aes(x = density, y = pcgr, col = treat) +
@@ -116,7 +80,7 @@ for (model_system in c("cilia", "cyano")) {
     print(paste("Saved", model_system, "PCGR plots"))
 
     # plot dT vs. trait ----
-    ggplot(data) +
+    p <- ggplot(data) +
         theme_bw() +
         scale_colour_manual(values = cbPalette) +
         aes(x = trait, y = dT, col = treat) +
@@ -139,7 +103,7 @@ for (model_system in c("cilia", "cyano")) {
     print(paste("Saved", model_system, "dT plots"))
 
     # Check correlations between traits and abundance ----
-    ggplot(data) +
+    p <- ggplot(data) +
         scale_shape_manual(values = 0:10) +
         theme_bw() +
         scale_colour_manual(values = cbPalette) +
@@ -160,190 +124,189 @@ for (model_system in c("cilia", "cyano")) {
     }
     
     print(paste("Saved", model_system, "corr plots"))
+}
 
-    # stats of the model outputs ----
-    stats_result <- modelling(
-            data = data,
-            var_to_nest_by = c("strain", "treat"),
-            formulas = c(
-                "dT ~ trait",
-                "dT ~ trait + density",
-                "pcgr ~ density",
-                "pcgr ~ trait + density")) %>%
-        rowwise %>%
-        mutate(
-            model_summary = list(tibble(
-                coefficient = names(coef(model)),
-                estimate = unname(coef(model)),
-                "Std. Error" = summary(model)$coefficients[, "Std. Error"],
-                "Pr(>|t|)" = summary(model)$coefficients[, "Pr(>|t|)"]
-                )),
-            # intrinsic_growth = model_summary["(Intercept)", "Pr(>|t|)"],
-            obs_pred = list(tibble(
-                obs = model$model[, 1],
-                pred = model$fitted.values,
-                error = abs(model$residuals)
-                )),
-            R2 = abs(summary(model)$r.squared),
-            aic = MuMIn::AICc(model),
-            response = ifelse(grepl("dT ~ ", form), "trait change", "growth"),
-            response = factor(response, levels = c("growth", "trait change")),
-            predictor = ifelse(grepl("\\+", form), "augmented", "single"),
-            predictor = factor(predictor, levels = c("single", "augmented"))
-            ) %>%
-        left_join(data %>% 
-            dplyr::select(strain, treat, pca_varexp) %>%
-            distinct, relationship = "many-to-many")
+# stats of the model outputs ----
+stats_result <- modelling(
+        data = data_merged,
+        var_to_nest_by = c("strain", "treat"),
+        formulas = c(
+            "dT ~ trait",
+            "dT ~ trait + density",
+            "pcgr ~ density",
+            "pcgr ~ trait + density")) %>%
+    rowwise %>%
+    mutate(
+        model_summary = list(tibble(
+            coefficient = names(coef(model)),
+            estimate = unname(coef(model)),
+            "Std. Error" = summary(model)$coefficients[, "Std. Error"],
+            "Pr(>|t|)" = summary(model)$coefficients[, "Pr(>|t|)"]
+            )),
+        # intrinsic_growth = model_summary["(Intercept)", "Pr(>|t|)"],
+        obs_pred = list(tibble(
+            obs = model$model[, 1],
+            pred = model$fitted.values,
+            error = abs(model$residuals)
+            )),
+        R2 = abs(summary(model)$r.squared),
+        aic = MuMIn::AICc(model),
+        response = ifelse(grepl("dT ~ ", form), "trait change", "growth"),
+        response = factor(response, levels = c("growth", "trait change")),
+        predictor = ifelse(grepl("\\+", form), "augmented", "single"),
+        predictor = factor(predictor, levels = c("single", "augmented"))
+        ) %>%
+    left_join(data_merged %>%
+        dplyr::select(system, strain, treat, pca_varexp) %>%
+        distinct, relationship = "many-to-many")
 
-    print(paste("Created", model_system, "statistics"))
+print(paste("Created", model_system, "statistics"))
 
-    # create bars to better separate strains
-    vline_pos <- (1.5):(length(unique(stats_result$strain)) - 0.5)
+# create bars to better separate strains
+vline_pos <- (1.5):(length(unique(stats_result$strain)) - 0.5)
 
-    # Plot the PCA variance explained
-    ggplot(stats_result) +
-        aes(x = strain, y = pca_varexp, fill = treat) +
-        scale_x_discrete() +
-        geom_vline(xintercept = vline_pos, color = "grey92") +
-        stat_summary(
-            inherit.aes = FALSE,
-            fun.y = mean,
-            aes(x = 2, y = pca_varexp, yintercept = after_stat(y)),
-            geom = "hline", lty = 2) +
-        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
-        labs(y = "Variance explained by\nfirst principal component",
-            x = "Strain",
-            fill = "Treatment") +
-        theme_bw() +
-        scale_fill_manual(values = cbPalette) +
-        scale_y_continuous(expand = expansion(mult = c(0, 0.05)),
-            labels = scales::percent) +
-        theme(panel.grid.major.x = element_blank(),
-            panel.grid.minor = element_blank())
+# Plot the PCA variance explained
+p <- ggplot(stats_result) +
+    aes(x = strain, y = pca_varexp, fill = treat) +
+    facet_grid2(. ~ system, scale = "free_x", space = "free_x") +
+    scale_x_discrete() +
+    geom_vline(xintercept = vline_pos, color = "grey92") +
+    stat_summary(
+        inherit.aes = FALSE,
+        fun.y = mean,
+        aes(x = 2, y = pca_varexp, yintercept = after_stat(y)),
+        geom = "hline", lty = 2) +
+    geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+    labs(y = "Variance explained by\nfirst principal component",
+        x = "Strain",
+        fill = "Treatment") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    scale_fill_manual(values = cbPalette) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.05)),
+        labels = scales::percent) +
+    theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank())
 
-    if (model_system == "cyano") {
-        ggsave(paste0(outpath, "PC_var_explained.pdf"),
-            width = 5.5, height = 2.5, device = "pdf")
-    } else {
-        ggsave(paste0(outpath, "PC_var_explained.pdf"),
-            width = 5.5, height = 2.5, device = "pdf")
-    }
+ggsave("figures/PC_var_explained.pdf", p,
+        width = 6, height = 2.5, device = "pdf")
 
-    print(paste("Saved", model_system, "PCA variance explained plots"))
+print(paste("Saved PCA variance explained plots"))
 
-    # plot R squared
+# plot R squared
 
-    # plot
-    ggplot(stats_result) +
-        scale_shape_manual(values = 0:10) +
-        theme_bw() +
-        scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
-        scale_fill_manual(values = cbPalette) +
-        aes(x = strain, y = R2, fill = treat) +
-        scale_x_discrete() +
-        geom_vline(xintercept = vline_pos, color = "grey92") +
-        stat_summary(
-            inherit.aes = FALSE,
-            fun.y = mean,
-            aes(x = 2, y = R2, yintercept = after_stat(y)),
-            geom = "hline", lty = 2) +
-        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
-        geom_hline(yintercept = c(0, 1)) +
-        facet_grid2(response + predictor ~ ., scales = "free",
-            labeller = labeller(.default = capitalise),
-            strip = strip_nested()) +
-        theme(panel.grid.major.x = element_blank(),
-            panel.grid.minor = element_blank()) +
-        labs(y = expression("R "^2),
-            x = "Strain",
-            fill = "Treatment")
+# plot
+p <- ggplot(stats_result) +
+    theme_bw() +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+    scale_fill_manual(values = cbPalette) +
+    aes(x = strain, y = R2, fill = treat) +
+    scale_x_discrete() +
+    geom_vline(xintercept = vline_pos, color = "grey92") +
+    stat_summary(
+        inherit.aes = FALSE,
+        fun.y = mean,
+        aes(x = 2, y = R2, yintercept = after_stat(y)),
+        geom = "hline", lty = 2) +
+    geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+    geom_hline(yintercept = c(0, 1)) +
+    facet_grid2(response + predictor ~ system, scales = "free",
+        labeller = labeller(.default = capitalise), space = "free_x",
+        strip = strip_nested()) +
+    theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+    ) +
+    labs(y = expression("R "^2),
+        x = "Strain",
+        fill = "Treatment")
 
-    if (model_system == "cyano") {
-        ggsave(paste0(outpath, "R2.pdf"),
-            width = 5, height = 4, device = "pdf")
-    } else {
-        ggsave(paste0(outpath, "R2.pdf"),
-            width = 6, height = 4, device = "pdf")
-    }
+ggsave("figures/R2.pdf", p, width = 5, height = 6, device = "pdf")
 
-    print(paste("Saved", model_system, "R-squared plots"))
+print"Saved R-squared plots")
 
-    # join models to data and make predictions ----
-    data_preds <- stats_result %>%
-        unnest(obs_pred) %>%
-        dplyr::select(-data, -model, -model_summary)
+# join models to data and make predictions ----
+data_preds <- stats_result %>%
+    unnest(obs_pred) %>%
+    dplyr::select(-data, -model, -model_summary)
 
-    # form "pcgr ~ density"
-    ggplot(data_preds) +
-        theme_bw() +
-        scale_shape_manual(values = 0:10) +
-        scale_colour_manual(values = cbPalette) +
-        aes(x = obs, y = pred, col = treat, pch = strain) +
-        geom_point() +
-        geom_smooth(method = "lm", se = FALSE, lwd = 0.5, formula = "y ~ x") +
-        facet_grid2(predictor ~ response, scales = "free",
-            labeller = labeller(.default = capitalise), independent = TRUE) +
-        geom_abline(slope = 1, intercept = 0) +
-        labs(x = "Observed value",
-            y = "Predicted value",
-            pch = "Strain",
-            col = "Treatment")
+# form "pcgr ~ density"
+p <- ggplot(data_preds) +
+    theme_bw() +
+    scale_shape_manual(values = 0:10) +
+    scale_colour_manual(values = cbPalette) +
+    aes(x = obs, y = pred, col = treat, pch = strain) +
+    geom_point(alpha = 0.5, size = 0.5) +
+    geom_smooth(method = "lm", se = FALSE, lwd = 0.5, formula = "y ~ x") +
+    facet_nested(system + predictor ~ response, scales = "free",
+        labeller = labeller(.default = capitalise), independent = TRUE) +
+    geom_abline(slope = 1, intercept = 0) +
+    labs(x = "Observed value",
+        y = "Predicted value",
+        pch = "Strain",
+        col = "Treatment")
 
-    if (model_system == "cyano") {
-        ggsave(paste0(outpath, "growth_dtrait.pdf"),
-            width = 5, height = 4, device = "pdf")
-    } else {
-        ggsave(paste0(outpath, "growth_dtrait.pdf"),
-            width = 5, height = 4, device = "pdf")
-    }
+ggsave("figures/growth_dtrait.pdf", p, width = 5, height = 6.5, device = "pdf")
 
-    print(paste("Saved", model_system, "obs. vs pred. plots"))
+    # if (model_system == "cyano") {
+    #     ggsave(paste0(outpath, "growth_dtrait.pdf"),
+    #         width = 5, height = 4, device = "pdf")
+    # } else {
+    #     ggsave(paste0(outpath, "growth_dtrait.pdf"),
+    #         width = 5, height = 4, device = "pdf")
+    # }
+
+print(paste("Saved", model_system, "obs. vs pred. plots"))
     
-    # Now error plot
-    data_synth <- data_preds %>%
-        group_by(strain, treat, response, predictor) %>%
-        summarise(error = sum(error), aic = first(aic)) %>%
-        pivot_wider(names_from = predictor, values_from = error:aic) %>%
-        rowwise %>%
-        mutate(delta_error = (error_augmented - error_single) / error_single,
-            AIC.weights = list(akaike.weights(c(aic_augmented, aic_single))$weights),
-            p_better = AIC.weights[1])
+# Now error plot
+data_synth <- data_preds %>%
+    group_by(system, strain, treat, response, predictor) %>%
+    summarise(error = sum(error), aic = first(aic)) %>%
+    pivot_wider(names_from = predictor, values_from = error:aic) %>%
+    rowwise %>%
+    mutate(delta_error = (error_augmented - error_single) / error_single,
+        AIC.weights = list(akaike.weights(c(aic_augmented, aic_single))$weights),
+        p_better = AIC.weights[1])
 
-    # view the delta error of using the augmented model vs single model
-    ggplot(data_synth) +
-        scale_shape_manual(values = 0:10) +
-        theme_bw() +
-        scale_fill_manual(values = cbPalette) +
-        aes(x = strain, y = delta_error, fill = treat) +
-        scale_x_discrete() +
-        geom_vline(xintercept = vline_pos, color = "grey92") +
-        stat_summary(
-            inherit.aes = FALSE,
-            fun.y = mean,
-            aes(x = 2, y = delta_error, yintercept = after_stat(y)),
-            geom = "hline", lty = 2) +
-        geom_bar(stat = "identity", position = "dodge", width = 0.75) +
-        geom_hline(yintercept = 0) +
-        facet_grid(response ~ ., labeller = labeller(.default = capitalise)) +
-        labs(x = "Strain",
-            fill = "treatment",
-            y = expression(paste(
-                "(Error"[augmented], " - Error"[single], ") /  Error"[single]))) +
-        theme(panel.grid.major.x = element_blank(),
-            panel.grid.minor = element_blank())
+# view the delta error of using the augmented model vs single model
+p <- ggplot(data_synth) +
+    scale_shape_manual(values = 0:10) +
+    theme_bw() +
+    scale_fill_manual(values = cbPalette) +
+    aes(x = strain, y = delta_error, fill = treat) +
+    scale_x_discrete() +
+    geom_vline(xintercept = vline_pos, color = "grey92") +
+    stat_summary(
+        inherit.aes = FALSE,
+        fun.y = mean,
+        aes(x = 2, y = delta_error, yintercept = after_stat(y)),
+        geom = "hline", lty = 2) +
+    geom_bar(stat = "identity", position = "dodge", width = 0.75) +
+    geom_hline(yintercept = 0) +
+    facet_grid2(response ~ system, labeller = labeller(.default = capitalise),
+        scales = "free_x", space = "free_x") +
+    labs(x = "Strain",
+        fill = "Treatment",
+        y = expression(paste(
+            "(Error"[augmented], " - Error"[single], ") /  Error"[single]))) +
+    theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
-    if (model_system == "cyano") {
-        ggsave(paste0(outpath, "delta_error.pdf"),
-            width = 4.5, height = 4, device = "pdf")
-    } else {
-        ggsave(paste0(outpath, "delta_error.pdf"), # ciliate plot bigger
-            width = 6, height = 4, device = "pdf")
-    }
+ggsave("figures/delta_error.pdf", p, width = 4.5, height = 4, device = "pdf")
 
-    print(paste("Saved", model_system, "delta error plots"))
+    # if (model_system == "cyano") {
+    #     ggsave(paste0(outpath, "delta_error.pdf"),
+    #         width = 4.5, height = 4, device = "pdf")
+    # } else {
+    #     ggsave(paste0(outpath, "delta_error.pdf"), # ciliate plot bigger
+    #         width = 6, height = 4, device = "pdf")
+    # }
+
+print(paste("Saved", model_system, "delta error plots"))
     
     # view the probability that augmented model is best
-    ggplot(data_synth) +
+    p <- ggplot(data_synth) +
         scale_shape_manual(values = 0:10) +
         theme_bw() +
         scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
@@ -359,25 +322,29 @@ for (model_system in c("cilia", "cyano")) {
         geom_bar(stat = "identity", position = "dodge", width = 0.75) +
         # stat_summary(geom = "hline", fun. = "mean") +
         geom_hline(yintercept = c(0, 1)) +
-        facet_grid(response ~ ., labeller = labeller(.default = capitalise)) +
+        facet_grid2(response ~ system, labeller = labeller(.default = capitalise),
+            scales = "free_x", space = "free_x") +
         labs(x = "Strain",
             fill = "Treatment",
             y = "Probability that augmented model is best") +
         theme(panel.grid.major.x = element_blank(),
-            panel.grid.minor = element_blank()
+            panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
         )
 
-    if (model_system == "cyano") {
-        ggsave(paste0(outpath, "AIC.pdf"),
-            width = 4.5, height = 4, device = "pdf")
-    } else {
-        ggsave(paste0(outpath, "AIC.pdf"), # ciliate plot bigger
-            width = 6, height = 4, device = "pdf")
-    }
+ggsave("figures/AIC.pdf", width = 6, height = 4, device = "pdf")
+
+    # if (model_system == "cyano") {
+    #     ggsave(paste0(outpath, "AIC.pdf"),
+    #         width = 4.5, height = 4, device = "pdf")
+    # } else {
+    #     ggsave(paste0(outpath, "AIC.pdf"), # ciliate plot bigger
+    #         width = 6, height = 4, device = "pdf")
+    # }
 
     print(paste("Saved", model_system, "AIC plots"))
 
-    ggplot(data_synth) +
+    p <- ggplot(data_synth) +
         aes(pch = strain, x = p_better, y = -delta_error, col = treat) +
         scale_shape_manual(values = 0:10) +
         theme_bw() +
@@ -394,34 +361,17 @@ for (model_system in c("cilia", "cyano")) {
             x = "Probability that augmented model is best") +
         theme(legend.position = "bottom", legend.box = "vertical")
 
-    if (model_system == "cyano") {
-        ggsave(paste0(outpath, "AIC_deltaerror.pdf"),
-            width = 6, height = 4, device = "pdf")
-    } else {
-        ggsave(paste0(outpath, "AIC_deltaerror.pdf"),
-            width = 6, height = 4.5, device = "pdf")
-    }
+    saveRDS(p, paste0(outpath, "AIC_delta_error.RData"))
+
+    # if (model_system == "cyano") {
+    #     ggsave(paste0(outpath, "AIC_deltaerror.pdf"),
+    #         width = 6, height = 4, device = "pdf")
+    # } else {
+    #     ggsave(paste0(outpath, "AIC_deltaerror.pdf"),
+    #         width = 6, height = 4.5, device = "pdf")
+    # }
 
     print(paste("Saved", model_system, "AIC vs delta error plots"))
-
-    # data_synth %>%
-    #     group_by(strain, response) %>% 
-    #     summarise(
-    #         ymin = min(p_better),
-    #         ymax = max(p_better),
-    #         p_better = mean(p_better),
-    #         ) %>%
-    #     ggplot() +
-    #         aes(x = strain, fill = response) +
-    #         facet_wrap(. ~ response, ncol = 2,
-    #             labeller = labeller(.default = capitalise)) +
-    #         scale_y_continuous(expand = expansion(mult = c(0,0.05))) +
-    #         geom_bar(aes(y = p_better), stat = "identity", col = "black") +
-    #         geom_errorbar(aes(ymin = ymin, ymax = ymax), width = 0.25) +
-    #         geom_hline(yintercept = 0.5) +
-    #         theme_bw() +
-    #         scale_fill_discrete(guide = "none") +
-    #         labs(y = "Probability that augmented model fits better")
 
     # results about regression coefficients ----
     stats_coef <- stats_result %>%
@@ -432,7 +382,7 @@ for (model_system in c("cilia", "cyano")) {
         mutate(estimate_sig = ifelse(`Pr(>|t|)` < 0.05, estimate, NA))
 
     # coefficient values and significance
-    ggplot(stats_coef) +
+    p <- ggplot(stats_coef) +
         aes(y = strain, x = estimate, col = treat) +
         geom_abline(intercept = 0, slope = 1e16) +
         geom_point(shape = 1, size = 3,
@@ -451,23 +401,24 @@ for (model_system in c("cilia", "cyano")) {
         theme_bw() +
         scale_colour_manual(values = cbPalette)
 
-    if (model_system == "cyano") {
-        ggsave(paste(outpath, "td_general.pdf", sep = ""),
-            width = 6.5, height = 7.5)
-    } else {
-        ggsave(paste(outpath, "td_general.pdf", sep = ""),
-            width = 6.5, height = 7.5)
-    }
+    saveRDS(p, paste0(outpath, "td_general.RData"))
+
+    # if (model_system == "cyano") {
+    #     ggsave(paste(outpath, "td_general.pdf", sep = ""),
+    #         width = 6.5, height = 7.5)
+    # } else {
+    #     ggsave(paste(outpath, "td_general.pdf", sep = ""),
+    #         width = 6.5, height = 7.5)
+    # }
 
     print(paste("Saved", model_system, "model coefficient plots"))
 
-    # merge pdfs to see them all
-    all_pdfs <- list.files(paste0("figures/", model_system), 
-        pattern = "\\.pdf$", full.names = TRUE)
-    all_pdfs <- all_pdfs[!grepl("merged.pdf", all_pdfs)]
-    pdf_combine(input = all_pdfs,
-        output = paste0("figures/", model_system, "/merged.pdf"))
+    # # merge pdfs to see them all
+    # all_pdfs <- list.files(paste0("figures/", model_system), 
+    #     pattern = "\\.pdf$", full.names = TRUE)
+    # all_pdfs <- all_pdfs[!grepl("merged.pdf", all_pdfs)]
+    # pdf_combine(input = all_pdfs,
+    #     output = paste0("figures/", model_system, "/merged.pdf"))
 
-    print(paste("Saved", model_system, "model merged plots file"))
+    # print(paste("Saved", model_system, "model merged plots file"))
 
-}

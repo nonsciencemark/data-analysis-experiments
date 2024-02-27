@@ -1,14 +1,8 @@
 ---
 title: "Environment- and system-specific interactions between traits and population growth"
 abstract-title: "Abstract"
-abstract: |
-  | **Abstract:** Understanding the factors that influence population dynamics across environmental contexts is essential to predict ecological stability. Functional traits influence population growth, which can in turn influence the traits and thus create a feedback between population and trait dynamics. We analysed the reciprocal relationship between population and trait dynamics in two microbial systems (one autotrophic and one heterotrophic system) and across a range of environmental conditions. When augmenting models of population (trait) dynamics with trait (population density) data, we found no consistent improvement of predictive capacity: this improvement was environment- and system-dependent. Notably, in the cyanobacteria system, models augmented with population density did predict trait dynamics better. In addition, when augmented models were superior, the improvement was substantial. Further investigation of the environmental dependence of trait-growth relationships is recommended.
-  | **Keywords:** holy, crap, my, dude
-# author:
-#   - Mark Holmes
-#   - Tessa de Bruin 
-#   - Nicolas Schtickzelle 
-#   - Frederik De Laender
+abstract: >
+  **Abstract:** Understanding the factors that influence population dynamics across environmental contexts is essential to predict ecological stability. Functional traits influence population growth, which can in turn influence the traits and thus create a feedback between population and trait dynamics. We analysed the reciprocal relationship between population and trait dynamics in two microbial systems (one autotrophic and one heterotrophic system) and across a range of environmental conditions. When augmenting models of population (trait) dynamics with trait (population density) data, we found no consistent improvement of predictive capacity: this improvement was environment- and system-dependent. Notably, in the cyanobacteria system, models augmented with population density did predict trait dynamics better. In addition, when augmented models were superior, the improvement was substantial. Further investigation of the environmental dependence of trait-growth relationships is recommended.
 bibliography: 
   - bibliography.bib
   - bibliography_new.bib
@@ -29,10 +23,12 @@ format:
     # fontfamilyoptions: sans
     toc: false
     keep-tex: true
-    colorlinks: true
+    colorlinks: false
     number-sections: false
     # output-file: manuscript.pdf
 ---
+
+{{< pagebreak >}}
 
 ## Introduction {#sec-DAE_introduction}
 
@@ -44,7 +40,7 @@ $$\begin{split}
         \frac{\text{d}N}{N\text{d}t} & = f(N, T) \\
         \frac{\text{d}T}{\text{d}t} & = g(N, T), \\
     \end{split}
-$${#eq-Patel}
+$$ {#eq-Patel}
 
 where $N$ and $T$ are the population density and mean trait value across individuals in a population, and $f$ and $g$ are functions describing the effects of these two predictors on the dynamics of population density and traits. Note that this framework is general; the functions $f$ and $g$ could capture a variety of biological mechanisms, including resource competition, and behavioural, epigenetic, or genetic change. In the context of @eq-Patel, the feedback between population and trait dynamics is captured by the dependence of $f$ on $T$ and of $g$ on $N$. If either dependence is zero, feedback is lost.
 
@@ -54,26 +50,26 @@ Here, we investigate the reciprocal links between population and trait dynamics 
 
 We found limited evidence to support general feedbacks between population and trait dynamics. Improvements to predictions of these dynamics by including both trait values and population densities was system- and environment-specific. In cases when the augmented model outperformed the single-state model, the prediction increase was substantial.
 
-## Materials and Methods{#sec-DAE_methods}
+## Materials and Methods {#sec-DAE_methods}
 
 ### Experiments
 
 #### Study systems
 
-We addressed these research questions using a number of unicellular, clonally-reproducing strains from two model systems: seven strains from four ciliate genera and four strains from two ecotypes of the picocyanobacteria genus *Synechococcus* [@Farrant2016; @Grebert2018; @Sohm2016]. The ciliate genera are globally-distributed freshwater mixotrophs and represent an important ecological link between primary producers and higher trophic levels [@Weisse2022; @Lu2021]. The *Synechococcus* genus makes up a substantial proportion of marine phytoplankton biomass and photosynthesis [@Dvorak2014]. Both study systems harbor considerable diversity, as the freshwater ciliates span several taxonomic orders and the polyphyetic _Synechoccocus_ has a similar order-level diversity, while, however, being less well-defined phylogenetically due to the frequency of horizontal gene transfer events [@Salazar2020; @Dvorak2015; @Zhaxybayeva2006]. Both taxa are commonly-used as model organisms in experiments due to their rapid growth and relative simplicity.
+We addressed these research questions using a number of unicellular, clonally-reproducing strains from two model systems: seven strains from four ciliate genera and four strains from two ecotypes of the picocyanobacteria genus *Synechococcus* [@Farrant2016; @Grebert2018; @Sohm2016]. The ciliate genera are globally-distributed freshwater mixotrophs and represent an important ecological link between primary producers and higher trophic levels [@Weisse2022; @Lu2021]. The *Synechococcus* genus makes up a substantial proportion of marine phytoplankton biomass and photosynthesis [@Dvorak2014]. Both study systems harbor considerable diversity, as the freshwater ciliates span several taxonomic orders and the polyphyetic *Synechoccocus* has a similar order-level diversity, while, however, being less well-defined phylogenetically due to the frequency of horizontal gene transfer events [@Salazar2020; @Dvorak2015; @Zhaxybayeva2006]. Both taxa are commonly-used as model organisms in experiments due to their rapid growth and relative simplicity. The *Synechococcus* strains were obtained from the Roscoff Culture Collection, while the ciliate strains were isolated from WHERE WERE THEY OBTAINED FROM.
 
-The ciliate strains selected exhibit substantial diversity in their functional traits and demography - _Spirostomum_ is a large, elongate, and slow-growing while _Tetrahymena_ is small, more rounded, and faster-growing - and they therefore span a broad range of ecological niches. Similarly, the _Synechoccocus_ strains are selected from two different "ecotypes" that characterise their pigmentation and biogeography [@Stomp2007a; @Sohm2016; @Grebert2018]. 
+The ciliate strains selected exhibit substantial diversity in their functional traits and demography - *Spirostomum* is a large, elongate, and slow-growing while *Tetrahymena* is small, more rounded, and faster-growing - and they therefore span a broad range of ecological niches. Similarly, the *Synechoccocus* strains are selected from two different "ecotypes" that characterise their pigmentation and biogeography [@Stomp2007a; @Sohm2016; @Grebert2018].
 
 We examined density-dependence and trait-dependence across a range of environmental conditions, represented here by temperature and a pollutant --- both commonly-encountered environmental pressures in natural systems. Specifically, we consider an "altered" environment to have increased temperature, increased concentration of a pollutant, or both. Both of these pressures are linked to human activity. Temperature change is ubiquitously-relevant as anthropogenically-driven climate change continues to intensify. We used atrazine as the pollutant. Atrazine is present in many aquatic ecosystems via agricultural run-off, represents a broad class of herbicides that act via the inhibition of photosynthesis, and also induces oxidative stress in heterotrophic organisms (e.g. ciliates), reducing their fitness [@Shim2022]. Control conditions are hereafter indicated by "C", temperature changes by "T", atrazine changes by "A", and the combined atrazine and temperature changes by "AT".
 
 We grew the strains in monoculture for sufficient time for them to reach their carrying capacity, enabling us to quantify their intrinsic growth rate and density-dependence. Population densities and trait values were measured at regular, frequent intervals (@tbl-treatment-table, @sec-sampling_times).
 
-| Model system  |  Exp. length (days)  |  No. of strains  |  Temperature ($\mathrm{^\circ C}$)   | Atrazine ($\mathrm{mg\,L}^{-1}$) |
-| --------------- | -------------------- | ---------------- | ----------------------------------- | --------------------------------------------- |
-| Ciliates        | $37$                |  $7$             |  $\mathbf{22}, 24$                      |  $\mathbf{0}, 20$ |
-| Cyanobacteria   | $10$                |  $4$             |  $\mathbf{22}, 24$                      |  $\mathbf{0}, 0.1$ |
+| Model system  | Exp. length (days) | No. of strains | Temperature ($\mathrm{^\circ C}$) | Atrazine ($\mathrm{mg\,L}^{-1}$) |
+|-------------|-------------|-------------|--------------|-------------------|
+| Ciliates      | $37$               | $7$            | $\mathbf{22}, 24$                 | $\mathbf{0}, 20$                 |
+| Cyanobacteria | $10$               | $4$            | $\mathbf{22}, 24$                 | $\mathbf{0}, 0.1$                |
 
-: Experimental design of the two model systems, showing how long the experiment lasted, how frequently they were sampled, the number of strains used, the temperature of the warming treatments in degrees Celsius, and the concentration of the pollutant (atrazine). All combinations of pollution and temperature were included in the experiment design. Treatments in bold indicate the reference conditions. {#tbl-treatment-table tbl-colwidths="[0.2,0.2,0.2,0.2,0.2]"}
+: Experimental design of the two model systems, showing how long the experiment lasted, how frequently they were sampled, the number of strains used, the temperature of the warming treatments in degrees Celsius, and the concentration of the pollutant (atrazine). All combinations of pollution and temperature were included in the experiment design. Treatments in bold indicate the reference conditions. {#tbl-treatment-table tbl-colwidths="\[0.2,0.2,0.2,0.2,0.2\]"}
 
 #### Experimental setup
 
@@ -90,6 +86,13 @@ Population densities and traits were measured using procedures specifically desi
 Ciliate microcosms were sampled by digital dark-field imaging using an much updated version of the method described by @Pennekamp2013. For each microcosm, at each sample time, a series of pictures was taken of a 810 \textmu L sub-sample using a Sony A9 camera equipped with an FE 90 mm F2.8 Macro G OSS lens and a dark-field approach (indirect light and black background). Each series consisted of 10 second burst shots at 10 fps in grey scale (other settings: 1/160s, F11, ISO 6400), resulting in 100 pictures per sample. We then proceeded with automated image analysis using Fiji [@Schindelin2012; @VanRossum2022] to count, track, and characterize the traits of all moving particles i.e. cell size (area), cell shape (aspect ratio), movement speed, and movement linearity in the sample [@Pennekamp2014]. The traits were population averages of cell size, cell aspect ratio, linearity of the cell's movement, and movement speed. Cell morphology influences the maintenance requirement and resource uptake rates and the motility traits affect the encounter rate of ciliates for their bacterial resources.
 
 Cyanobacteria microcosms were sampled using a flow cytometer (Guava easyCyte 12HT) that measures cell densities and trait values using several channels, which correspond to specific excitation and fluorescence combinations by lasers and detectors. The flow cytometer channels correspond approximately to cell size and concentration of three photosynthetic pigments present in *Synechococcus*: chlorophyll-a, phycocyanin, and phycoerythrin. At each sampling time, 57 \textmu  L of distilled water was added to counteract evaporation. Then, 200 \textmu L of the 6 mL microcosm was removed and replaced with 200 \textmu L of fresh medium. This 200 \textmu L sample of the culture was diluted with distilled water to be between 50 and 500 cells \textmu $\mathrm{L}^{-1}$, the concentration range for which the flow cytometer gives accurate measurements, and 200 \textmu L of the appropriately-diluted sample was put into a 96-well plate and processed by the flow cytometer. The flow cytometer then measures 1000 cells from each well to determine the cell density and measure the trait values. The traits were population averages of several flow cytometer channels, indicative of cell size and concentrations of chlorophyll-a, phycocyanin, & phycoerythrin. Cell size again influences resource uptake and maintenance and the photosynthetic pigments influence the light absorption [@Maranon2015; @Stomp2007a]. Sampled debris, dead cells, and doublets were removed from the analysed data using the CyanoFilter and PeacoQC packages in R version 2.3.1 [@Olusoji2021; @PeacoQC; @RCoreTeam2023].
+
+#### Replication statement
+
+| **Scale of inference**           | **Scale at which the factor of interest is applied** | **Number of replicates at the appropriate scale**         |
+|----------------|-----------------------------|---------------------------|
+| Phytoplankton strain populations | 6 mL microcosms                                      | 4 strains, 4 treatments, 3 replicates of each combination |
+| Ciliate strain populations       | 100 mL microcosms                                    | 7 strains, 4 treatments, 1 replicate of each combination  |
 
 ### Analyses
 
@@ -123,27 +126,14 @@ where $N_t$ (density, continuous) and $T_t$ (trait value, continuous) are predic
 
 With these models at hand, we then tested whether the augmented model improved predictions of population/trait dynamics by comparing the prediction accuracy of the augmented models relative to the basic models. We compared the AICc [Akaike information criterion corrected for small sample size @Burnham2004] of these models to determine which model best predicted the data, transforming these AICc values into Akaike scores representing the probability that the augmented models (@eq-pcgrExtd, @eq-dTExtd) were better than the basic models (@eq-pcgr, @eq-dT) [@Wagenmakers2004; @Burnham2004]. Finally, in conjunction with the likelihood that the augmented model was best, we compared the relative change in predictive accuracy, relative to the single-variable model, using the coefficient of determination (R-squared).
 
-## Results{#sec-DAE_results}
+## Results {#sec-DAE_results}
 
-### Growth and trait change
+### Observed vs predicted trait and population change
 
-The ciliate populations grew logistically in all conditions, approaching a roughly stable state by the end of the experiment (@fig-cilia-pop-traits-time). The final population densities differed greatly between genera, with _Tetrahymena_ reaching densities an order of magnitude greater than the others.
+![Observed (x-axis) and predicted (y-axis) population growth (left column) and trait change (left column), including either one (top row) or both predictors (bottom row), for various strains (point types) of ciliates and across environmental conditions (colours).](figures/cilia/cilia_growth_dtrait.pdf){#fig-cilia-growth-dtrait}
 
-![Log-transformed populations and trait changes over time for the ciliate system. The traits show the mean values in the sampled population at each time point. Size indicates the top-down area of the cell in \textmu$\mathrm{m}^{2}$. Speed indicates the average movement speed in \textmu$\mathrm{m \, s}^{-1}$. Aspect ratio is the ratio of the longest cell dimension relative to the shortest. Linearity indicates the cell movement linearity i.e. a value of 1 is perfectly linear while a value of 0 is Brownian motion. Trait indicates the aggregate trait - the first axis of a PCA fitted across the four measured traits for each strain and treatment combination.](figures/cilia/cilia_pop-traits-time.png){#fig-cilia-pop-traits-time width="6in"}
 
-The cyanobacteria populations grew logistically in the control and temperature treatments, but maintained stable or slightly-decreased populations in the atrazine and atrazine-temperature treatments (@fig-cyano-pop-traits-time).
-
-![Log-transformed populations and trait changes over time for the ciliate system. The traits show the mean values in the sampled population at each time point. Measured traits (size, chlorophyll, phycocyanin, and phycoerythrin) are expressed in arbitrary units. Size is proportional to the cell diameter, and the three pigment channels are defined by their excitation and fluorescence (see supporting information). Trait indicates the aggregate trait - the first axis of a PCA fitted across the four measured traits for each strain and treatment combination.](figures/cyano/cyano_pop-traits-time.png){#fig-cyano-pop-traits-time width="5in"}
-
-Individual traits (and therefore the aggregate trait) changed substantially throughout the experiment for both the ciliate and cyanobacteria systems (@fig-cilia-pop-traits-time, @fig-cyano-pop-traits-time). These aggregate traits also contained the majority of the trait variation, and well-summarised the four functional traits of each study system into a single variable (@fig-cilia-PC-var-explained, @fig-cyano-PC-var-explained)
-
-![The amount of variance explained by the first component of the PCA for the ciliate system. These values indicate how much information is kept when the traits are combined into a single aggregate trait. The horizontal dashed line indicates the mean explained variance across all strains and treatments ($53.6\%$).](figures/cilia/cilia_PC_var_explained.pdf){#fig-cilia-PC-var-explained}
-
-![The amount of variance explained by the first component of the PCA for the cyanobacteria system. As in @fig-cilia-PC-var-explained, these values indicate how much information is kept when the traits are combined into a single aggregate trait. The horizontal dashed line indicates the mean explained variance across all strains and treatments ($79.5\%$).](figures/cyano/cyano_PC_var_explained.pdf){#fig-cyano-PC-var-explained}
-
-Populations of both systems exhibited mostly nonzero intrinsic growth and negative density-dependence (@fig-cilia-td-general, @fig-cyano-td-general). Intrinsic growth rates of *Tetrahymena* strains were consistently higher than that of the other strains and *Spirostomum* strains exhibited stronger negative density-dependence (i.e. stronger self-limitation). Environmental conditions had moderate and variable effects on how ciliate populations grew. In the cyanobacteria system, intrinsic growth and density-dependence were comparable across strains (@fig-cyano-pcgr). However, environmental conditions had greater effects on these parameters; the addition of atrazine substantially reduced intrinsic growth rates (to the point of being negative in cases).
-
-The traits of both systems exhibited generally negative trait-dependence (@fig-cilia-td-general, @fig-cyano-td-general). In the ciliate system, intrinsic trait change (@fig-cilia-dT) was generally not significantly different from zero, but estimates varied across environmental conditions in *Tetrahymena* strains. The trait-dependence of trait change in ciliates was also strongest for these strains. In the cyanobacteria system, intrinsic trait change was often significantly different from zero and mostly positive (@fig-cyano-growth-dtrait).
+![As @fig-cilia-growth-dtrait but for the cyanobacteria system.](figures/cyano/cyano_growth_dtrait.pdf){#fig-cyano-growth-dtrait}
 
 ### Model selection
 
@@ -155,7 +145,7 @@ In the ciliate system, using the augmented model (including both traits and popu
 
 In the cyanobacteria system, for treatments without atrazine, the augmented models were generally notably better at predicting the system dynamics (@fig-cyano-AIC). For predictions of population growth, the augmented model was generally likely to best describe the data, with some exceptions in which the added trait data provided no benefit to predictions. For predictions of trait change, the augmented model was more likely to be better, with only some cases in the treatments with atrazine where it failed to improve the predictive ability.
 
-![Comparing the change in predictive accuracy using the augmented model (both population and traits) as a response to the probability that the augmented model is best for the ciliate system. Model accuracy was calculated using the R-squared statistic. ](figures/cilia/cilia_AIC_deltaerror.pdf){#fig-cilia-AIC-deltaerror width="4in"}
+![Comparing the change in predictive accuracy using the augmented model (both population and traits) as a response to the probability that the augmented model is best for the ciliate system. Model accuracy was calculated using the R-squared statistic.](figures/cilia/cilia_AIC_deltaerror.pdf){#fig-cilia-AIC-deltaerror width="4in"}
 
 In the ciliate system, the probability that the augmented model fitted best was more beneficial when making predictions of population growth than trait change (@fig-cilia-AIC-deltaerror). In other words, the cases in which the augmented model was substantially-better fitting (e.g. predictions of growth in *Tetrahymena* 1, control) yielded more accurate predictions of population growth than trait changes.
 
@@ -165,7 +155,7 @@ In the cyanobacteria system, improvement in predictive accuracy by using the aug
 
 We do not observe a consistent, cross-system result as to whether population growth or trait changes are better-predicted by the augmented model. The relationships are clearly environmentally-dependent and system-specific, and variation in augmented model performance is strongly dependent on environmental conditions. That said, for a large number of the cyanobacteria microcosms, particularly in those without atrazine added, the augmented model substantially outperforms the single-variable model (@fig-cyano-AIC-deltaerror).
 
-## Discussion{#sec-DAE_discussion}
+## Discussion {#sec-DAE_discussion}
 
 We have analysed population and trait dynamics in two microbial systems, across various environmental conditions. Our results do not support a general reciprocal relationship between both types of dynamics, but do indicate that trait dynamics are better predicted when considering population density for the cyanobacteria system, in particular. Furthermore, trait effects on growth are dependent on the environment (@fig-cilia-td-general, @fig-cyano-td-general): a given trait value has differently effects on growth, depending on the (a)biotic conditions [@Gibert2022; @Wieczynski2021].
 
@@ -177,7 +167,7 @@ There are several possible explanations for the patterns observed. Firstly, whil
 
 In a similar manner, the superior performance of the augmented model in the cyanobacteria system compared to that of the ciliate system may be due to differences in the traits measured. Firstly that, in the cyanobacteria system, the aggregate trait summarised more of the trait information present than in the ciliate system ($79.5\%$ in the cyanobacteria system against the $53.6\%$ in the ciliate system, @fig-cyano-PC-var-explained and @fig-cilia-PC-var-explained). The ciliate traits were more variable and demonstrated less congruent changes over time (@fig-cilia-pop-traits-time). Secondly, it may be that the cyanobacteria traits are more directly linked to growth than the ciliate traits. For example, the concentration of photosynthetic pigments within a cell controls absorption of incoming light and therefore growth. Similarly, the effectiveness of light harvesting is likely density-dependent (high cell densities cause shading, which can alter pigmentation), which makes the pigmentation content subject to plastic change in the time frame of our experiment [@Stomp2004]. Pigmentation and size in cyanobacteria both constitute resource uptake traits and may both influence and depend on population growth [@Maranon2015; @Stomp2007a]. In contrast, in the ciliate system, only one trait, size, could be considered a direct resource uptake trait. The other ciliate traits (movement linearity, movement speed, and cell aspect ratio) are less-directly linked to resource uptake rate and growth. To compute a more directly-functional aggregate trait for the ciliate system may require a more specific analysis, for example, by combining the movement and cell size traits into a clearance rate, which may be more strongly-linked to the growth of the heterotrophic ciliates [@Kiorboe1995; @Jacob2019].
 
-While we summarised the functional traits into a single aggregate trait per strain and treatment, the individual traits monitored may have distinct biological responses to the treatments applied and the changes in population densities. Size changes in response to increased temperatures is a well-documented phenomenon in microbes [@Finkel2010]. _Synechococcus_ may respond to atrazine exposure by entering a state of chlorosis, characterised by a loss of chlorophyll and slower growth [@Gonzalez-Barreiro2004], although this was not observed in the experimental populations presented here (@fig-cyano-pop-traits-time). Ciliates are known to adjust their motility and size in response to population density [@Pennekamp2014; @Gibert2022], as shown in @fig-cilia-pop-traits-time.
+While we summarised the functional traits into a single aggregate trait per strain and treatment, the individual traits monitored may have distinct biological responses to the treatments applied and the changes in population densities. Size changes in response to increased temperatures is a well-documented phenomenon in microbes [@Finkel2010]. *Synechococcus* may respond to atrazine exposure by entering a state of chlorosis, characterised by a loss of chlorophyll and slower growth [@Gonzalez-Barreiro2004], although this was not observed in the experimental populations presented here (@fig-cyano-pop-traits-time). Ciliates are known to adjust their motility and size in response to population density [@Pennekamp2014; @Gibert2022], as shown in @fig-cilia-pop-traits-time.
 
 While we have analysed growth curves and trait dynamics to infer coupling between density and traits, akin to time series analysis, a more direct approach would have consisted of a space-for-time approach. In said approach, one experimentally crosses density and trait values, and then monitors short-term growth and trait change [e.g. @Wieczynski2021]. While manipulating density is feasible, manipulating traits is less so. One approach could be to grow cultures at different densities, which we know will lead to different traits (@fig-cilia-td-general, @fig-cyano-td-general), and then create density gradients by dilution. However, such space-for-time approaches do not guarantee a reliable gradient of functional traits and are more experimentally demanding.
 
@@ -189,7 +179,9 @@ The potential for mutations to take place during the course of the experiments m
 
 In conclusion, we found that the relationships between populations and functional traits vary with model system and environmental context. While reciprocal interactions between density and traits were apparent for the cyanobacteria system, we did not find broad support for strong feedbacks between population and trait change. More work is needed to unveil the context dependence of growth-trait connections.
 
+```{=html}
 <!-- ## References
 
 ::: {#refs}
 ::: -->
+```

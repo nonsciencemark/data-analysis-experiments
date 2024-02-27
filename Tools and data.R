@@ -49,16 +49,30 @@ data_cilia <- read_csv("data/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
     dplyr::filter(!is.na(dT), Temp > 20, Atrazine != 10) %>%
     mutate(treat = case_when(
             (Atrazine == 0) & (Temp == 22) ~ "C",
-            # (Atrazine == 10) & (Temp == 22) ~ "a",
             (Atrazine == 20) & (Temp == 22) ~ "A",
             (Atrazine == 0) & (Temp == 24) ~ "T",
-            # (Atrazine == 10) & (Temp == 24) ~ "aT",
             (Atrazine == 20) & (Temp == 24) ~ "AT"),
         species = factor(species, levels = c("Loxo", "Spiro", "Tetra", "Para")),
         treat = factor(treat, levels = c("C", "T", "A", "AT")),
         strain = factor(strain, levels = c(
             "Spiro_C", "Spiro_D", "Tetra_1", "Tetra_2",
                 "Loxo_1", "Loxo_2", "Para_4")))
+
+cilia_trait_levels <- c("mean_area", "mean_speed", "mean_ar",
+    "mean_linearity", "trait")
+cilia_trait_labels <- c("Size", "Speed", "Aspect~ratio",
+    "Linearity", "Trait")
+# strain_labels <- c("Spiro[1]", "Spiro[2]", "Tetra[1]", "Tetra[2]", "Loxo[1]", "Loxo[2]", "Para[4]")
+
+long_data_cilia <- data_cilia %>%
+    mutate(density = log10(density)) %>%
+    pivot_longer(all_of(c("density", cilia_trait_levels))) %>%
+    mutate(
+        name = factor(name,
+            levels = c("density", cilia_trait_levels),
+            labels = c("log[10]~density", cilia_trait_labels)),
+        # strain = factor(strain, levels = levels(strain), labels = strain_labels),
+        day = Time_Days)
 
 # Import and make uniform the cyano data-------------------
 data_cyano <- read_csv("data/cyanobacteria/mono_data.csv") %>%
@@ -89,3 +103,26 @@ data_cyano <- read_csv("data/cyanobacteria/mono_data.csv") %>%
     dplyr::filter(!is.na(dT)) %>%
     mutate(treat = factor(treat, levels = c("C", "T", "A", "AT")),
         strain = paste(species, "_", strain, sep = ""))
+
+cyano_trait_levels <- c("Size", "Chlorophyll", "Phycocyanin",
+    "Phycoerythrin", "trait")
+cyano_trait_labels <- c("Size", "Chlorophyll", "Phycocyanin",
+    "Phycoerythrin", "Trait")
+
+long_data_cyano <- data_cyano %>%
+    mutate(density = log10(density)) %>%
+    pivot_longer(all_of(c("density", cyano_trait_levels))) %>%
+    mutate(name = factor(name,
+        levels = c("density", cyano_trait_levels),
+        labels = c("log[10]~density", cyano_trait_labels)))
+
+# merged data
+data_merged <- bind_rows(
+    data_cilia %>% mutate(system = "Ciliates"),
+    data_cyano %>% mutate(system = "Cyanobacteria")
+)
+
+long_data_merged <- bind_rows(
+    long_data_cilia %>% mutate(system = "Ciliates"),
+    long_data_cyano %>% mutate(system = "Cyanobacteria")
+)

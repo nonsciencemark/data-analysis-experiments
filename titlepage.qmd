@@ -1,0 +1,39 @@
+---
+format:
+  pdf:
+    documentclass: scrartcl
+    toc: false
+    keep-tex: false
+    colorlinks: false
+    number-sections: false
+---
+
+# Manuscript title
+
+Environment- and system-specific interactions between traits and population growth
+
+# Author names
+
+- Mark Holmes ${}^{1}$
+- Tessa de Bruin ${}^{2}$
+- Pauline Witsel ${}^{1}$
+- Julie Jadoul ${}^{2}$
+- Nicholas Schtickzelle ${}^{2}$
+- Frederik de Laender ${}^{1}$
+
+# Institutions and addresses
+
+1. Universite de Namur; Rue de Bruxelles 61, 5000 Namur, Belgium
+2. Universite Catholique de Louvain; Croix du Sud 4, 1348 Ottignies-Louvain-la-Neuve, Belgium
+
+# Acknowledgements
+
+Authors were supported by the ARC Grant DIVERCE, a concerted research action from the special research fund (Convention 18/23-095).
+
+# Author contributions 
+
+M.H., T.D.B., N.S., and F.D.L. conceived of the ideas and study design; M.H., T.D.B., P.W., and J.J. created the experimental protocols and performed the laboratory work; M.H., T.D.B., and F.D.L. performed the data analysis; M.H., T.D.B., N.S., and F.D.L. wrote the original draft of the manuscript; and all authors contributed to revisions.
+
+# Data availability statement
+
+The experimental data and R code used to perform this study will be made available on Zenodo and GitHub, respectively. 

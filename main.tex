@@ -1,7 +1,6 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
   letterpaper,
@@ -207,18 +206,12 @@
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
   pdftitle={Environment- and system-specific interactions between traits and population growth},
-  pdfauthor={Mark Holmes; Tessa de Bruin; Nicolas Schtickzelle; Frederik De Laender},
-  colorlinks=true,
-  linkcolor={blue},
-  filecolor={Maroon},
-  citecolor={Blue},
-  urlcolor={Blue},
+  hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
 \title{Environment- and system-specific interactions between traits and
 population growth}
-\author{Mark Holmes \and Tessa de Bruin \and Nicolas
-Schtickzelle \and Frederik De Laender}
+\author{}
 \date{}
 
 \begin{document}
@@ -240,6 +233,8 @@ better. In addition, when augmented models were superior, the
 improvement was substantial. Further investigation of the environmental
 dependence of trait-growth relationships is recommended.
 \end{abstract}
+
+\newpage{}
 
 \subsection{Introduction}\label{sec-DAE_introduction}
 
@@ -407,7 +402,7 @@ We grew the strains in monoculture for sufficient time for them to reach
 their carrying capacity, enabling us to quantify their intrinsic growth
 rate and density-dependence. Population densities and trait values were
 measured at regular, frequent intervals
-(Table~\ref{tbl-treatment-table}, \textbf{?@sec-sampling-times}).
+(Table~\ref{tbl-treatment-table}, \textbf{?@sec-sampling\_times}).
 
 \begin{longtable}[]{@{}lllll@{}}
 \caption{Experimental design of the two model systems, showing how long
@@ -522,6 +517,30 @@ CyanoFilter and PeacoQC packages in R version 2.3.1
 (\citeproc{ref-Olusoji2021}{Olusoji et al. 2021};
 \citeproc{ref-PeacoQC}{Emmaneel 2022}; \citeproc{ref-RCoreTeam2023}{R
 Core Team 2023}).
+
+\paragraph{Replication statement}\label{replication-statement}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1622}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4324}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4054}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Scale of inference}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Scale at which the factor of interest is applied}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Number of replicates at the appropriate scale}
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Phytoplankton strain populations & 6 mL microcosms & 4 strains, 4
+treatments, 3 replicates of each combination \\
+Ciliate strain populations & 100 mL microcosms & 7 strains, 4
+treatments, 1 replicate of each combination \\
+\end{longtable}
 
 \subsubsection{Analyses}\label{analyses}
 
