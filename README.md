@@ -1,21 +1,28 @@
 # Experiment data analyses
-Project repository for the functions used to fit DIVERCE experiment data.
+Project repository the combined DIVERCE monoculture experiment analyses.
 
 # Aims, goals, etc.
-1. Create a unified data-cleaning procedure
-2. Create a consistent Lotka-Volterra model-fitting procedure
-3. Analyse the strain traits, comparing how they change and linking to the fitted model parameters
+Explore trait-dependent growth and density-dependent trait change across the two model systems and evaluate the frequency of feedbacks between these.
 
-# Files
-1. **gause_wrapper_fixed.R**: modified version of `gauseR::gause_wrapper()` which allows you to keep some parameters fixed/constant (assuming that they have already been determined) using the `offset` argument in `lm()`. Also should allow you to optimise the fit in log-space or regular-space, according to your needs.
-2. **demonstration.Rmd**: R Markdown file demonstrating the model-fitting procedure
-3. **{_system_}-writeup.Rmd**: R Markdown files for the system (i.e. cyanobacteria or ciliates) trait changes writeup
+# Repository structure
 
-# Workflow
-1. Try stuff
-2. When things are wrong, either submit an [issue](https://github.com/nonsciencemark/data-analysis-experiments/issues) or fix it and submit a pull request[^pull-req]
-3. ???
-4. Profit
+Most important files are shown here:
 
-[^pull-req]: Use `git clone https://github.com/nonsciencemark/data-analysis-experiments` and then `git checkout -b your-branch-name` if you want to create a new branch and work on that. Then you can make a pull request with `hub pull-request`.
-
+```
+.
+├── data               // where we keep the raw data
+│   ├── ciliates
+│       └── DIVERCE_TdB_Ciliates_Traits_Cut.csv
+│   └── cyanobacteria
+│       └── mono_data.csv
+├── figures            // where we save the figs
+│   ├── fig_name.pdf
+│   ├── ...
+│   └── fig_name.pdf
+├── Tools and data.R   // funcs used for analysis
+├── Saving plots.R     // funcs used for plots
+├── Analysis.R         // source to make plots
+├── main.qmd           // the actual article
+├── supplementary.qmd  // the actual article
+└── README.md
+```
