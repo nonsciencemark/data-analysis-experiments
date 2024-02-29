@@ -11,7 +11,32 @@ format:
     colorlinks: true
     number-sections: false
     # output-file: manuscript.pdf
+bibliography: bibliography_new.bib
 ---
+
+## Culture origins
+
+The ciliate strains were isolated from cultures used for past experiments.
+
+| Name    | Strain                    | Isolation         | Publication    |
+|---------|---------------------------|-------------------|----------------|
+| Tetra_1 | *Tetrahymena* TSC SD01546 | Pennsylvania, USA | @Pennekamp2014 |
+| Tetra_2 | *Tetrahymena* TSC SD01548 | Pennsylvania, USA | @pennekamp2014 |
+| Loxo_1  | *Loxocephalus*            |                   |                |
+| Loxo_2  | *Loxocephalus*            |                   |                |
+| Para_4  | *Paramecium*              |                   |                |
+| Spiro_C | *Spirostomum*             |                   |                |
+| Spiro_D | *Spirostomum*             |                   |                |
+
+The cyanobacteria strains were purchased from the Roscoff Culture Collection (<https://roscoff-culture-collection.org/>) and they are referred to throughout using their RCC Number.
+
+|                       |            |                               |                  |               |
+|--------------------|-------------|-------------|-------------|-------------|
+| **Name / RCC number** | **Strain** | ***Synechococcus*** **clade** | **Pigment type** | **Isolation** |
+| 2375                  | BL_10      | Subcluster 5.1 V              | 2                | W. Sahara     |
+| 2434                  | RS9906     | Subcluster 5.1 VIII           | 1                | Israel        |
+| 2524                  | A15-46     | Subcluster 5.1 V              | 2                | Spain         |
+| 2383                  | RS9909     | Subcluster 5.1 VIII           | 1                | Israel        |
 
 ## Sampling regime {#sec-sampling_times}
 
@@ -23,7 +48,6 @@ Due to the large differences in cilate population dynamics, the sampling differe
 
 The cyanobacteria microcosms were sampled every day at the same time for each microcosm: between 09:00 and 13:00 depending on the population, as the sampling procedure took some time. Additionally, each microcosm of the cyanobacteria system had three replicates.
 
-
 ### Growth and trait change
 
 The ciliate populations grew logistically in all conditions, approaching a roughly stable state by the end of the experiment (@fig-cilia-pop-traits-time). The final population densities differed greatly between genera, with *Tetrahymena* reaching densities an order of magnitude greater than the others.
@@ -34,15 +58,13 @@ The cyanobacteria populations grew logistically in the control and temperature t
 
 ![Log-transformed populations and trait changes over time for the ciliate system. The traits show the mean values in the sampled population at each time point. Measured traits (size, chlorophyll, phycocyanin, and phycoerythrin) are expressed in arbitrary units. Size is proportional to the cell diameter, and the three pigment channels are defined by their excitation and fluorescence (see supporting information). Trait indicates the aggregate trait - the first axis of a PCA fitted across the four measured traits for each strain and treatment combination.](figures/cyano/cyano_pop-traits-time.png){#fig-cyano-pop-traits-time width="5in"}
 
-Individual traits (and therefore the aggregate trait) changed substantially throughout the experiment for both the ciliate and cyanobacteria systems (@fig-cilia-pop-traits-time, @fig-cyano-pop-traits-time). These aggregate traits also contained the majority of the trait variation, and well-summarised the four functional traits of each study system into a single variable (@fig-cilia-PC-var-explained, @fig-cyano-PC-var-explained)
+Individual traits (and therefore the aggregate trait) changed substantially throughout the experiment for both the ciliate and cyanobacteria systems (@fig-cilia-pop-traits-time, @fig-cyano-pop-traits-time). These aggregate traits also contained the majority of the trait variation, and well-summarised the four functional traits of each study system into a single variable (@fig-PC-var-explained, @fig-PC-var-explained)
 
-![The amount of variance explained by the first component of the PCA for the ciliate system. These values indicate how much information is kept when the traits are combined into a single aggregate trait. The horizontal dashed line indicates the mean explained variance across all strains and treatments ($53.6\%$).](figures/cilia/cilia_PC_var_explained.pdf){#fig-cilia-PC-var-explained}
-
-![The amount of variance explained by the first component of the PCA for the cyanobacteria system. As in @fig-cilia-PC-var-explained, these values indicate how much information is kept when the traits are combined into a single aggregate trait. The horizontal dashed line indicates the mean explained variance across all strains and treatments ($79.5\%$).](figures/cyano/cyano_PC_var_explained.pdf){#fig-cyano-PC-var-explained}
+![The amount of variance explained by the first component of the PCA for the ciliate and cyanobacteria systems. These values indicate how much information is kept when the traits are combined into a single aggregate trait. The horizontal dashed line indicates the mean explained variance across all strains and treatments ($53.6\%$).](figures/PC_var_explained.pdf){#fig-PC-var-explained}
 
 Populations of both systems exhibited mostly nonzero intrinsic growth and negative density-dependence (@fig-cilia-td-general, @fig-cyano-td-general). Intrinsic growth rates of *Tetrahymena* strains were consistently higher than that of the other strains and *Spirostomum* strains exhibited stronger negative density-dependence (i.e. stronger self-limitation). Environmental conditions had moderate and variable effects on how ciliate populations grew. In the cyanobacteria system, intrinsic growth and density-dependence were comparable across strains (@fig-cyano-pcgr). However, environmental conditions had greater effects on these parameters; the addition of atrazine substantially reduced intrinsic growth rates (to the point of being negative in cases).
 
-The traits of both systems exhibited generally negative trait-dependence (@fig-cilia-td-general, @fig-cyano-td-general). In the ciliate system, intrinsic trait change (@fig-cilia-dT) was generally not significantly different from zero, but estimates varied across environmental conditions in *Tetrahymena* strains. The trait-dependence of trait change in ciliates was also strongest for these strains. In the cyanobacteria system, intrinsic trait change was often significantly different from zero and mostly positive (@fig-cyano-growth-dtrait).
+The traits of both systems exhibited generally negative trait-dependence (@fig-cilia-td-general, @fig-cyano-td-general). In the ciliate system, intrinsic trait change (@fig-cilia-dT) was generally not significantly different from zero, but estimates varied across environmental conditions in *Tetrahymena* strains. The trait-dependence of trait change in ciliates was also strongest for these strains. In the cyanobacteria system, intrinsic trait change was often significantly different from zero and mostly positive (@fig-growth-dtrait).
 
 ## Population density and population change
 
@@ -68,7 +90,7 @@ The traits of both systems exhibited generally negative trait-dependence (@fig-c
 
 ### Ciliate
 
-![Fitted model parameters showing intrinsic population/trait change (left), density-dependence (centre), and trait dependence (right) in seven strains of ciliates. Large rows indicate whether growth or trait change is being examined and subrows indicate whether the coefficients are from the single-variable or augmented model. Points indicate the mean, error bars indicate the standard error, and asterisks indicate parameters are significantly different from zero (vertical black line).](figures/cilia/cilia_td_general.pdf){#fig-cilia-td-general width="4in"}
+![Fitted model parameters showing intrinsic population/trait change (left), density-dependence (centre), and trait dependence (right) in seven strains of ciliates. Large rows indicate whether growth or trait change is being examined and subrows indicate whether the coefficients are from the single-variable or augmented model. Points indicate the mean, error bars indicate the 95% confidence intervals, and asterisks indicate parameters are significantly different from zero (vertical black line).](figures/cilia/cilia_td_general.pdf){#fig-cilia-td-general width="4in"}
 
 ### Cyanobacteria
 
@@ -78,10 +100,6 @@ The traits of both systems exhibited generally negative trait-dependence (@fig-c
 
 ### Ciliate
 
-![The coefficient of determination i.e., r-squared, for the cilia system models. The mean values across strains and treatments are shown by the horizontal dashed lines.](figures/cilia/cilia_R2.pdf){#fig-cilia-R2}
+![The coefficient of determination i.e., r-squared, for the cilia and cyanobacteria system models. The mean values across strains and treatments are shown by the horizontal dashed lines.](figures/R2.pdf){#fig-R2}
 
-### Cyanobacteria
-
-![As @fig-cilia-R2 but for the cyanobacteria system.](figures/cyano/cyano_R2.pdf){#fig-cyano-R2}
-
-In the ciliate system, the $R^2$ of the model fit was generally below 0.5 for both growth and trait changes for all treatments and was generally unaffected by whether the single- or both-predictor model was used (@fig-cilia-R2). *Tetrahymena* strains were generally better-fitting but still without substantial model support. In the cyanobacteria system, the treatments without atrazine were substantially better-fitting than those with atrazine added (@fig-cyano-R2). Additionally, while the goodness-of-fit of the growth predictions were only marginally improved by the addition of the full model, the trait change predictions were greatly improved by including the full model.
+In the ciliate system, the $R^2$ of the model fit was generally below 0.5 for both growth and trait changes for all treatments and was generally unaffected by whether the single- or both-predictor model was used (@fig-R2). *Tetrahymena* strains were generally better-fitting but still without substantial model support. In the cyanobacteria system, the treatments without atrazine were substantially better-fitting than those with atrazine added (@fig-R2). Additionally, while the goodness-of-fit of the growth predictions were only marginally improved by the addition of the full model, the trait change predictions were greatly improved by including the full model.

@@ -12,6 +12,18 @@ capitalise <- function(string) {
   string
 }
 
+tag_facet <- function(p, open = "(", close = ")", tag_pool = letters, x = -Inf,
+    y = Inf, hjust = -0.5, vjust = 1.5, fontface = 2, family = "", ...) {
+    gb <- ggplot_build(p)
+    lay <- gb$layout$layout
+    tags <- cbind(
+        lay, label = paste0(open, tag_pool[lay$PANEL], close), x = x, y = y)
+    p + geom_text(
+        data = tags, aes_string(x = "x", y = "y", label = "label"), ...,
+        hjust = hjust, vjust = vjust, fontface = fontface, family = family,
+        inherit.aes = FALSE)
+}
+
 pch_map <- c(
     "Spiro_C" = 0, "Spiro_D" = 5,
     "Tetra_1" = 2, "Tetra_2" = 6,
@@ -57,7 +69,7 @@ for (model_system in c("cilia", "cyano")) {
             strip.placement.y = "outside",
             strip.background.y = element_rect(fill = NA, color = NA))
 
-    
+    p <- tag_facet(p)
 
     if (model_system == "cyano") {
         ggsave(paste0(outpath, "pop-traits-time.png"),
@@ -82,6 +94,8 @@ for (model_system in c("cilia", "cyano")) {
             y = "PCGR",
             col = "Treatment")
 
+    p <- tag_facet(p)
+
     if (model_system == "cyano") {
         ggsave(paste0(outpath, "pcgr.pdf"),
             width = 5, height = 4, device = "pdf")
@@ -105,6 +119,8 @@ for (model_system in c("cilia", "cyano")) {
             y = "Trait change",
             col = "Treatment")
 
+    p <- tag_facet(p)
+
     if (model_system == "cyano") {
         ggsave(paste0(outpath, "dT.pdf"),
             width = 5, height = 4, device = "pdf")
@@ -127,6 +143,8 @@ for (model_system in c("cilia", "cyano")) {
         labs(x = expression(paste("log"[10], " density")),
             y = "Trait value",
             col = "Treatment")
+
+    p <- tag_facet(p)
 
     if (model_system == "cyano") {
         ggsave(paste0(outpath, "corr.pdf"),
@@ -156,7 +174,6 @@ stats_result <- modelling(
             "Conf. Int." = confint(model),
             "Pr(>|t|)" = summary(model)$coefficients[, "Pr(>|t|)"]
             )),
-        # intrinsic_growth = model_summary["(Intercept)", "Pr(>|t|)"],
         obs_pred = list(tibble(
             obs = model$model[, 1],
             pred = model$fitted.values,
@@ -176,7 +193,7 @@ stats_result <- modelling(
 print("Created statistics")
 
 # create bars to better separate strains
-vline_pos <- (1.5):(length(unique(stats_result$strain)) - 0.5)
+vline_pos <- (0.5):(length(unique(stats_result$strain)) - 0.5)
 
 # Plot the PCA variance explained
 p <- ggplot(stats_result) +
@@ -190,7 +207,7 @@ p <- ggplot(stats_result) +
         aes(x = 2, y = pca_varexp, yintercept = after_stat(y)),
         geom = "hline", lty = 2) +
     geom_bar(stat = "identity", position = "dodge", width = 0.75) +
-    labs(y = "Variance explained by\nfirst principal component",
+    labs(y = "Proportion of variance explained by\nfirst principal component",
         x = "Strain",
         fill = "Treatment") +
     theme_bw() +
@@ -222,7 +239,8 @@ p <- ggplot(stats_result) +
         aes(x = 2, y = R2, yintercept = after_stat(y)),
         geom = "hline", lty = 2) +
     geom_bar(stat = "identity", position = "dodge", width = 0.75) +
-    geom_hline(yintercept = c(0, 1)) +
+    geom_hline(yintercept = 0, col = "black") +
+    geom_hline(yintercept = 1, col = "grey46") +
     facet_grid2(response + predictor ~ system, scales = "free",
         labeller = labeller(.default = capitalise), space = "free_x",
         strip = strip_nested()) +
@@ -233,6 +251,8 @@ p <- ggplot(stats_result) +
     labs(y = expression("R "^2),
         x = "Strain",
         fill = "Treatment")
+
+p <- tag_facet(p)
 
 ggsave("figures/R2.pdf", p, width = 5, height = 6, device = "pdf")
 
@@ -251,24 +271,32 @@ p <- ggplot(data_preds) +
     aes(x = obs, y = pred, col = treat, pch = strain) +
     geom_point(alpha = 0.5, size = 0.5) +
     geom_smooth(method = "lm", se = FALSE, lwd = 0.5, formula = "y ~ x") +
-    facet_nested(system + predictor ~ response, scales = "free",
+    facet_nested(response ~ system + predictor, scales = "free", switch = "y",
         labeller = labeller(.default = capitalise), independent = TRUE) +
     geom_abline(slope = 1, intercept = 0) +
     labs(x = "Observed value",
         y = "Predicted value",
         pch = "Strain",
         col = "Treatment") +
+    theme(strip.placement.y = "outside",
+	    strip.background.y = element_blank(),
+        strip.text.y = element_text(colour = "black")) +
     guides(pch = guide_legend(override.aes = list(size = 2, alpha = 1)),
         col = guide_legend(override.aes = list(size = 1.5, alpha = 1)))
 
-ggsave("figures/growth_dtrait.pdf", p, width = 5, height = 6.25, device = "pdf")
+p <- tag_facet(p)
+
+pdf("figures/growth_dtrait.pdf", width = 4.5, height = 9)
+grid::pushViewport(grid::viewport(name = "rotate", angle = 270, width = 2, height = 0.5))
+print(p, vp = "rotate")
+dev.off()
 
 print(paste("Saved", model_system, "obs. vs pred. plots"))
     
 # Now error plot
 data_synth <- data_preds %>%
     group_by(system, strain, treat, response, predictor) %>%
-    summarise(error = sum(error), aic = first(aic)) %>%
+    summarise(error = sum(error), aic = first(aic), pca_varexp = first(pca_varexp)) %>%
     pivot_wider(names_from = predictor, values_from = error:aic) %>%
     rowwise %>%
     mutate(delta_error = (error_augmented - error_single) / error_single,
@@ -300,6 +328,8 @@ p <- ggplot(data_synth) +
         panel.grid.minor = element_blank(),
         axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
+p <- tag_facet(p)
+
 ggsave("figures/delta_error.pdf", p, width = 4.5, height = 4, device = "pdf")
 
 print(paste("Saved", model_system, "delta error plots"))
@@ -320,7 +350,8 @@ p <- ggplot(data_synth) +
         geom = "hline", lty = 2) +
     geom_bar(stat = "identity", position = "dodge", width = 0.75) +
     # stat_summary(geom = "hline", fun. = "mean") +
-    geom_hline(yintercept = c(0, 1)) +
+    geom_hline(yintercept = 0, col = "black") +
+    geom_hline(yintercept = 1, col = "grey46") +
     facet_grid2(response ~ system, labeller = labeller(.default = capitalise),
         scales = "free_x", space = "free_x") +
     labs(x = "Strain",
@@ -330,6 +361,8 @@ p <- ggplot(data_synth) +
         panel.grid.minor = element_blank(),
     axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
     )
+
+p <- tag_facet(p)
 
 ggsave("figures/AIC.pdf", width = 6, height = 4, device = "pdf")
 
@@ -343,7 +376,7 @@ p <- ggplot(data_synth) +
     scale_y_continuous(labels = scales::percent) +
     scale_fill_manual(values = cbPalette) +
     geom_hline(yintercept = 0) +
-    geom_point(size = 2) +
+    geom_point(size = 2, stroke = 1.5) +
     facet_grid2(response ~ system, labeller = labeller(.default = capitalise)) +
     labs(pch = "Strain",
         y = "Predictive accuracy difference",
@@ -351,8 +384,10 @@ p <- ggplot(data_synth) +
         x = "Probability that augmented model is best") +
     # theme(legend.position = "bottom", legend.box = "vertical") +
     pch_merged +
-    guides(pch = guide_legend(override.aes = list(size = 2, alpha = 1)),
+    guides(pch = guide_legend(override.aes = list(size = 2, alpha = 1, stroke = 0.5)),
         col = guide_legend(override.aes = list(size = 1.5, alpha = 1)))
+
+p <- tag_facet(p)
 
 ggsave("figures/AIC_deltaerror.pdf", p, width = 6, height = 4.75, device = "pdf")
 
@@ -371,7 +406,7 @@ stats_coef <- stats_result %>%
 
 # coefficient values and significance
 plotCoef <- function(dat) {
-    ggplot(dat) +
+    p <- ggplot(dat) +
         aes(y = strain, x = estimate, col = treat) +
         geom_abline(intercept = 0, slope = 1e16) +
         geom_point(shape = 1, size = 3,
@@ -390,7 +425,8 @@ plotCoef <- function(dat) {
         # theme(axis.text.x = element_text(angle = 90)) +
         labs(x = "Estimate", y = "Strain", col = "Treatment") +
         theme_bw() +
-        scale_colour_manual(values = cbPalette)
+        scale_colour_manual(values = cbPalette) 
+    # p <- tag_facet(p)
 }
 
 # ciliate plot
@@ -401,3 +437,30 @@ p <- plotCoef(subset(stats_coef, system == "Cyanobacteria"))
 ggsave("figures/cyano_td_general.pdf", width = 6.5, height = 7.5)
 
 print(paste("Saved", model_system, "model coefficient plots"))
+
+# varexp vs predictive acc
+p <- data_synth %>%
+    ggplot() +
+        aes(x = pca_varexp, y = -delta_error) +
+        theme_bw() +
+        # scale_x_log10() +
+        scale_color_manual(values = cbPalette) +
+        scale_y_continuous(labels = scales::percent) +
+        geom_hline(yintercept = 0) +
+        geom_point(aes(col = treat, pch = strain), size = 2) +
+        geom_smooth(aes(col = treat), method = "lm", se = FALSE) +
+        # geom_smooth(method = "lm") +
+        facet_grid2(response ~ .,
+            labeller = labeller(.rows = label_both, .default = capitalise)) +
+        # facet_grid2(. ~ system, labeller = labeller(.default = capitalise)) +
+        pch_merged +
+        guides(pch = guide_legend(override.aes = list(size = 2, alpha = 1)),
+            col = guide_legend(override.aes = list(size = 1.5, alpha = 1))) +
+        labs(
+            x = "Proportion of variance explained by\nfirst principal component",
+            y = "Predictive accuracy difference",
+            col = "Treatment", pch = "Strain")
+
+p <- tag_facet(p)
+
+ggsave("figures/varexp_deltaerror.pdf", width = 4, height = 5)

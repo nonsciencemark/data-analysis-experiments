@@ -126,6 +126,7 @@
 \floatplacement{table}{H}
 \setlength{\parindent}{20pt}
 
+
 % \newcommand{\beginsupplement}{
 %   \setcounter{table}{0}  
 %   \renewcommand{\thetable}{S\arabic{table}} 
@@ -139,7 +140,7 @@
 \definecolor{main}{HTML}{5989cf}    % setting main color to be used
 \definecolor{sub}{HTML}{cde4ff}     % setting sub color to be used
 
-\usepackage{pdflscape}
+\usepackage{lscape}
 \newcommand{\blandscape}{\begin{landscape}}
 \newcommand{\elandscape}{\end{landscape}}
 
@@ -369,7 +370,9 @@ phylogenetically due to the frequency of horizontal gene transfer events
 \citeproc{ref-Dvorak2015}{Dvořák et al. 2015};
 \citeproc{ref-Zhaxybayeva2006}{Zhaxybayeva et al. 2006}). Both taxa are
 commonly-used as model organisms in experiments due to their rapid
-growth and relative simplicity.
+growth and relative simplicity. The \emph{Synechococcus} strains were
+obtained from the Roscoff Culture Collection, while the ciliate strains
+were isolated from existing cultures in PETCHEY AND PENNEKAMP .
 
 The ciliate strains selected exhibit substantial diversity in their
 functional traits and demography - \emph{Spirostomum} is a large,
@@ -518,30 +521,6 @@ CyanoFilter and PeacoQC packages in R version 2.3.1
 \citeproc{ref-PeacoQC}{Emmaneel 2022}; \citeproc{ref-RCoreTeam2023}{R
 Core Team 2023}).
 
-\paragraph{Replication statement}\label{replication-statement}
-
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1622}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4324}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4054}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Scale of inference}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Scale at which the factor of interest is applied}
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Number of replicates at the appropriate scale}
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-Phytoplankton strain populations & 6 mL microcosms & 4 strains, 4
-treatments, 3 replicates of each combination \\
-Ciliate strain populations & 100 mL microcosms & 7 strains, 4
-treatments, 1 replicate of each combination \\
-\end{longtable}
-
 \subsubsection{Analyses}\label{analyses}
 
 The objectives of our analyses were to investigate whether we could best
@@ -558,8 +537,7 @@ eliminates the impact of trait covariance and collinearity, and ensures
 that trait information is represented by a single variable, as is
 population density. We use only the first component of this PCA to
 represent the traits, which contains most of the explained variance
-(Figure~\ref{fig-cilia-PC-var-explained},
-Figure~\ref{fig-cyano-PC-var-explained}).
+(Figure~\ref{fig-PC-var-explained}, Figure~\ref{fig-PC-var-explained}).
 
 We calculated, for all combinations of strains and environmental
 conditions, the growth rate at each time point,
@@ -622,126 +600,29 @@ single-variable model, using the coefficient of determination
 
 \subsection{Results}\label{sec-DAE_results}
 
-\subsubsection{Growth and trait change}\label{growth-and-trait-change}
+\subsubsection{Observed vs predicted trait and population
+change}\label{observed-vs-predicted-trait-and-population-change}
 
-The ciliate populations grew logistically in all conditions, approaching
-a roughly stable state by the end of the experiment
-(Figure~\ref{fig-cilia-pop-traits-time}). The final population densities
-differed greatly between genera, with \emph{Tetrahymena} reaching
-densities an order of magnitude greater than the others.
-
-\begin{figure}
-
-\centering{
-
-\includegraphics[width=6in,height=\textheight]{figures/cilia/cilia_pop-traits-time.png}
-
-}
-
-\caption{\label{fig-cilia-pop-traits-time}Log-transformed populations
-and trait changes over time for the ciliate system. The traits show the
-mean values in the sampled population at each time point. Size indicates
-the top-down area of the cell in \textmu\(\mathrm{m}^{2}\). Speed
-indicates the average movement speed in \textmu\(\mathrm{m \, s}^{-1}\).
-Aspect ratio is the ratio of the longest cell dimension relative to the
-shortest. Linearity indicates the cell movement linearity i.e.~a value
-of 1 is perfectly linear while a value of 0 is Brownian motion. Trait
-indicates the aggregate trait - the first axis of a PCA fitted across
-the four measured traits for each strain and treatment combination.}
-
-\end{figure}%
-
-The cyanobacteria populations grew logistically in the control and
-temperature treatments, but maintained stable or slightly-decreased
-populations in the atrazine and atrazine-temperature treatments
-(Figure~\ref{fig-cyano-pop-traits-time}).
+We first compare the observed changes in traits and population densities
+to the predicted changes using either the single-predictor model or the
+model augmented with both predictor variables
+(Figure~\ref{fig-growth-dtrait}).
 
 \begin{figure}
 
 \centering{
 
-\includegraphics[width=5in,height=\textheight]{figures/cyano/cyano_pop-traits-time.png}
+\includegraphics{figures/growth_dtrait.pdf}
 
 }
 
-\caption{\label{fig-cyano-pop-traits-time}Log-transformed populations
-and trait changes over time for the ciliate system. The traits show the
-mean values in the sampled population at each time point. Measured
-traits (size, chlorophyll, phycocyanin, and phycoerythrin) are expressed
-in arbitrary units. Size is proportional to the cell diameter, and the
-three pigment channels are defined by their excitation and fluorescence
-(see supporting information). Trait indicates the aggregate trait - the
-first axis of a PCA fitted across the four measured traits for each
-strain and treatment combination.}
+\caption{\label{fig-growth-dtrait}Observed (x-axis) and predicted
+(y-axis) population growth (left column) and trait change (left column),
+including either one (top row) or both predictors (bottom row), for
+various strains (point types) of ciliates (top) and cyanobacteria
+(bottom) and across environmental conditions (colours).}
 
 \end{figure}%
-
-Individual traits (and therefore the aggregate trait) changed
-substantially throughout the experiment for both the ciliate and
-cyanobacteria systems (Figure~\ref{fig-cilia-pop-traits-time},
-Figure~\ref{fig-cyano-pop-traits-time}). These aggregate traits also
-contained the majority of the trait variation, and well-summarised the
-four functional traits of each study system into a single variable
-(Figure~\ref{fig-cilia-PC-var-explained},
-Figure~\ref{fig-cyano-PC-var-explained})
-
-\begin{figure}
-
-\centering{
-
-\includegraphics{figures/cilia/cilia_PC_var_explained.pdf}
-
-}
-
-\caption{\label{fig-cilia-PC-var-explained}The amount of variance
-explained by the first component of the PCA for the ciliate system.
-These values indicate how much information is kept when the traits are
-combined into a single aggregate trait. The horizontal dashed line
-indicates the mean explained variance across all strains and treatments
-(\(53.6\%\)).}
-
-\end{figure}%
-
-\begin{figure}
-
-\centering{
-
-\includegraphics{figures/cyano/cyano_PC_var_explained.pdf}
-
-}
-
-\caption{\label{fig-cyano-PC-var-explained}The amount of variance
-explained by the first component of the PCA for the cyanobacteria
-system. As in Figure~\ref{fig-cilia-PC-var-explained}, these values
-indicate how much information is kept when the traits are combined into
-a single aggregate trait. The horizontal dashed line indicates the mean
-explained variance across all strains and treatments (\(79.5\%\)).}
-
-\end{figure}%
-
-Populations of both systems exhibited mostly nonzero intrinsic growth
-and negative density-dependence (Figure~\ref{fig-cilia-td-general},
-Figure~\ref{fig-cyano-td-general}). Intrinsic growth rates of
-\emph{Tetrahymena} strains were consistently higher than that of the
-other strains and \emph{Spirostomum} strains exhibited stronger negative
-density-dependence (i.e.~stronger self-limitation). Environmental
-conditions had moderate and variable effects on how ciliate populations
-grew. In the cyanobacteria system, intrinsic growth and
-density-dependence were comparable across strains
-(Figure~\ref{fig-cyano-pcgr}). However, environmental conditions had
-greater effects on these parameters; the addition of atrazine
-substantially reduced intrinsic growth rates (to the point of being
-negative in cases).
-
-The traits of both systems exhibited generally negative trait-dependence
-(Figure~\ref{fig-cilia-td-general}, Figure~\ref{fig-cyano-td-general}).
-In the ciliate system, intrinsic trait change
-(Figure~\ref{fig-cilia-dT}) was generally not significantly different
-from zero, but estimates varied across environmental conditions in
-\emph{Tetrahymena} strains. The trait-dependence of trait change in
-ciliates was also strongest for these strains. In the cyanobacteria
-system, intrinsic trait change was often significantly different from
-zero and mostly positive (Figure~\ref{fig-cyano-growth-dtrait}).
 
 \subsubsection{Model selection}\label{model-selection}
 
@@ -749,13 +630,13 @@ zero and mostly positive (Figure~\ref{fig-cyano-growth-dtrait}).
 
 \centering{
 
-\includegraphics{figures/cilia/cilia_AIC.pdf}
+\includegraphics{figures/AIC.pdf}
 
 }
 
-\caption{\label{fig-cilia-AIC}Differences in model performance when
-adding traits or density to predict growth (top panel) or trait change
-(bottom panel) different cilia strains (x-axis) in different treatments
+\caption{\label{fig-AIC}Differences in model performance when adding
+traits or density to predict growth (top panel) or trait change (bottom
+panel) different cilia strains (x-axis) in different treatments
 (colour). The mean values across strains and treatments are shown by the
 horizontal dashed lines. Values greater than 0.5 indicate that the full
 model is likely to be better, values less than 0.5 indicate that the
@@ -766,76 +647,48 @@ indicate that the two models are approximately equal.}
 
 In the ciliate system, using the augmented model (including both traits
 and population densities) to predict growth/trait change generally did
-not improve predictions (Figure~\ref{fig-cilia-AIC-deltaerror}). For
+not improve predictions (Figure~\ref{fig-AIC-deltaerror}). For
 predictions of growth, only in a few cases (particularly
 \emph{Tetrahymena} strains and \emph{Loxocephalus} 1) was the augmented
 model more likely in some environmental conditions. Predictions of trait
 change with the augmented model were even less likely to outperform the
 trait-only model.
 
-\begin{figure}
-
-\centering{
-
-\includegraphics{figures/cyano/cyano_AIC.pdf}
-
-}
-
-\caption{\label{fig-cyano-AIC}As Figure~\ref{fig-cilia-AIC} but for the
-cyanobacteria system.}
-
-\end{figure}%
-
 In the cyanobacteria system, for treatments without atrazine, the
 augmented models were generally notably better at predicting the system
-dynamics (Figure~\ref{fig-cyano-AIC}). For predictions of population
-growth, the augmented model was generally likely to best describe the
-data, with some exceptions in which the added trait data provided no
-benefit to predictions. For predictions of trait change, the augmented
-model was more likely to be better, with only some cases in the
-treatments with atrazine where it failed to improve the predictive
-ability.
+dynamics (Figure~\ref{fig-AIC}). For predictions of population growth,
+the augmented model was generally likely to best describe the data, with
+some exceptions in which the added trait data provided no benefit to
+predictions. For predictions of trait change, the augmented model was
+more likely to be better, with only some cases in the treatments with
+atrazine where it failed to improve the predictive ability.
 
 \begin{figure}
 
 \centering{
 
-\includegraphics[width=4in,height=\textheight]{figures/cilia/cilia_AIC_deltaerror.pdf}
+\includegraphics[width=4in,height=\textheight]{figures/AIC_deltaerror.pdf}
 
 }
 
-\caption{\label{fig-cilia-AIC-deltaerror}Comparing the change in
-predictive accuracy using the augmented model (both population and
-traits) as a response to the probability that the augmented model is
-best for the ciliate system. Model accuracy was calculated using the
-R-squared statistic.}
+\caption{\label{fig-AIC-deltaerror}Comparing the change in predictive
+accuracy using the augmented model (both population and traits) as a
+response to the probability that the augmented model is best for the
+ciliate and cyanobacteria systems. Model accuracy was calculated using
+the R-squared statistic.}
 
 \end{figure}%
 
 In the ciliate system, the probability that the augmented model fitted
 best was more beneficial when making predictions of population growth
-than trait change (Figure~\ref{fig-cilia-AIC-deltaerror}). In other
-words, the cases in which the augmented model was substantially-better
-fitting (e.g.~predictions of growth in \emph{Tetrahymena} 1, control)
-yielded more accurate predictions of population growth than trait
-changes.
-
-\begin{figure}
-
-\centering{
-
-\includegraphics[width=4in,height=\textheight]{figures/cyano/cyano_AIC_deltaerror.pdf}
-
-}
-
-\caption{\label{fig-cyano-AIC-deltaerror}As
-Figure~\ref{fig-cilia-AIC-deltaerror} but for the cyanobacteria system.}
-
-\end{figure}%
+than trait change (Figure~\ref{fig-AIC-deltaerror}). In other words, the
+cases in which the augmented model was substantially-better fitting
+(e.g.~predictions of growth in \emph{Tetrahymena} 1, control) yielded
+more accurate predictions of population growth than trait changes.
 
 In the cyanobacteria system, improvement in predictive accuracy by using
 the augmented model was substantial only when the augmented model was
-near-certain to be the best (Figure~\ref{fig-cyano-AIC-deltaerror}). The
+near-certain to be the best (Figure~\ref{fig-AIC-deltaerror}). The
 augmented model improved predictions of trait change slightly more than
 predictions of population growth.
 
@@ -846,7 +699,7 @@ system-specific, and variation in augmented model performance is
 strongly dependent on environmental conditions. That said, for a large
 number of the cyanobacteria microcosms, particularly in those without
 atrazine added, the augmented model substantially outperforms the
-single-variable model (Figure~\ref{fig-cyano-AIC-deltaerror}).
+single-variable model (Figure~\ref{fig-AIC-deltaerror}).
 
 \subsection{Discussion}\label{sec-DAE_discussion}
 
@@ -869,9 +722,9 @@ is clearly a driving force in these cases as their fitted model
 coefficients were mostly significantly different from zero
 (Figure~\ref{fig-cilia-td-general}) and the augmented model was not
 strongly supported on the basis of Akaike weights
-(Figure~\ref{fig-cilia-AIC}). Trait dynamics were similarly generally
+(Figure~\ref{fig-AIC}). Trait dynamics were similarly generally
 better-described without including population density as a covariate
-(Figure~\ref{fig-cilia-AIC}). While intrinsic trait dynamics are not as
+(Figure~\ref{fig-AIC}). While intrinsic trait dynamics are not as
 well-founded as the equivalent methods in population dynamics
 (i.e.~there are no real equivalents of trait intrinsic growth or
 carrying capacity), this basic linear trait-dependent trait change still
@@ -884,16 +737,16 @@ By contrast, in the cyanobacteria system, the augmented model
 outperformed the population-only model in predicting population dynamics
 more often than not and, in the cases where it did not fit well, the
 population-only model was similarly poorly-fitting
-(Figure~\ref{fig-cyano-R2}). Furthermore, trait dynamics in the
-cyanobacteria system were much more consistently well-described by the
-augmented model. Particularly in the atrazine-free treatments, where the
-augmented model was near-certain to always be better, but even in the
-combined atrazine and temperature (AT) treatments, its performance was
-overall better. Overall, while population is only modestly
-trait-dependent, the trait dynamics are clearly influenced by population
-density. In certain cases, therefore, there is potential for feedbacks
-between populations and traits (e.g.~strain V\_2524 in the control and
-temperature treatments).
+(Figure~\ref{fig-R2}). Furthermore, trait dynamics in the cyanobacteria
+system were much more consistently well-described by the augmented
+model. Particularly in the atrazine-free treatments, where the augmented
+model was near-certain to always be better, but even in the combined
+atrazine and temperature (AT) treatments, its performance was overall
+better. Overall, while population is only modestly trait-dependent, the
+trait dynamics are clearly influenced by population density. In certain
+cases, therefore, there is potential for feedbacks between populations
+and traits (e.g.~strain V\_2524 in the control and temperature
+treatments).
 
 There are several possible explanations for the patterns observed.
 Firstly, while we assess the linear relationships between traits and
@@ -913,8 +766,8 @@ due to differences in the traits measured. Firstly that, in the
 cyanobacteria system, the aggregate trait summarised more of the trait
 information present than in the ciliate system (\(79.5\%\) in the
 cyanobacteria system against the \(53.6\%\) in the ciliate system,
-Figure~\ref{fig-cyano-PC-var-explained} and
-Figure~\ref{fig-cilia-PC-var-explained}). The ciliate traits were more
+Figure~\ref{fig-PC-var-explained} and
+Figure~\ref{fig-PC-var-explained}). The ciliate traits were more
 variable and demonstrated less congruent changes over time
 (Figure~\ref{fig-cilia-pop-traits-time}). Secondly, it may be that the
 cyanobacteria traits are more directly linked to growth than the ciliate
@@ -1215,10 +1068,10 @@ Patel, Swati, Michael H. Cortez, and Sebastian J. Schreiber. 2018.
 
 \bibitem[\citeproctext]{ref-Pennekamp2014}
 Pennekamp, Frank, Katherine A. Mitchell, Alexis Chaine, and Nicolas
-Schtickzelle. 2014. {``Dispersal Propensity in Tetrahymena Thermophila
-Ciliates-a Reaction Norm Perspective.''} \emph{Evolution; International
-Journal of Organic Evolution} 68 (8): 2319--30.
-\url{https://doi.org/10.1111/evo.12428}.
+Schtickzelle. 2014. {``Dispersal {Propensity} in {Tetrahymena}
+Thermophila {Ciliates} - a {Reaction Norm Perspective}.''}
+\emph{Evolution; International Journal of Organic Evolution} 68 (8):
+2319--30. \url{https://doi.org/10.1111/evo.12428}.
 
 \bibitem[\citeproctext]{ref-Pennekamp2013}
 Pennekamp, Frank, and Nicolas Schtickzelle. 2013. {``Implementing Image
@@ -1353,6 +1206,64 @@ Events.''} \emph{Genome Research} 16 (9): 1099--1108.
 
 \section{Supplementary}\label{supplementary}
 
+\subsection{Culture origins}\label{culture-origins}
+
+The ciliate strains were isolated from cultures used for past
+experiments.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1268}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3803}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2676}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2254}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Name
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Strain
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Isolation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Publication
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Tetra\_1 & \emph{Tetrahymena} TSC SD01546 & Pennsylvania, USA &
+Pennekamp et al. (\citeproc{ref-Pennekamp2014}{2014}) \\
+Tetra\_2 & \emph{Tetrahymena} TSC SD01548 & Pennsylvania, USA &
+(\citeproc{ref-pennekamp2014}{\textbf{pennekamp2014?}}) \\
+Loxo\_1 & \emph{Loxocephalus} & & \\
+Loxo\_2 & \emph{Loxocephalus} & & \\
+Para\_4 & \emph{Paramecium} & & \\
+Spiro\_C & \emph{Spirostomum} & & \\
+Spiro\_D & \emph{Spirostomum} & & \\
+\end{longtable}
+
+The cyanobacteria strains were purchased from the Roscoff Culture
+Collection (\url{https://roscoff-culture-collection.org/}) and they are
+referred to throughout using their RCC Number.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2778}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Name / RCC number} & \textbf{Strain} &
+\textbf{\emph{Synechococcus}} \textbf{clade} & \textbf{Pigment type} &
+\textbf{Isolation} \\
+2375 & BL\_10 & Subcluster 5.1 V & 2 & W. Sahara \\
+2434 & RS9906 & Subcluster 5.1 VIII & 1 & Israel \\
+2524 & A15-46 & Subcluster 5.1 V & 2 & Spain \\
+2383 & RS9909 & Subcluster 5.1 VIII & 1 & Israel \\
+\end{longtable}
+
 \subsection{Sampling regime}\label{sec-sampling_times}
 
 \subsubsection{Ciliate}\label{ciliate}
@@ -1376,6 +1287,109 @@ The cyanobacteria microcosms were sampled every day at the same time for
 each microcosm: between 09:00 and 13:00 depending on the population, as
 the sampling procedure took some time. Additionally, each microcosm of
 the cyanobacteria system had three replicates.
+
+\subsubsection{Growth and trait change}\label{growth-and-trait-change}
+
+The ciliate populations grew logistically in all conditions, approaching
+a roughly stable state by the end of the experiment
+(Figure~\ref{fig-cilia-pop-traits-time}). The final population densities
+differed greatly between genera, with \emph{Tetrahymena} reaching
+densities an order of magnitude greater than the others.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=6in,height=\textheight]{figures/cilia/cilia_pop-traits-time.png}
+
+}
+
+\caption{\label{fig-cilia-pop-traits-time}Log-transformed populations
+and trait changes over time for the ciliate system. The traits show the
+mean values in the sampled population at each time point. Size indicates
+the top-down area of the cell in \textmu\(\mathrm{m}^{2}\). Speed
+indicates the average movement speed in \textmu\(\mathrm{m \, s}^{-1}\).
+Aspect ratio is the ratio of the longest cell dimension relative to the
+shortest. Linearity indicates the cell movement linearity i.e.~a value
+of 1 is perfectly linear while a value of 0 is Brownian motion. Trait
+indicates the aggregate trait - the first axis of a PCA fitted across
+the four measured traits for each strain and treatment combination.}
+
+\end{figure}%
+
+The cyanobacteria populations grew logistically in the control and
+temperature treatments, but maintained stable or slightly-decreased
+populations in the atrazine and atrazine-temperature treatments
+(Figure~\ref{fig-cyano-pop-traits-time}).
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=5in,height=\textheight]{figures/cyano/cyano_pop-traits-time.png}
+
+}
+
+\caption{\label{fig-cyano-pop-traits-time}Log-transformed populations
+and trait changes over time for the ciliate system. The traits show the
+mean values in the sampled population at each time point. Measured
+traits (size, chlorophyll, phycocyanin, and phycoerythrin) are expressed
+in arbitrary units. Size is proportional to the cell diameter, and the
+three pigment channels are defined by their excitation and fluorescence
+(see supporting information). Trait indicates the aggregate trait - the
+first axis of a PCA fitted across the four measured traits for each
+strain and treatment combination.}
+
+\end{figure}%
+
+Individual traits (and therefore the aggregate trait) changed
+substantially throughout the experiment for both the ciliate and
+cyanobacteria systems (Figure~\ref{fig-cilia-pop-traits-time},
+Figure~\ref{fig-cyano-pop-traits-time}). These aggregate traits also
+contained the majority of the trait variation, and well-summarised the
+four functional traits of each study system into a single variable
+(Figure~\ref{fig-PC-var-explained}, Figure~\ref{fig-PC-var-explained})
+
+\begin{figure}
+
+\centering{
+
+\includegraphics{figures/PC_var_explained.pdf}
+
+}
+
+\caption{\label{fig-PC-var-explained}The amount of variance explained by
+the first component of the PCA for the ciliate and cyanobacteria
+systems. These values indicate how much information is kept when the
+traits are combined into a single aggregate trait. The horizontal dashed
+line indicates the mean explained variance across all strains and
+treatments (\(53.6\%\)).}
+
+\end{figure}%
+
+Populations of both systems exhibited mostly nonzero intrinsic growth
+and negative density-dependence (Figure~\ref{fig-cilia-td-general},
+Figure~\ref{fig-cyano-td-general}). Intrinsic growth rates of
+\emph{Tetrahymena} strains were consistently higher than that of the
+other strains and \emph{Spirostomum} strains exhibited stronger negative
+density-dependence (i.e.~stronger self-limitation). Environmental
+conditions had moderate and variable effects on how ciliate populations
+grew. In the cyanobacteria system, intrinsic growth and
+density-dependence were comparable across strains
+(Figure~\ref{fig-cyano-pcgr}). However, environmental conditions had
+greater effects on these parameters; the addition of atrazine
+substantially reduced intrinsic growth rates (to the point of being
+negative in cases).
+
+The traits of both systems exhibited generally negative trait-dependence
+(Figure~\ref{fig-cilia-td-general}, Figure~\ref{fig-cyano-td-general}).
+In the ciliate system, intrinsic trait change
+(Figure~\ref{fig-cilia-dT}) was generally not significantly different
+from zero, but estimates varied across environmental conditions in
+\emph{Tetrahymena} strains. The trait-dependence of trait change in
+ciliates was also strongest for these strains. In the cyanobacteria
+system, intrinsic trait change was often significantly different from
+zero and mostly positive (Figure~\ref{fig-growth-dtrait}).
 
 \subsection{Population density and population
 change}\label{population-density-and-population-change}
@@ -1461,9 +1475,9 @@ intrinsic population/trait change (left), density-dependence (centre),
 and trait dependence (right) in seven strains of ciliates. Large rows
 indicate whether growth or trait change is being examined and subrows
 indicate whether the coefficients are from the single-variable or
-augmented model. Points indicate the mean, error bars indicate the
-standard error, and asterisks indicate parameters are significantly
-different from zero (vertical black line).}
+augmented model. Points indicate the mean, error bars indicate the 95\%
+confidence intervals, and asterisks indicate parameters are
+significantly different from zero (vertical black line).}
 
 \end{figure}%
 
@@ -1483,8 +1497,7 @@ cyanobacteria genus \emph{Synechococcus}.}
 
 \end{figure}%
 
-\subsection{Observed vs predicted trait and population
-change}\label{observed-vs-predicted-trait-and-population-change}
+\subsection{Model goodness-of-fit}\label{model-goodness-of-fit}
 
 \subsubsection{Ciliate}\label{ciliate-4}
 
@@ -1492,77 +1505,26 @@ change}\label{observed-vs-predicted-trait-and-population-change}
 
 \centering{
 
-\includegraphics{figures/cilia/cilia_growth_dtrait.pdf}
+\includegraphics{figures/R2.pdf}
 
 }
 
-\caption{\label{fig-cilia-growth-dtrait}Observed (x-axis) and predicted
-(y-axis) population growth (left column) and trait change (left column),
-including either one (top row) or both predictors (bottom row), for
-various strains (point types) of ciliates and across environmental
-conditions (colours).}
-
-\end{figure}%
-
-\subsubsection{Cyanobacteria}\label{cyanobacteria-4}
-
-\begin{figure}
-
-\centering{
-
-\includegraphics{figures/cyano/cyano_growth_dtrait.pdf}
-
-}
-
-\caption{\label{fig-cyano-growth-dtrait}As
-Figure~\ref{fig-cilia-growth-dtrait} but for the cyanobacteria system.}
-
-\end{figure}%
-
-\subsection{Model goodness-of-fit}\label{model-goodness-of-fit}
-
-\subsubsection{Ciliate}\label{ciliate-5}
-
-\begin{figure}
-
-\centering{
-
-\includegraphics{figures/cilia/cilia_R2.pdf}
-
-}
-
-\caption{\label{fig-cilia-R2}The coefficient of determination i.e.,
-r-squared, for the cilia system models. The mean values across strains
-and treatments are shown by the horizontal dashed lines.}
-
-\end{figure}%
-
-\subsubsection{Cyanobacteria}\label{cyanobacteria-5}
-
-\begin{figure}
-
-\centering{
-
-\includegraphics{figures/cyano/cyano_R2.pdf}
-
-}
-
-\caption{\label{fig-cyano-R2}As Figure~\ref{fig-cilia-R2} but for the
-cyanobacteria system.}
+\caption{\label{fig-R2}The coefficient of determination i.e., r-squared,
+for the cilia and cyanobacteria system models. The mean values across
+strains and treatments are shown by the horizontal dashed lines.}
 
 \end{figure}%
 
 In the ciliate system, the \(R^2\) of the model fit was generally below
 0.5 for both growth and trait changes for all treatments and was
 generally unaffected by whether the single- or both-predictor model was
-used (Figure~\ref{fig-cilia-R2}). \emph{Tetrahymena} strains were
-generally better-fitting but still without substantial model support. In
-the cyanobacteria system, the treatments without atrazine were
-substantially better-fitting than those with atrazine added
-(Figure~\ref{fig-cyano-R2}). Additionally, while the goodness-of-fit of
-the growth predictions were only marginally improved by the addition of
-the full model, the trait change predictions were greatly improved by
-including the full model.
+used (Figure~\ref{fig-R2}). \emph{Tetrahymena} strains were generally
+better-fitting but still without substantial model support. In the
+cyanobacteria system, the treatments without atrazine were substantially
+better-fitting than those with atrazine added (Figure~\ref{fig-R2}).
+Additionally, while the goodness-of-fit of the growth predictions were
+only marginally improved by the addition of the full model, the trait
+change predictions were greatly improved by including the full model.
 
 
 
