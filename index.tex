@@ -126,13 +126,12 @@
 \floatplacement{table}{H}
 \setlength{\parindent}{20pt}
 
-
-% \newcommand{\beginsupplement}{
-%   \setcounter{table}{0}  
-%   \renewcommand{\thetable}{S\arabic{table}} 
-%   \setcounter{figure}{0} 
-%   \renewcommand{\thefigure}{S\arabic{figure}}
-% }
+\newcommand{\beginsupplement}{
+  \setcounter{table}{0}  
+  \renewcommand{\thetable}{S\arabic{table}} 
+  \setcounter{figure}{0} 
+  \renewcommand{\thefigure}{S\arabic{figure}}
+}
 
 \usepackage[many]{tcolorbox}    	% for COLORED BOXES (tikz and xcolor included)
 \usepackage{multicol}               % for MULTICOLUMNS
@@ -344,9 +343,7 @@ substantial.
 
 \subsection{Materials and Methods}\label{sec-DAE_methods}
 
-\subsubsection{Experiments}\label{experiments}
-
-\paragraph{Study systems}\label{study-systems}
+\subsubsection{Study systems}\label{study-systems}
 
 We addressed these research questions using a number of unicellular,
 clonally-reproducing strains from two model systems: seven strains from
@@ -432,7 +429,7 @@ Cyanobacteria & \(10\) & \(4\) & \(\mathbf{22}, 24\) &
 \(\mathbf{0}, 0.1\) \\
 \end{longtable}
 
-\paragraph{Experimental setup}\label{experimental-setup}
+\subsubsection{Experimental setup}\label{experimental-setup}
 
 For the ciliate system, the microcosms consisted of 250 mL square
 bottles with vented caps (DURAN®) containing 100 mL nutrient medium,
@@ -467,7 +464,8 @@ and microcosms were kept at a constant temperature throughout. All
 sampling was undertaken in sterile environments to prevent
 contamination.
 
-\paragraph{Sampling procedure}\label{sampling-procedure}
+\subsubsection{Experimental sampling
+procedure}\label{experimental-sampling-procedure}
 
 Population densities and traits were measured using procedures
 specifically designed for each species: imaging for ciliates and flow
@@ -1204,7 +1202,11 @@ Events.''} \emph{Genome Research} 16 (9): 1099--1108.
 
 \newpage{}
 
+\beginsupplement
+
 \section{Supplementary}\label{supplementary}
+
+\singlespacing
 
 \subsection{Culture origins}\label{culture-origins}
 
@@ -1218,13 +1220,13 @@ experiments.
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2254}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
-Name
+\textbf{Name}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Strain
+\textbf{Strain}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Isolation
+\textbf{Isolation}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Publication
+\textbf{Publication}
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
@@ -1233,7 +1235,7 @@ Publication
 Tetra\_1 & \emph{Tetrahymena} TSC SD01546 & Pennsylvania, USA &
 Pennekamp et al. (\citeproc{ref-Pennekamp2014}{2014}) \\
 Tetra\_2 & \emph{Tetrahymena} TSC SD01548 & Pennsylvania, USA &
-(\citeproc{ref-pennekamp2014}{\textbf{pennekamp2014?}}) \\
+Pennekamp et al. (\citeproc{ref-Pennekamp2014}{2014}) \\
 Loxo\_1 & \emph{Loxocephalus} & & \\
 Loxo\_2 & \emph{Loxocephalus} & & \\
 Para\_4 & \emph{Paramecium} & & \\
@@ -1252,12 +1254,21 @@ referred to throughout using their RCC Number.
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1806}}@{}}
 \toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Name / RCC number}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Strain}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{\emph{Synechococcus}} \textbf{clade}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Pigment type}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{Isolation}
+\end{minipage} \\
+\midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-\textbf{Name / RCC number} & \textbf{Strain} &
-\textbf{\emph{Synechococcus}} \textbf{clade} & \textbf{Pigment type} &
-\textbf{Isolation} \\
 2375 & BL\_10 & Subcluster 5.1 V & 2 & W. Sahara \\
 2434 & RS9906 & Subcluster 5.1 VIII & 1 & Israel \\
 2524 & A15-46 & Subcluster 5.1 V & 2 & Spain \\
@@ -1300,7 +1311,7 @@ densities an order of magnitude greater than the others.
 
 \centering{
 
-\includegraphics[width=6in,height=\textheight]{figures/cilia/cilia_pop-traits-time.png}
+\includegraphics[width=6in,height=\textheight]{figures/cilia_pop-traits-time.png}
 
 }
 
@@ -1326,7 +1337,7 @@ populations in the atrazine and atrazine-temperature treatments
 
 \centering{
 
-\includegraphics[width=5in,height=\textheight]{figures/cyano/cyano_pop-traits-time.png}
+\includegraphics[width=5in,height=\textheight]{figures/cyano_pop-traits-time.png}
 
 }
 
@@ -1400,7 +1411,7 @@ change}\label{population-density-and-population-change}
 
 \centering{
 
-\includegraphics[width=4in,height=\textheight]{figures/cilia/cilia_pcgr.pdf}
+\includegraphics[width=4in,height=\textheight]{figures/cilia_pcgr.pdf}
 
 }
 
@@ -1415,7 +1426,7 @@ growth rate in the different treatments.}
 
 \centering{
 
-\includegraphics[width=4in,height=\textheight]{figures/cyano/cyano_pcgr.pdf}
+\includegraphics[width=4in,height=\textheight]{figures/cyano_pcgr.pdf}
 
 }
 
@@ -1433,7 +1444,7 @@ change}\label{trait-values-and-trait-change}
 
 \centering{
 
-\includegraphics[width=4in,height=\textheight]{figures/cilia/cilia_dT.pdf}
+\includegraphics[width=4in,height=\textheight]{figures/cilia_dT.pdf}
 
 }
 
@@ -1448,7 +1459,7 @@ the different treatments.}
 
 \centering{
 
-\includegraphics[width=4in,height=\textheight]{figures/cyano/cyano_dT.pdf}
+\includegraphics[width=4in,height=\textheight]{figures/cyano_dT.pdf}
 
 }
 
@@ -1466,7 +1477,7 @@ coefficients}\label{fitted-regression-coefficients}
 
 \centering{
 
-\includegraphics[width=4in,height=\textheight]{figures/cilia/cilia_td_general.pdf}
+\includegraphics[width=4in,height=\textheight]{figures/cilia_td_general.pdf}
 
 }
 
@@ -1487,7 +1498,7 @@ significantly different from zero (vertical black line).}
 
 \centering{
 
-\includegraphics[width=4in,height=\textheight]{figures/cyano/cyano_td_general.pdf}
+\includegraphics[width=4in,height=\textheight]{figures/cyano_td_general.pdf}
 
 }
 

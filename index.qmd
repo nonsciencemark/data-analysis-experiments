@@ -30,6 +30,8 @@ format:
 
 {{< pagebreak >}}
 
+\beginsupplement
+
 # Supplementary
 
 {{< include supplementary.qmd >}}

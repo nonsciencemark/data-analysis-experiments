@@ -7,21 +7,23 @@ format:
     # fontfamily: libertinus
     # fontfamilyoptions: sans
     toc: false
-    keep-tex: true
+    keep-tex: false
     colorlinks: true
     number-sections: false
     # output-file: manuscript.pdf
 bibliography: bibliography_new.bib
 ---
 
+\singlespacing
+
 ## Culture origins
 
 The ciliate strains were isolated from cultures used for past experiments.
 
-| Name    | Strain                    | Isolation         | Publication    |
+| **Name**    | **Strain**                    | **Isolation**         | **Publication**    |
 |---------|---------------------------|-------------------|----------------|
 | Tetra_1 | *Tetrahymena* TSC SD01546 | Pennsylvania, USA | @Pennekamp2014 |
-| Tetra_2 | *Tetrahymena* TSC SD01548 | Pennsylvania, USA | @pennekamp2014 |
+| Tetra_2 | *Tetrahymena* TSC SD01548 | Pennsylvania, USA | @Pennekamp2014 |
 | Loxo_1  | *Loxocephalus*            |                   |                |
 | Loxo_2  | *Loxocephalus*            |                   |                |
 | Para_4  | *Paramecium*              |                   |                |
@@ -30,9 +32,8 @@ The ciliate strains were isolated from cultures used for past experiments.
 
 The cyanobacteria strains were purchased from the Roscoff Culture Collection (<https://roscoff-culture-collection.org/>) and they are referred to throughout using their RCC Number.
 
-|                       |            |                               |                  |               |
-|--------------------|-------------|-------------|-------------|-------------|
 | **Name / RCC number** | **Strain** | ***Synechococcus*** **clade** | **Pigment type** | **Isolation** |
+|--------------------|-------------|-------------|-------------|-------------|
 | 2375                  | BL_10      | Subcluster 5.1 V              | 2                | W. Sahara     |
 | 2434                  | RS9906     | Subcluster 5.1 VIII           | 1                | Israel        |
 | 2524                  | A15-46     | Subcluster 5.1 V              | 2                | Spain         |
@@ -52,11 +53,11 @@ The cyanobacteria microcosms were sampled every day at the same time for each mi
 
 The ciliate populations grew logistically in all conditions, approaching a roughly stable state by the end of the experiment (@fig-cilia-pop-traits-time). The final population densities differed greatly between genera, with *Tetrahymena* reaching densities an order of magnitude greater than the others.
 
-![Log-transformed populations and trait changes over time for the ciliate system. The traits show the mean values in the sampled population at each time point. Size indicates the top-down area of the cell in \textmu$\mathrm{m}^{2}$. Speed indicates the average movement speed in \textmu$\mathrm{m \, s}^{-1}$. Aspect ratio is the ratio of the longest cell dimension relative to the shortest. Linearity indicates the cell movement linearity i.e. a value of 1 is perfectly linear while a value of 0 is Brownian motion. Trait indicates the aggregate trait - the first axis of a PCA fitted across the four measured traits for each strain and treatment combination.](figures/cilia/cilia_pop-traits-time.png){#fig-cilia-pop-traits-time width="6in"}
+![Log-transformed populations and trait changes over time for the ciliate system. The traits show the mean values in the sampled population at each time point. Size indicates the top-down area of the cell in \textmu$\mathrm{m}^{2}$. Speed indicates the average movement speed in \textmu$\mathrm{m \, s}^{-1}$. Aspect ratio is the ratio of the longest cell dimension relative to the shortest. Linearity indicates the cell movement linearity i.e. a value of 1 is perfectly linear while a value of 0 is Brownian motion. Trait indicates the aggregate trait - the first axis of a PCA fitted across the four measured traits for each strain and treatment combination.](figures/cilia_pop-traits-time.png){#fig-cilia-pop-traits-time width="6in"}
 
 The cyanobacteria populations grew logistically in the control and temperature treatments, but maintained stable or slightly-decreased populations in the atrazine and atrazine-temperature treatments (@fig-cyano-pop-traits-time).
 
-![Log-transformed populations and trait changes over time for the ciliate system. The traits show the mean values in the sampled population at each time point. Measured traits (size, chlorophyll, phycocyanin, and phycoerythrin) are expressed in arbitrary units. Size is proportional to the cell diameter, and the three pigment channels are defined by their excitation and fluorescence (see supporting information). Trait indicates the aggregate trait - the first axis of a PCA fitted across the four measured traits for each strain and treatment combination.](figures/cyano/cyano_pop-traits-time.png){#fig-cyano-pop-traits-time width="5in"}
+![Log-transformed populations and trait changes over time for the ciliate system. The traits show the mean values in the sampled population at each time point. Measured traits (size, chlorophyll, phycocyanin, and phycoerythrin) are expressed in arbitrary units. Size is proportional to the cell diameter, and the three pigment channels are defined by their excitation and fluorescence (see supporting information). Trait indicates the aggregate trait - the first axis of a PCA fitted across the four measured traits for each strain and treatment combination.](figures/cyano_pop-traits-time.png){#fig-cyano-pop-traits-time width="5in"}
 
 Individual traits (and therefore the aggregate trait) changed substantially throughout the experiment for both the ciliate and cyanobacteria systems (@fig-cilia-pop-traits-time, @fig-cyano-pop-traits-time). These aggregate traits also contained the majority of the trait variation, and well-summarised the four functional traits of each study system into a single variable (@fig-PC-var-explained, @fig-PC-var-explained)
 
@@ -70,31 +71,31 @@ The traits of both systems exhibited generally negative trait-dependence (@fig-c
 
 ### Ciliate
 
-![Density-dependence of ciliate per-capita growth rate in the different treatments.](figures/cilia/cilia_pcgr.pdf){#fig-cilia-pcgr width="4in"}
+![Density-dependence of ciliate per-capita growth rate in the different treatments.](figures/cilia_pcgr.pdf){#fig-cilia-pcgr width="4in"}
 
 ### Cyanobacteria
 
-![As @fig-cilia-pcgr but for the cyanobacteria system](figures/cyano/cyano_pcgr.pdf){#fig-cyano-pcgr width="4in"}
+![As @fig-cilia-pcgr but for the cyanobacteria system](figures/cyano_pcgr.pdf){#fig-cyano-pcgr width="4in"}
 
 ## Trait values and trait change
 
 ### Ciliate
 
-![Trait-dependence of ciliate trait change in the different treatments.](figures/cilia/cilia_dT.pdf){#fig-cilia-dT width="4in"}
+![Trait-dependence of ciliate trait change in the different treatments.](figures/cilia_dT.pdf){#fig-cilia-dT width="4in"}
 
 ### Cyanobacteria
 
-![As @fig-cilia-dT but the cyanobacteria system.](figures/cyano/cyano_dT.pdf){#fig-cyano-dT width="4in"}
+![As @fig-cilia-dT but the cyanobacteria system.](figures/cyano_dT.pdf){#fig-cyano-dT width="4in"}
 
 ## Fitted regression coefficients
 
 ### Ciliate
 
-![Fitted model parameters showing intrinsic population/trait change (left), density-dependence (centre), and trait dependence (right) in seven strains of ciliates. Large rows indicate whether growth or trait change is being examined and subrows indicate whether the coefficients are from the single-variable or augmented model. Points indicate the mean, error bars indicate the 95% confidence intervals, and asterisks indicate parameters are significantly different from zero (vertical black line).](figures/cilia/cilia_td_general.pdf){#fig-cilia-td-general width="4in"}
+![Fitted model parameters showing intrinsic population/trait change (left), density-dependence (centre), and trait dependence (right) in seven strains of ciliates. Large rows indicate whether growth or trait change is being examined and subrows indicate whether the coefficients are from the single-variable or augmented model. Points indicate the mean, error bars indicate the 95% confidence intervals, and asterisks indicate parameters are significantly different from zero (vertical black line).](figures/cilia_td_general.pdf){#fig-cilia-td-general width="4in"}
 
 ### Cyanobacteria
 
-![As @fig-cilia-td-general, but for four strains of the cyanobacteria genus *Synechococcus*.](figures/cyano/cyano_td_general.pdf){#fig-cyano-td-general width="4in"}
+![As @fig-cilia-td-general, but for four strains of the cyanobacteria genus *Synechococcus*.](figures/cyano_td_general.pdf){#fig-cyano-td-general width="4in"}
 
 ## Model goodness-of-fit
 

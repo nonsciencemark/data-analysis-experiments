@@ -1,5 +1,5 @@
 # load in the data and get plotting functions
-source("Tools and data.R")
+source("tools-and-data.R")
 
 library("qpcR") # for AIC comparison
 library("lmtest") # for Granger causality
@@ -69,7 +69,7 @@ for (model_system in c("cilia", "cyano")) {
             strip.placement.y = "outside",
             strip.background.y = element_rect(fill = NA, color = NA))
 
-    p <- tag_facet(p)
+    # p <- tag_facet(p)
 
     if (model_system == "cyano") {
         ggsave(paste0(outpath, "pop-traits-time.png"),

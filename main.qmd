@@ -22,7 +22,7 @@ format:
     # fontfamily: libertinus
     # fontfamilyoptions: sans
     toc: false
-    keep-tex: true
+    keep-tex: false
     colorlinks: false
     number-sections: false
     # output-file: manuscript.pdf
@@ -52,9 +52,7 @@ We found limited evidence to support general feedbacks between population and tr
 
 ## Materials and Methods {#sec-DAE_methods}
 
-### Experiments
-
-#### Study systems
+### Study systems
 
 We addressed these research questions using a number of unicellular, clonally-reproducing strains from two model systems: seven strains from four ciliate genera and four strains from two ecotypes of the picocyanobacteria genus *Synechococcus* [@Farrant2016; @Grebert2018; @Sohm2016]. The ciliate genera are globally-distributed freshwater mixotrophs and represent an important ecological link between primary producers and higher trophic levels [@Weisse2022; @Lu2021]. The *Synechococcus* genus makes up a substantial proportion of marine phytoplankton biomass and photosynthesis [@Dvorak2014]. Both study systems harbor considerable diversity, as the freshwater ciliates span several taxonomic orders and the polyphyetic *Synechoccocus* has a similar order-level diversity, while, however, being less well-defined phylogenetically due to the frequency of horizontal gene transfer events [@Salazar2020; @Dvorak2015; @Zhaxybayeva2006]. Both taxa are commonly-used as model organisms in experiments due to their rapid growth and relative simplicity. The *Synechococcus* strains were obtained from the Roscoff Culture Collection, while the ciliate strains were isolated from existing cultures in PETCHEY AND PENNEKAMP .
 
@@ -71,7 +69,7 @@ We grew the strains in monoculture for sufficient time for them to reach their c
 
 : Experimental design of the two model systems, showing how long the experiment lasted, how frequently they were sampled, the number of strains used, the temperature of the warming treatments in degrees Celsius, and the concentration of the pollutant (atrazine). All combinations of pollution and temperature were included in the experiment design. Treatments in bold indicate the reference conditions. {#tbl-treatment-table tbl-colwidths="\[0.2,0.2,0.2,0.2,0.2\]"}
 
-#### Experimental setup
+### Experimental setup
 
 For the ciliate system, the microcosms consisted of 250 mL square bottles with vented caps (DURAN®) containing 100 mL nutrient medium, inoculated with enough cells to initiate population growth. We obtained the required cell density by injecting a species-specific volume of 1-week old preculture into new medium (100 \textmu L, 5 mL, 10 mL, and 10 mL for *Tetrahymena thermophila*, *Loxocephalus* sp., *Paramecium caudatum* and *Spirostomum teres*, respectively). The microcosms were kept in an incubator with a 10:14h light/dark cycle. The nutrient medium consisted of Chalkey's solution supplemented with crushed protist pellets (Carolina biological supply; 0.55 $\mathrm{gL}^{-1}$), filtered through a 0.22 \textmu m filter system (BT50 500 mL) to remove all particulate matter and consecutively bacterized with *Bacillus brevis*, *Brevibacillus subtilis* and *Serratia fonticola*. Following bacterization, the medium was incubated for two days at 20°C on a shaker to allow the bacteria to grow before ciliates were added. During the experiment, we replaced 20% of the medium every third day by replacing 4 mL culture with 4 mL 5x concentrated unbacterized nutrient medium, supplemented with atrazine as needed.
 
@@ -79,7 +77,7 @@ For the cyanobacteria system, the microcosms consisted of 6 mL six-well plates (
 
 Growth media were adjusted to include the appropriate amount of atrazine and microcosms were kept at a constant temperature throughout. All sampling was undertaken in sterile environments to prevent contamination.
 
-#### Sampling procedure
+### Experimental sampling procedure
 
 Population densities and traits were measured using procedures specifically designed for each species: imaging for ciliates and flow cytometry for cyanobacteria.
 
