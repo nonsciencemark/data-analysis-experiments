@@ -38,15 +38,16 @@ data_cilia <- read_csv("data/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
     mutate(
         pca_data = list(dplyr::select(data, contains("mean"))),
         pca = list(prcomp(pca_data, center = TRUE, scale = TRUE)),
-        data = list(cbind(data, pca1 = pca$x[, 1])),
-        pca_varexp = (pca$sdev^2)[1] / sum(pca$sde^2)) %>%
+        data = list(cbind(data, pca1 = pca$x[, 1:2])),
+        pca_varexp = sum((pca$sdev^2)[1:2]) / sum(pca$sde^2)) %>%
     dplyr::select(strain, treat, data, pca_varexp) %>%
     unnest(data) %>%
     # epxand pca and compute dT and clean up stuff
-    rename(trait = pca1) %>%
+    rename(trait_1 = pca1.PC1, trait_2 = pca1.PC2) %>%
     group_by(strain, atrazine, temperature) %>%
-    mutate(dT = lead(trait, 1) - trait / (lead(Time_Days, 1) - Time_Days)) %>%
-    dplyr::filter(!is.na(dT), Temp > 20, Atrazine != 10) %>%
+    mutate(dT1 = lead(trait_1, 1) - trait_1 / (lead(Time_Days, 1) - Time_Days),
+        dT2 = lead(trait_2, 1) - trait_2 / (lead(Time_Days, 1) - Time_Days)) %>%
+    dplyr::filter(!is.na(dT1), Temp > 20, Atrazine != 10) %>%
     mutate(treat = case_when(
             (Atrazine == 0) & (Temp == 22) ~ "C",
             (Atrazine == 20) & (Temp == 22) ~ "A",
@@ -59,9 +60,9 @@ data_cilia <- read_csv("data/ciliates/DIVERCE_TdB_Ciliates_Traits_FULL.csv") %>%
                 "Loxo_1", "Loxo_2", "Para_4")))
 
 cilia_trait_levels <- c("mean_area", "mean_speed", "mean_ar",
-    "mean_linearity", "trait")
+    "mean_linearity", "trait_1", "trait_2")
 cilia_trait_labels <- c("Size", "Speed", "Aspect~ratio",
-    "Linearity", "Trait")
+    "Linearity", "Trait 1", "Trait 2")
 # strain_labels <- c("Spiro[1]", "Spiro[2]", "Tetra[1]", "Tetra[2]", "Loxo[1]", "Loxo[2]", "Para[4]")
 
 long_data_cilia <- data_cilia %>%
