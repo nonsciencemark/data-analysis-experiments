@@ -20,15 +20,15 @@ bibliography: bibliography_new.bib
 
 The ciliate strains were isolated from cultures used for past experiments.
 
-| **Name**    | **Strain**                    | **Isolation**         | **Publication**    |
+| **Name**    | **Strain**                    | **Origin**         |
 |---------|---------------------------|-------------------|----------------|
-| Tetra_1 | *Tetrahymena* TSC SD01546 | Pennsylvania, USA | @Pennekamp2014 |
-| Tetra_2 | *Tetrahymena* TSC SD01548 | Pennsylvania, USA | @Pennekamp2014 |
-| Loxo_1  | *Loxocephalus*            |                   |                |
-| Loxo_2  | *Loxocephalus*            |                   |                |
-| Para_4  | *Paramecium*              |                   |                |
-| Spiro_C | *Spirostomum*             |                   |                |
-| Spiro_D | *Spirostomum*             |                   |                |
+| Tetra_1 | *Tetrahymena* TSC SD01546 | American Type Center Collection |
+| Tetra_2 | *Tetrahymena* TSC SD01548 | American Type Center Collection |
+| Loxo_1  | *Loxocephalus*            | Carolina Biological Supplies |
+| Loxo_2  | *Loxocephalus*            | Carolina Biological Supplies |
+| Para_4  | *Paramecium*              | Carolina Biological Supplies |
+| Spiro_C | *Spirostomum*             |                   |
+| Spiro_D | *Spirostomum*             |                   | 
 
 The cyanobacteria strains were purchased from the Roscoff Culture Collection (<https://roscoff-culture-collection.org/>) and they are referred to throughout using their RCC Number.
 

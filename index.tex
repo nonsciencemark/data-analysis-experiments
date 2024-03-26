@@ -241,10 +241,10 @@ dependence of trait-growth relationships is recommended.
 Forecasting ecological change requires an understanding of population
 dynamics, the trajectory of population density through time. A prime
 predictor of a population's growth rate is its current density.
-Density-dependence of population growth is generally negative,
-stimulating growth at low density, and limiting it when density gets
-high, which effectively puts a cap on population size. Since the classic
-experiments by Gause (\citeproc{ref-Gause1934}{1934}) and Gill
+Density-dependence of population growth is typically negative,
+stimulating growth at low density, while limiting growth at higher
+density, which effectively puts a cap on population size. Since the
+classic experiments by Gause (\citeproc{ref-Gause1934}{1934}) and Gill
 (\citeproc{ref-Gill1972}{1972}), evidence of negative density-dependence
 is abundant across biological systems (\citeproc{ref-Sibly2005}{Sibly et
 al. 2005}). However, means of functional traits across individuals in a
@@ -300,12 +300,16 @@ feedback between population and trait dynamics is captured by the
 dependence of \(f\) on \(T\) and of \(g\) on \(N\). If either dependence
 is zero, feedback is lost.
 
-Environmental conditions can affect population growth and traits. For
-example, increases in temperature favour smaller cell size in plankton
+Environmental conditions can affect both population growth and
+functional traits. For example, in phytoplankton, moderate increases in
+temperature increase the growth rate (\citeproc{ref-Brown2004}{Brown et
+al. 2004}; \citeproc{ref-Gillooly2001}{Gillooly et al. 2001};
+\citeproc{ref-Kremer2017a}{Kremer, Thomas, and Litchman 2017}) while
+also favouring smaller cell size
 (\citeproc{ref-Fernandez-Gonzalez2021}{Fernández-González and Marañón
-2021}). Furthermore, interactions between growth and traits can be
-environment-dependent as well, as environmental factors such as
-temperature have been shown to modulate how traits affect growth
+2021}). Furthermore, interactions between growth and traits can also be
+environment-dependent, as environmental factors such as temperature have
+been shown to modulate how traits affect growth
 (\citeproc{ref-Brown2004}{Brown et al. 2004};
 \citeproc{ref-Gillooly2001}{Gillooly et al. 2001};
 \citeproc{ref-Kremer2017a}{Kremer, Thomas, and Litchman 2017}). One can
@@ -318,9 +322,10 @@ or pigmentation have a direct link to light and carbon fixation and
 therefore fitness and population growth (\citeproc{ref-Chin2023}{Chin et
 al. 2023}). In such systems, trait information may be essential to
 correctly predict population dynamics (\citeproc{ref-Stomp2004}{Stomp et
-al. 2004}). How the reciprocal effects (of density on traits) differ
-between systems is less intuitive, however, and will depend on the
-capacity and speed of the trait change.
+al. 2004}) and it is likely that larger changes to the environment will
+only increase the importance of trait information. How the reciprocal
+effects (of density on traits) differ between systems is less intuitive,
+however, and will depend on the capacity and speed of the trait change.
 
 Here, we investigate the reciprocal links between population and trait
 dynamics in two different microbial systems (ciliates and cyanobacteria)
@@ -369,7 +374,7 @@ phylogenetically due to the frequency of horizontal gene transfer events
 commonly-used as model organisms in experiments due to their rapid
 growth and relative simplicity. The \emph{Synechococcus} strains were
 obtained from the Roscoff Culture Collection, while the ciliate strains
-were isolated from existing cultures in PETCHEY AND PENNEKAMP .
+were isolated from existing cultures in ==PETCHEY AND PENNEKAMP==.
 
 The ciliate strains selected exhibit substantial diversity in their
 functional traits and demography - \emph{Spirostomum} is a large,
@@ -601,9 +606,14 @@ single-variable model, using the coefficient of determination
 \subsubsection{Observed vs predicted trait and population
 change}\label{observed-vs-predicted-trait-and-population-change}
 
-We first compare the observed changes in traits and population densities
-to the predicted changes using either the single-predictor model or the
-model augmented with both predictor variables
+Having fit simple models based on a single variable
+(Equation~\ref{eq-pcgr} and Equation~\ref{eq-dT}) as well as the models
+augmented using both predictors (Equation~\ref{eq-pcgrExtd} and
+Equation~\ref{eq-dTExtd}) on the experimental data
+(Figure~\ref{fig-cilia-pcgr} and Figure~\ref{fig-cyano-pcgr}), we first
+compare the observed changes in traits and population densities to the
+predicted changes using either the single-predictor model or the model
+augmented with both predictor variables
 (Figure~\ref{fig-growth-dtrait}).
 
 \begin{figure}
@@ -615,10 +625,10 @@ model augmented with both predictor variables
 }
 
 \caption{\label{fig-growth-dtrait}Observed (x-axis) and predicted
-(y-axis) population growth (left column) and trait change (left column),
-including either one (top row) or both predictors (bottom row), for
-various strains (point types) of ciliates (top) and cyanobacteria
-(bottom) and across environmental conditions (colours).}
+(y-axis) population growth (top row) and trait change (bottom row),
+including either one (left column) or both predictors (right column),
+for various strains (point types) of ciliates (left) and cyanobacteria
+(right) and across environmental conditions (colours).}
 
 \end{figure}%
 
@@ -1224,21 +1234,20 @@ experiments.
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 \textbf{Strain}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Isolation}
+\textbf{Origin}
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-\textbf{Publication}
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Tetra\_1 & \emph{Tetrahymena} TSC SD01546 & Pennsylvania, USA &
-Pennekamp et al. (\citeproc{ref-Pennekamp2014}{2014}) \\
-Tetra\_2 & \emph{Tetrahymena} TSC SD01548 & Pennsylvania, USA &
-Pennekamp et al. (\citeproc{ref-Pennekamp2014}{2014}) \\
-Loxo\_1 & \emph{Loxocephalus} & & \\
-Loxo\_2 & \emph{Loxocephalus} & & \\
-Para\_4 & \emph{Paramecium} & & \\
+Tetra\_1 & \emph{Tetrahymena} TSC SD01546 & American Type Center
+Collection & \\
+Tetra\_2 & \emph{Tetrahymena} TSC SD01548 & American Type Center
+Collection & \\
+Loxo\_1 & \emph{Loxocephalus} & Carolina Biological Supplies & \\
+Loxo\_2 & \emph{Loxocephalus} & Carolina Biological Supplies & \\
+Para\_4 & \emph{Paramecium} & Carolina Biological Supplies & \\
 Spiro\_C & \emph{Spirostomum} & & \\
 Spiro\_D & \emph{Spirostomum} & & \\
 \end{longtable}
