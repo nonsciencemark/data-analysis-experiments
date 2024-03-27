@@ -14,11 +14,12 @@ crossref:
 format:
   pdf:
     documentclass: scrartcl
+    output-file: "article.pdf"
     include-in-header: preamble.tex
     toc: false
     keep-tex: true
     colorlinks: false
-    number-sections: false
+    number-sections: true
 ---
 
 {{< include main.qmd >}}
